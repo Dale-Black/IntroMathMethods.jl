@@ -1,8 +1,8 @@
-using intro_math_methods
+using IntroMathMethods
 using Test
 using Symbolics
 
-@testset "intro-math-methods.jl" begin
+@testset "IntroMathMethods.jl" begin
     @variables x
     @testset "Taylor Series" begin
         sym_exp = taylor_series_exp(x, 10)

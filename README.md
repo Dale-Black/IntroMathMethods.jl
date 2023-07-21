@@ -1,6 +1,6 @@
-# intro-math-methods
+# IntroMathMethods
 
-[![Build Status](https://github.com/Dale-Black/intro-math-methods.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Dale-Black/intro-math-methods.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/Dale-Black/IntroMathMethods.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Dale-Black/IntroMathMethods.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 Contains a collection of Pluto notebooks for the course [PHYSICS 208. Math Methods](https://catalogue.uci.edu/allcourses/physics/) at UCI. This is meant to be a refresher course on basic math concepts for the graduate physics program.
 

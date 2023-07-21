@@ -1,4 +1,4 @@
-module intro_math_methods
+module IntroMathMethods
 
 using Symbolics
 
