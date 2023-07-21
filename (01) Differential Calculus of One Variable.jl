@@ -20,6 +20,9 @@ using PlutoUI, Symbolics, CairoMakie
 # ╔═╡ 1bb4b0c9-5d04-4e62-807c-9f455ef49c89
 using Symbolics: derivative, solve_for
 
+# ╔═╡ d64bd4c1-95ec-4551-8e0a-e9394af342ef
+using Latexify
+
 # ╔═╡ 25877aa4-8c2a-4112-be89-8a707f367019
 TableOfContents()
 
@@ -32,7 +35,7 @@ md"""
 md"""
 I am entering my first year of graduate studies at the University of California, Irvine and as a big fan of Julia, I am going to attempt to use it everywhere I can. This course is not meant to be a computational mathematics course, but I feel like it's the perfect onramp for someone like me to get a grasp of the Symbolics ecosystem in Julia. I might abandon this idea (depending on time constraints and the maturity of the Symbolics ecosystem for this use case) but for now my plan is to solve all my homework in Pluto notebooks with Markdown/Latex (by hand) and Symbolics (computationally).
 
-I am going to attempt to write this notebooks in a way that could serve as a blog post if I want. There are a few reasons for that - (1) one of the toughest parts about using Julia is usually the lack of documentation so maybe one day these could be cleaned up and used for Symbolics.jl docs, (2) Julia makes math much more fun and trying to implement mathematical concepts in code helps me understand these concepts at a deeper level, (3) writing this in blog format (and potentially publishing on something like substack/medium) will force me to not only implement these concepts for homework problems but also understand them deeply enough to explain them to others, and (4) our new product [Glass Notebook](https://glassnotebook.io) is a fun way to publish interactive Pluto notebooks on the web and I want to use this service as much as possible (of course, since me and Connor Burns built it)
+I am going to attempt to write this notebooks in a way that could serve as a blog post if I want. There are a few reasons for that - (1) one of the toughest parts about using Julia is usually the lack of documentation so maybe one day these could be cleaned up and used as a supplement to the Symbolics.jl docs, (2) Julia makes math much more fun and trying to implement mathematical concepts in code helps me understand these concepts at a deeper level, (3) writing this in blog format (and potentially publishing on something like substack/medium) will force me to not only implement these concepts for homework problems but also understand them deeply enough to explain them to others, and (4) our new product [Glass Notebook](https://glassnotebook.io) is a fun way to publish interactive Pluto notebooks on the web and I want to use this service as much as possible (of course, since me and Connor Burns built it)
 """
 
 # ╔═╡ 495c8000-00f8-475a-8a34-6ea621ffd3c3
@@ -121,7 +124,7 @@ u = x^2 + 1
 f = u^2
 
 # ╔═╡ 12836574-d754-424a-b6da-c14e02efbfac
-dfdx = derivative(f, x)
+derivative(f, x)
 
 # ╔═╡ 10d67f07-47b1-448f-8224-e18f01861a7c
 md"""
@@ -196,10 +199,10 @@ Let's check our answer using Symbolics. This will be a trend as you will see.
 """
 
 # ╔═╡ 4293024b-c33e-467b-8e21-416556eb4582
-f2 = 1/x
-
-# ╔═╡ 0e502f76-92c5-47ec-b741-577f00f94fd9
-derivative(f2, x)
+let
+	f = 1/x
+	derivative(f, x)
+end
 
 # ╔═╡ dcc46222-aa33-4646-a197-105528781dca
 md"""
@@ -275,7 +278,7 @@ md"""
 
 # ╔═╡ 47f116d2-3ad6-482a-9a13-412d2de5ad36
 md"""
-### With Symbolics
+#### With Symbolics
 """
 
 # ╔═╡ c3fc7c93-1a2f-4314-a994-0eed2bb414e1
@@ -317,59 +320,173 @@ end
 
 # ╔═╡ b7a1d81e-c1a7-42f0-a04c-7988cc378a06
 md"""
-Let's check that `taylor_series_exp` works like we expect
+Let's check that `taylor_series_exp` works like we expect. First we will show the symbolic computation, then we will `substitute` a number into our symbolic expression to get a numeric result that we can compare with the built in `Base.exp()`
 """
 
 # ╔═╡ d63ffafe-b823-4c23-9d60-7b9cade415c1
-sym_exp = taylor_series_exp(x, 3)
+let
+	sym_exp = taylor_series_exp(x, 4)
+	num_exp = Float64(substitute(sym_exp, x => 1).val)
+	@info num_exp, exp(1)
+	@info isapprox(exp(1), num_exp; atol = 1e-2)
+end
 
-# ╔═╡ 1b9f261e-04b5-4134-a3ff-ad6d0ccfa845
-sym_exp_1 = substitute(sym_exp, x => 1)
-
-# ╔═╡ aba99245-8f84-435c-aa23-dcb14f30c68c
-Float64(sym_exp_1.val)
-
-# ╔═╡ c8e3b1fa-86ef-4825-a966-153d0de1112c
-exp(1)
+# ╔═╡ c4469c5c-d23d-484d-9a8d-da41690555ab
+md"""
+Great, now we can set up the `cosh` and `sinh` Taylor seriex expansions with Symbolics.jl, using the Taylor series expansions for ``e`` that we defined right above
+"""
 
 # ╔═╡ bee68160-5c02-45e0-a61d-bfb0b3c21140
-function sinh_taylor(x, n::Int)
-    return (exp_taylor(x, n) - exp_taylor(-x, n)) / 2
+function taylor_series_sinh(x::Num, n::Int)
+    return (taylor_series_exp(x, n) - taylor_series_exp(-x, n)) / 2
 end
 
 # ╔═╡ 60566da3-93f7-4d83-9c30-1c2a21ea844b
-function cosh_taylor(x, n::Int)
-    return (exp_taylor(x, n) + exp_taylor(-x, n)) / 2
+function taylor_series_cosh(x::Num, n::Int)
+    return (taylor_series_exp(x, n) + taylor_series_exp(-x, n)) / 2
 end
 
+# ╔═╡ f984855b-b2af-4ecf-adef-9bca9a0d95ee
+md"""
+Taking these expansions to the 5th term, gives us the exact results as our "by hand" approach. The only difference in some ordering of the terms and the factorials ``!`` have been computed
+"""
+
 # ╔═╡ 52a0dae1-e85e-426b-a995-19e2a50a6612
-sinh_taylor(x, 5)
+taylor_series_sinh(x, 5)
 
 # ╔═╡ eb3dcddb-c1b5-406b-8829-47cf0d991a4b
-cosh_taylor(x, 5)
+taylor_series_cosh(x, 5)
+
+# ╔═╡ 60c8878c-2740-4ba4-86d0-6d555222bb0f
+md"""
+## Plotting functions
+"""
+
+# ╔═╡ 44b251b8-5e6d-4ee4-a189-83c455f65a0e
+md"""
+This sections explains the basics of plotting functions by hand. Instead of going through that, I think it would be insightful to show how a Taylor series approximation of ``e^x`` improves with increasing `n` terms. This will showcase the power of Pluto.jl, Makie.jl, Symbolics.jl, and even [Glass Notebook](https://glassnotebook.io/)
+"""
+
+# ╔═╡ 9a2d9e3b-e012-4353-8f05-49b8f83bb6cb
+@bind n_term PlutoUI.Slider(1:5; show_value = true)
+
+# ╔═╡ 68e0a7f2-d913-402e-bab2-6da3e434f1af
+begin
+	xs = collect(-1:0.1:1)
+	ys = exp.(xs)
+	taylor_series_ys = Float64.([substitute(taylor_series_exp(x, n_term), x => i).val for i in xs])
+end
+
+# ╔═╡ 5961146a-c5f6-463a-82d5-6c8eb0b970ae
+let
+	f = Figure()
+	ax = Axis(f[1, 1])
+	
+	scatterlines!(xs, ys; label = L"e^x")
+	scatterlines!(xs, taylor_series_ys; label = L"\text{Taylor series expansion of e^x to the n^{th} term}")
+	xlims!(low = -1, high = 1)
+	ylims!(low = 0, high = 3)
+	axislegend(ax; position = :rb)
+	
+	f
+end
+
+# ╔═╡ 45f1f1e4-a853-4ae0-a7e2-d293d036509d
+md"""
+We can see from above, as we increase the amount of terms ``n`` in the expansion by moving the `Slider`, the Taylor series approximation approaches the ground truth ``e^x``
+"""
+
+# ╔═╡ ba25de9b-a0aa-4350-879d-96acaf046d68
+md"""
+## Miscellaneous Problems on Differential Calculus
+"""
 
 # ╔═╡ c1f5c48e-9aaf-46ae-96c3-c1a2837b251c
 md"""
-### Problem 1.6.1
-
-Given:
-
-- Expand the function ``f(x) = \sin(x) / (\cosh(x) + 2)`` in a Taylor series around the origin going up to ``x^3``. Calculate ``f(0.1)`` from this series and compare to the exact answer obtained from a calculator
+!!! info "Problem 1.6.1"
+	
+	Expand the function ``f(x) = \sin(x) / (\cosh(x) + 2)`` in a Taylor series around the origin going up to ``x^3``. Calculate ``f(0.1)`` from this series and compare to the exact answer obtained from a calculator
 """
 
-# ╔═╡ 60985af7-d99a-426f-9ca6-6bc5e41f38ca
+# ╔═╡ abd50323-9f71-4d12-bc08-f82d3e2f7f98
 md"""
-``f_{ts} = f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x^2) + \frac{f'''(0)}{3!}(x^3)``
+!!! warning "By Hand"
+
+	Given the Taylor series expansion
+	```math
+	\begin{align*}
+	f(x) &= f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x^2) + \frac{f'''(0)}{3!}(x^3)
+	\end{align*}
+	```
+
+	We can find the first three derivatives and plug them in. (*This would take forever to do by hand, so I just used Symbolics.jl and Latexify.jl and copy-pasted these in, see below*)
+	```math
+	\begin{align*}
+	f'(x) &= \frac{\cos\left( x \right)}{2 + \cosh\left( x \right)} - \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right) \\
+
+	f''(x) &= \frac{ - \sin\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cosh\left( x \right) \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
+	&- \left( \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
+	&- \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right)\\
+
+	f'''(x) &= \frac{ - \cos\left( x \right) \cosh\left( x \right) - \sin\left( x \right) \sinh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\
+	&+ \left( \frac{ - \cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} + 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \cosh\left( x \right) \\ 
+	&+ \frac{ - \cos\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cos\left( x \right) \cosh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
+	&- \left( \frac{ - \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \left( 2 + \cosh\left( x \right) \right) \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
+	&+ \ ...
+	\end{align*}
+	```
+
+	Evaluating these at ``x = 0`` gives:
+	```math
+	\begin{align*}
+	f(0) &= 0 \\
+	f'(0) &= \frac{1}{3} \\
+	f''(0) &= 0 \\
+	f'''(0) &= -\frac{2}{3} \\
+	\end{align*}
+	```
+
+	The Taylor series expansion of ``f(x)`` around ``x = 0`` up to ``x^3`` is then:
+	```math
+	\begin{align*}
+	f(x) &= \frac{1}{3}x - \frac{2}{3}x^3 \\
+	f(0.1) &= 0.032667
+	\end{align*}
+	```
 """
 
-# ╔═╡ d47aac9b-cb54-4cb6-bec5-ffafa737daf0
-# ╠═╡ disabled = true
-#=╠═╡
-f = sin(x) / (cosh(x) + 2)
-  ╠═╡ =#
+# ╔═╡ 0ce25fd4-79c7-4081-9a30-62ecdf2de9a3
+md"""
+Too lazy to calculate these derivatives truly by hand, so this is a workaround
+"""
 
-# ╔═╡ 2b3e3bb0-3073-453c-ac58-8d665bd940f8
-Dx = Differential(x)
+# ╔═╡ 1b916de7-1336-45e1-bf3d-e6fbf48b9f8f
+let
+	Dx = Differential(x)
+	Dxx, Dxxx = Dx^2, Dx^3
+	f = sin(x) / (cosh(x) + 2)
+	
+	@info substitute(f, x => 0)
+	@info substitute(expand_derivatives(Dx(f)), x => 0)
+	@info substitute(expand_derivatives(Dxx(f)), x => 0)
+	@info substitute(expand_derivatives(Dxxx(f)), x => 0)
+	
+	
+	
+	println(latexify(expand_derivatives(Dx(f))))
+	println(latexify(expand_derivatives(Dxx(f))))
+	println(latexify(expand_derivatives(Dxxx(f))))
+end
+
+# ╔═╡ 9114d095-1c90-4af3-b1c8-ee0e4b837e44
+md"""
+#### With Symbolics
+"""
+
+# ╔═╡ 3c76acbf-6aa1-456c-a633-7dff4164f325
+md"""
+This is a great example of where a computer and Symbolics.jl comes in handy. Taking all those derivatives by hand was tedius. Let's see how Symbolics.jl can solve this. First let's create a function for the Taylor series about the origin
+"""
 
 # ╔═╡ 7337e22a-8e57-4dd5-ad59-5d7f2dc34beb
 """
@@ -393,178 +510,149 @@ taylor_series(f, x, 5)
 ```
 """
 function taylor_series(f, x, n::Int)
+	Dx = Differential(x)
+	
     f_ts = substitute(f, x => 0)
     for i in 1:n
 		Dxi = Dx^i
-        df = Dxi(f)
-		df_0 = substitute(expand_derivatives(df), x => 0)
+		df = expand_derivatives(Dxi(f))
+		df_0 = substitute(df, x => 0)
         f_ts += (df_0 * x^i) / factorial(i)
     end
     return f_ts
 end
 
-# ╔═╡ f038228c-c172-42d3-83e5-8ab354cb7d19
-@bind n PlutoUI.Slider(1:2:7; default = 3, show_value = true)
+# ╔═╡ c913a4c3-1e64-45ae-95e1-e908b6fe2364
+let
+	f = sin(x) / (cosh(x) + 2)
+	f_ts = taylor_series(f, x, 3)
 
-# ╔═╡ fbb4a060-5068-492b-a0bd-0d7916cf8499
-f_ts = taylor_series(f, x, n)
+	@info "Original: " f
+	@info "Taylor Series Expansion: " f_ts
+	@info isapprox(substitute(f, x => 0.1), substitute(f_ts, x => 0.1); atol = 1e-3)
+end
 
-# ╔═╡ 62134ccb-7bcc-4cfc-867d-7fb21ea5a76b
-ans_ts = substitute(f_ts, x => 0.1)
-
-# ╔═╡ a401a563-e7e4-4722-96b1-6c366c98eb55
-ans = substitute(f, x => 0.1)
-
-# ╔═╡ 8d73c648-6815-4bdd-a91f-027266f1b0b4
-Symbolics.value(ans_ts), Symbolics.value(ans)
-
-# ╔═╡ 5b80f365-5e7d-44c2-b673-3d4ceb30eb4e
-isapprox(Symbolics.value(ans_ts), Symbolics.value(ans))
+# ╔═╡ 7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
+md"""
+We see below that the taylor series expansion of the function `f3` is approximately equal to the true function at ``f(0.1)``
+"""
 
 # ╔═╡ 868ac754-fe57-4552-8eab-d9213fa66123
 md"""
-### Problem 1.6.7
-Given:
-- A wire of length ``L`` is used to fence a rectangular piece of land. For a rectangle of general aspect ratio compute the area of the rectangle. Use the rule for finding the maximum of a function to find the shape that gives the largest area. Find this area. 
+!!! info "Problem 1.6.7"
+	A wire of length ``L`` is used to fence a rectangular piece of land. For a rectangle of general aspect ratio compute the area of the rectangle. Use the rule for finding the maximum of a function to find the shape that gives the largest area. Find this area. 
+"""
+
+# ╔═╡ 76660d53-7a5b-4d1c-a025-aa6642d59853
+md"""
+!!! warning "By Hand"
+
+	Let's denote the length and width of the rectangle as ``x`` and ``y`` respectively. Given that the perimeter of the rectangle is ``L``, we have:
+
+	```math
+	\begin{align*}
+	2x + 2y &= L \\
+	y &= \frac{L - 2x}{2}
+	\end{align*}
+	```
+
+	Area
+	```math
+	\begin{align*}
+	A(x) = x \cdot \frac{L - 2x}{2}
+	\end{align*}
+	```
+
+	Maximum area
+	```math
+	\begin{align*}
+	A'(x) & = 0 \\
+	A'(x) &= \frac{L}{2} - 2x\\
+	x &= \boxed{\frac{L}{4}} \\ \\
+
+	y &= \frac{L - 2x}{2} \\
+	y &= \frac{L - 2(\frac{L}{4})}{2} \\
+	y &= \boxed{\frac{L}{4}}
+	\end{align*}
+	```
+
+	```math
+	\begin{align*}
+
+	\end{align*}
+	```
 """
 
 # ╔═╡ 5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
 md"""
-#### Without Lagrangian
+#### With Symbolics
 """
 
-# ╔═╡ aea7c643-84ce-4071-9eed-8e4f4749810c
-@variables y L
-
-# ╔═╡ e97d8869-9ad1-4dfd-b573-2db12d75818d
-Dy = Differential(y)
-
-# ╔═╡ 5be5f317-762d-4293-a339-28d4d0104a9e
+# ╔═╡ d0734ab0-241f-4dbf-ab11-c18b4a886ee0
 let
+	@variables y L
 	perimeter = L ~ 2y + 2x
-	area = x*y
-	
 	y0 = solve_for(perimeter, y)
-	area = x*(y0)
-	Dxa = expand_derivatives(Dx(area))
-	solve_for(Dxa ~ 0, x)
-end
-
-# ╔═╡ 4846b8af-9153-40f7-8e78-680aa6d8b5a5
-md"""
-#### With Lagrange Multipliers and the Lagrangian Method
-The Lagrangian method is used to find the maximum or minimum value of a function $f(x,y)$ subject to a constraint $g(x,y) = k$.
-
-```math
-\begin{align*}
-&\text{Objective function: } f(x,y) \\
-&\text{Constraint equation: } g(x,y) = k
-\end{align*}
-```
-
-To set up the Lagrangian, we introduce a new variable $\lambda$ called the Lagrange multiplier:
-
-```math
-\begin{align*}
-L(x,y,\lambda) = f(x,y) - \lambda(g(x,y) - k)
-\end{align*}
-```
-
-We then find the critical points by taking the partial derivatives and setting them equal to zero:
-
-```math
-\begin{align*}
-\frac{\partial L}{\partial x} = 0\\
-\frac{\partial L}{\partial y} = 0\\
-\frac{\partial L}{\partial \lambda} = 0
-\end{align*}
-```
-
-Solving this system of equations gives us candidate critical points $x, y, \lambda$ that maximize/minimize $f(x,y)$ while satisfying the constraint $g(x,y)=k$.
-
-The Lagrangian method converts a constrained optimization problem into an unconstrained system of equations. The $\lambda$ variable accounts for the constraint while finding critical points.
-
-Some key points:
-- Used when constraints are present
-- Introduces $\lambda$ to encode constraints
-- Take derivatives and solve as system of equations
-- Critical points give maximum/minimum of $f(x,y)$
-
-```julia
-using Symbolics
-
-@variables x y λ k
-
-f = ... # objective function
-g = ... # constraint equation
-
-L = f - λ*(g - k) # Lagrangian
-
-dldx = expand_derivatives(Dx(L))
-dldy = expand_derivatives(Dy(L))
-dldλ = expand_derivatives(Dλ(L))
-
-sys = [dldx ~ 0, dldy ~ 0, dldλ ~ 0]
-x0, y0, _ = solve_for(sys, [x, y, λ])
-```
-"""
-
-# ╔═╡ c06988f4-d317-42ee-8abd-fb3d575cae62
-@variables λ 
-
-# ╔═╡ a6a94bba-ddf3-4381-9918-31a4daa601c2
-Dλ = Differential(λ)
-
-# ╔═╡ a5c3aa93-fadb-456d-9588-e32702300a9a
-let
-	f = x*y # Define the function to be maximized (the area of the rectangle)
-	g = 2x + 2y - L # Define the constraint (the length of the fence)
-	Lagrangian = f - λ*g
-
-	dldx = expand_derivatives(Dx(Lagrangian))
-	dldy = expand_derivatives(Dy(Lagrangian))
-	dldλ = expand_derivatives(Dλ(Lagrangian))
-
-	sys = [dldx ~ 0, dldy ~ 0, dldλ ~ 0]
-	x0, y0, _ = solve_for(sys, [x, y, λ])
-	x0, y0
+	area = x*(y0)	
+	dxda = derivative(area, x)
+	x_ = solve_for(dxda ~ 0, x)
+	y_ = substitute(y0, x => x_)
+	@info x_, y_
 end
 
 # ╔═╡ 776c3c03-bbff-4705-b7c4-29002b25c840
 md"""
-### Problem 1.6.12
-Given:
-- Find the slope at the point (2, 3) on the ellipse ``3x^2 + 4y^2 = 48`` using implicit differentiation
-
-Answer:
-```math
-\begin{align*}
-3x^2 + 4y^2 &= 48 \\
-\frac{d}{dx}(3x^2 + 4y^2) &= \frac{d}{dx}(48) \\
-6x + 8 \frac{dy}{dx}(y) &= 0 \\
-\frac{dy}{dx} &= \frac{-6x}{8y} \\
-\frac{dy}{dx} &= \boxed{\frac{-9}{8}}
-\end{align*}
-```
+!!! info "Problem 1.6.12"
+	Find the slope at the point (2, 3) on the ellipse ``3x^2 + 4y^2 = 48`` using implicit differentiation
 """
 
-# ╔═╡ c918824e-f881-4201-9503-2d3044b7ad5d
-let
-	@variables y(x)
-	f = 3x^2 + 4y^2 ~ 48
-	deq = expand_derivatives(Dx(f.lhs)) ~ expand_derivatives(Dx(f.rhs))
+# ╔═╡ 81bd62e2-3adf-4449-a86a-2cbfb4cb33ad
+md"""
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	3x^2 + 4y^2 &= 48 \\
+	\frac{d}{dx}(3x^2 + 4y^2) &= \frac{d}{dx}(48) \\
+	6x + 8 \frac{dy}{dx}(y) &= 0 \\
+	\frac{dy}{dx} &= \frac{-6x}{8y} \\
+	\frac{dy}{dx} &= \boxed{\frac{-9}{8}}
+	\end{align*}
+	```
+"""
 
-	@variables _dydx
-	subbed = substitute(deq, Dict([Dx(y) => _dydx]))
-	dydx =Symbolics.solve_for(subbed, _dydx)
-	substitute(dydx, Dict(x => 3, y => 2))
+# ╔═╡ 502ff296-6868-4fe3-b894-2458c98c88e8
+md"""
+#### With Symbolics
+
+It seems like implicit differentiation is tricky to implement with Symbolics. We will therefore make this work in a kind of clunky way
+"""
+
+# ╔═╡ 9b51ea4f-b0a0-465d-8b7c-206c2ae500ab
+function implicit_derivative(f, x, y, dy)
+	deq = derivative(f.lhs, x) ~ derivative(f.rhs, x)
+	subbed = substitute(deq, derivative(y, x) => dy)
+end
+
+# ╔═╡ 8aea098e-7320-46f6-a7af-5ab44411de51
+let
+	@variables y(x) ∂y∂x
+	
+	f = 3x^2 + 4y^2 ~ 48
+	@info f
+	
+	df = implicit_derivative(f, x, y, ∂y∂x)
+	@info df
+	
+	
+	ans = solve_for(df, ∂y∂x)
+	@info ans
 end
 
 # ╔═╡ 06b0725a-9950-45b1-b04e-c723dfa0d3e8
 md"""
-## Summary
+# Summary
 
-There were many ideas discussed in this chapter of the book, and although this notebook doesn't touch on all of them, the book does a nice job at summarizing the most important concepts, which I included below
+There were many ideas discussed in this chapter of the book, and although this notebook doesn't touch on all of them, the book does a nice job at summarizing the most important concepts, which I included below. I am looking forward to learning about Symbolics.jl through this exercise and playing around with different ways of formatting these Pluto.jl notebooks and tutorials. 
 
 ---
 Definition of the deriative
@@ -685,11 +773,13 @@ which defines ``df`` in terms of the derivative at the point ``x`` and that as `
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 CairoMakie = "~0.10.6"
+Latexify = "~0.16.1"
 PlutoUI = "~0.7.52"
 Symbolics = "~5.5.0"
 """
@@ -700,7 +790,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "8ff3b9012d1fa6516e05780bec29bf6500fe17ab"
+project_hash = "cfdbea4baf30edade69d26323196b64686fd589d"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e58c18d2312749847a74f5be80bb0fa53da102bd"
@@ -2359,7 +2449,6 @@ version = "3.5.0+0"
 # ╟─f4ba19f8-ed4c-48be-ab42-a6cae6824444
 # ╟─046531f7-0c18-417d-a5b2-119cdcd7420e
 # ╠═4293024b-c33e-467b-8e21-416556eb4582
-# ╠═0e502f76-92c5-47ec-b741-577f00f94fd9
 # ╟─dcc46222-aa33-4646-a197-105528781dca
 # ╟─869a1b00-6ccb-472a-b517-cf68c1967735
 # ╟─33522b04-66c9-41e0-b35a-48344ee2f5bd
@@ -2369,35 +2458,38 @@ version = "3.5.0+0"
 # ╠═38ec9be3-b90a-45d6-b7cb-f506b10e8b12
 # ╟─b7a1d81e-c1a7-42f0-a04c-7988cc378a06
 # ╠═d63ffafe-b823-4c23-9d60-7b9cade415c1
-# ╠═1b9f261e-04b5-4134-a3ff-ad6d0ccfa845
-# ╠═aba99245-8f84-435c-aa23-dcb14f30c68c
-# ╠═c8e3b1fa-86ef-4825-a966-153d0de1112c
+# ╟─c4469c5c-d23d-484d-9a8d-da41690555ab
 # ╠═bee68160-5c02-45e0-a61d-bfb0b3c21140
 # ╠═60566da3-93f7-4d83-9c30-1c2a21ea844b
+# ╟─f984855b-b2af-4ecf-adef-9bca9a0d95ee
 # ╠═52a0dae1-e85e-426b-a995-19e2a50a6612
 # ╠═eb3dcddb-c1b5-406b-8829-47cf0d991a4b
+# ╟─60c8878c-2740-4ba4-86d0-6d555222bb0f
+# ╟─44b251b8-5e6d-4ee4-a189-83c455f65a0e
+# ╠═68e0a7f2-d913-402e-bab2-6da3e434f1af
+# ╟─9a2d9e3b-e012-4353-8f05-49b8f83bb6cb
+# ╟─5961146a-c5f6-463a-82d5-6c8eb0b970ae
+# ╟─45f1f1e4-a853-4ae0-a7e2-d293d036509d
+# ╟─ba25de9b-a0aa-4350-879d-96acaf046d68
 # ╟─c1f5c48e-9aaf-46ae-96c3-c1a2837b251c
-# ╟─60985af7-d99a-426f-9ca6-6bc5e41f38ca
-# ╠═d47aac9b-cb54-4cb6-bec5-ffafa737daf0
-# ╠═2b3e3bb0-3073-453c-ac58-8d665bd940f8
+# ╟─abd50323-9f71-4d12-bc08-f82d3e2f7f98
+# ╟─0ce25fd4-79c7-4081-9a30-62ecdf2de9a3
+# ╠═d64bd4c1-95ec-4551-8e0a-e9394af342ef
+# ╠═1b916de7-1336-45e1-bf3d-e6fbf48b9f8f
+# ╟─9114d095-1c90-4af3-b1c8-ee0e4b837e44
+# ╟─3c76acbf-6aa1-456c-a633-7dff4164f325
 # ╠═7337e22a-8e57-4dd5-ad59-5d7f2dc34beb
-# ╟─f038228c-c172-42d3-83e5-8ab354cb7d19
-# ╠═fbb4a060-5068-492b-a0bd-0d7916cf8499
-# ╠═62134ccb-7bcc-4cfc-867d-7fb21ea5a76b
-# ╠═a401a563-e7e4-4722-96b1-6c366c98eb55
-# ╠═8d73c648-6815-4bdd-a91f-027266f1b0b4
-# ╠═5b80f365-5e7d-44c2-b673-3d4ceb30eb4e
+# ╠═c913a4c3-1e64-45ae-95e1-e908b6fe2364
+# ╟─7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
 # ╟─868ac754-fe57-4552-8eab-d9213fa66123
+# ╟─76660d53-7a5b-4d1c-a025-aa6642d59853
 # ╟─5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
-# ╠═aea7c643-84ce-4071-9eed-8e4f4749810c
-# ╠═e97d8869-9ad1-4dfd-b573-2db12d75818d
-# ╠═5be5f317-762d-4293-a339-28d4d0104a9e
-# ╟─4846b8af-9153-40f7-8e78-680aa6d8b5a5
-# ╠═c06988f4-d317-42ee-8abd-fb3d575cae62
-# ╠═a6a94bba-ddf3-4381-9918-31a4daa601c2
-# ╠═a5c3aa93-fadb-456d-9588-e32702300a9a
+# ╠═d0734ab0-241f-4dbf-ab11-c18b4a886ee0
 # ╟─776c3c03-bbff-4705-b7c4-29002b25c840
-# ╠═c918824e-f881-4201-9503-2d3044b7ad5d
+# ╟─81bd62e2-3adf-4449-a86a-2cbfb4cb33ad
+# ╟─502ff296-6868-4fe3-b894-2458c98c88e8
+# ╠═9b51ea4f-b0a0-465d-8b7c-206c2ae500ab
+# ╠═8aea098e-7320-46f6-a7af-5ab44411de51
 # ╟─06b0725a-9950-45b1-b04e-c723dfa0d3e8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
