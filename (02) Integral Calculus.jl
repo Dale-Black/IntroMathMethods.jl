@@ -37,200 +37,357 @@ md"""
 # Integral Calculus
 
 **Homework Problems**
-- ✅ 2.1.3
-- ✅ 2.2.1
-- ✅ 2.2.8
-- ✅ 2.2.9
+- 2.1.3
+- 2.2.1
+- 2.2.8
+- 2.2.9
+"""
+
+# ╔═╡ 39230cd8-3e7e-4a29-9d16-6c4668791647
+md"""
+## Basics of Integration
+"""
+
+# ╔═╡ af47fdf3-5190-4f5c-bd58-ef0f491eade9
+md"""
+The reverse problem of differention (the rate of change of something) is called integration. 
+
+```math
+\begin{align*}
+F(x) = F(x_0) + \int_{x_0}^{x} f(x) dx
+\end{align*}
+```
+
+Where ``f(x)`` is the rate of change of ``x``.
+
+Weirdly enough, many problems involving analytical integration solutions are solved by informed guessing and checking. This has been going on for centuries and there are very robust integration tables, which contain solutions to common types of integrals. Often our problems can be broken up to resemble these common types and then solved via a lookup table. These properties/rules are essential in transforming integrals into more approachable forms
+
+1. Linearity property
+
+```math
+\begin{align*}
+\int (af + bg)dx = \int(af)dx + \int(bg)dx
+\end{align*}
+```
+
+2. Composition rule
+```math
+\begin{align*}
+\int_a^b f(x) dx = \int_a^c f(x) dx + \int_c^b f(x) dx
+\end{align*}
+```
+
+3. Integration by parts
+```math
+\begin{align*}
+\int_{x_1}^{x^2} F g dx = FG|_{x_1}^{x_2} - \int_{x_1}^{x_2} G f dx
+\end{align*}
+```
+
+- Note, I learned this using ``u`` and ``v``, which gave the silly (but useful) mnemonic "**u**ltra**v**iolet **v**oo**du**"
+```math
+\begin{align*}
+\int udv = uv - \int vdu
+\end{align*}
+```
+
 """
 
 # ╔═╡ 0d949853-bf76-45ba-8fb6-3870d78ffc5e
 md"""
-## Problem 2.1.3
+!!! info "Problem 2.1.3"
 
-Given the function:
-```math
-\begin{align*}
-F(n) = \int_0^{\infty} x^n e^{-x}dx
-\end{align*}
-```
-
-Show using integration by parts:
-```math
-\begin{align*}
-F(n) &= nF(n-1) \\
-F(n) &= n!
-\end{align*}
-```
+	Given the function:
+	```math
+	\begin{align*}
+	F(n) = \int_0^{\infty} x^n e^{-x}dx
+	\end{align*}
+	```
+	
+	Show using integration by parts:
+	```math
+	\begin{align*}
+	F(n) &= nF(n-1) \\
+	F(n) &= n!
+	\end{align*}
+	```
 
 """
 
+# ╔═╡ e135e6d4-09e6-40bb-bfb1-42655129b130
+md"""
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	F(n) = \int_0^{\infty} x^n e^{-x}dx
+	\end{align*}
+	```
+	---
+
+	```math
+	\begin{align*}
+	\int udv &= uv - \int vdu \\
+	&= \left[ -x^n e^{-x} \right]_0^\infty + \int_0^{\infty} n x^{n-1} e^{-x} dx \\
+	&= n \int_0^{\infty} x^{n-1} e^{-x} dx \\
+	&= \boxed{nF(n-1)}
+	\end{align*}
+	```
+	---
+
+	```math
+	\begin{align*}
+	F(0) &= \int_0^{\infty} e^{-x}dx \\
+	&= 1 \\
+
+	&\therefore \\
+	F(1) &= (1)(F(0))  = 1 \\
+	F(2) &= 2(F(1)) = 2(1) = 2 \\
+	F(3) &= 3(F(2)) = 3(2)(1) = 6 \\
+	&... \\
+	F(n) &= \boxed{n!}
+	\end{align*}
+	```
+"""
+
+# ╔═╡ 00ff8fae-234a-4fd2-a8d5-c4874efe45a6
+md"""
+#### With Symbolics
+Now let's solve this using Symbolics and `SymbolicNumericIntegration`, which provides the `integrate` function. SNI is unique in that it returns the symbolic answer along with the potential errors. From the docstring you can see
+
+```
+Returns 
+
+solved: the solved integral
+unsolved: the residual unsolved portion of the input
+err: the numerical error in reaching the solution
+```
+"""
+
 # ╔═╡ 67ceccec-8229-47d2-9ce7-0c3ef67a82a2
-@variables x n F(..); Dx = Differential(x);
+@variables x n
 
 # ╔═╡ 08146807-be78-4b5e-824b-9339ba74e5dd
 f = x^n*exp(-x)
 
-# ╔═╡ 2838d88a-5d04-4762-90a8-08f5412db9bd
-F(n) ~ f
-
-# ╔═╡ b34c15a1-502a-4197-aa04-5a7f04ed94fd
-u = x^n
-
-# ╔═╡ b2ec0ab8-c0e8-413d-9f44-caa064ecdc53
-dv = exp(-x)
-
-# ╔═╡ 847771d7-afdc-48f4-9a5e-1f7dfd7520a2
-du = expand_derivatives(Dx(u))
-
-# ╔═╡ fa9ac258-8d20-469b-b8ec-1473a5bd0d95
-v, _ = integrate(dv, x)
-
-# ╔═╡ e0c40bdb-01a3-47b1-97b5-d2b5c3fff3df
-uv = substitute(u*v, x => 0) - substitute(u*v, x => Inf)
-
-# ╔═╡ f61f1fac-cb1a-4a31-a5f2-d574b904e91e
-begin
-	vdu = -n * x^(n-1)exp(-x)
-	vdu = -n * F(n-1)
-end
-
-# ╔═╡ 69599054-68dc-41c9-a179-2adb8da373b2
-vdu
-
-# ╔═╡ 977ccea8-4c15-48c6-808a-87c46ac6a178
-Fn = uv - vdu
-
-# ╔═╡ 674146c2-fc6c-4623-ac15-260a1ef4b487
-begin
-	F0, _ = integrate(substitute(f, n => 0), x)
-	F0 = substitute(F0, x=>Inf) - substitute(F0, x=>0)
-end
-
-# ╔═╡ c57d145e-3e10-4582-a9d5-864f09356cb8
-F1 = 1(F0)
-
-# ╔═╡ 9ab18383-5872-4fbd-b69c-8c3acf8c25fe
-F2 = 2(F1)
-
-# ╔═╡ d0181d00-ca8f-4388-947f-db2090d6887f
-F3 = 3(F2)
-
-# ╔═╡ 6831bfdc-d66c-41ed-8da5-d1cbf915ef51
-F4 = 4(F3)
-
-# ╔═╡ afc9193c-77df-4aa4-bef1-8032e6552541
+# ╔═╡ 0a462de2-6ac0-49a2-8363-7f71a151326e
 md"""
+Symbolics does not know how to do definite integration so we will create a simple wrapper function for that.
+"""
+
+# ╔═╡ 4215ff54-de42-4443-9fc1-775467e0001a
+function SymbolicNumericIntegration.integrate(f, x, x0, x1)
+	F = integrate(f, x)[1]
+	F = substitute(F, x => x1) - substitute(F, x => x0)
+end
+
+# ╔═╡ 57586f37-1b1a-4ebc-92e1-bb218e7cba81
+begin
+	_F0 = substitute(f, n => 0)
+	F0 = integrate(_F0, x, 0, Inf)
+end
+
+# ╔═╡ d010dc88-b540-44cd-b3af-3a46e23e2b50
+F1 = 1*F0
+
+# ╔═╡ 4e6db988-c227-488d-9345-d2cd4300e8b7
+F2 = 2*F1
+
+# ╔═╡ 8ad718a9-061a-4757-9eb2-60068a743a14
+F3 = 3*F2
+
+# ╔═╡ ed87125e-23b5-4b4d-b42e-570552d36967
+md"""
+Without doing integration by parts, we can see that Symbolics and `SymbolicNumericIntegration` does a decent job at showing ``F(n) = n!`` if we begin with the assumed knowledge of ``F(n) = n F(n-1)``
+"""
+
+# ╔═╡ dcb8308e-22b1-421f-a0cc-86661aae92da
+md"""
+## Some tricks of the trade
+"""
+
+# ╔═╡ 29225ab1-963c-4d03-8c43-54333cfa8d99
+md"""
+There are numerous ways to try to evaluate integrals, but two specifc "tricks" are frequently employed.
+
+1. Substitution or change of variable
+2. Differentiating with respect to a parameter
+
+As an example of (1) we see how substitution of the integrand with ``u`` can simplify the process of finding a solution
+
+We're given the function:
 ```math
-\therefore F(n) = \boxed{n!}
+\begin{align*}
+F(x_1, x_2) &= \int_{x_1}^{x_2} \frac{x^2}{(x^3 + 4)^2}dx
+\end{align*}
 ```
+
+We can simplify the integration by using a substitution. Let's set ``u = x^3 + 4``. Then, the differential ``du`` is ``3x^2 dx``. Hence, ``dx = \frac{du}{3x^2}``.
+
+Now, we substitute ``u`` and ``dx`` into the integral:
+```math
+\begin{align*}
+F(x_1, x_2) &= \int_{u(x_1)}^{u(x_2)} \frac{1}{u^2} \cdot \frac{du}{3} = \frac{1}{3} \int_{u(x_1)}^{u(x_2)} \frac{du}{u^2}
+\end{align*}
+```
+
+This integral is now much easier to solve. The integral of ``\frac{1}{u^2}`` is ``-\frac{1}{u}``. Therefore, we have:
+```math
+\begin{align*}
+F(x_1, x_2) &= -\frac{1}{3} \left[ \frac{1}{u} \right]_{u(x_1)}^{u(x_2)} = -\frac{1}{3} \left( \frac{1}{x_2^3 + 4} - \frac{1}{x_1^3 + 4} \right)
+\end{align*}
+```
+
+This is the result of the integral after applying the substitution method.
+
+An important note is the Jacobian, which is just ``J = \frac{dx}{du}``. This will be included in every substitution
+
 """
 
 # ╔═╡ 1af99b41-85dc-463d-8a02-35600a5c82e3
 md"""
-## Problem 2.2.1
-Evaluate ``\int_{x_1}^{x_2} \frac{dx}{\sqrt{a^2 - x^2}}`` by switching to ``\theta`` defined by ``x = a \sin \theta``, assume ``0 \leq x \leq \frac{\pi}{2}``
+!!! info "Problem 2.2.1"
+	Evaluate ``\int_{x_1}^{x_2} \frac{dx}{\sqrt{a^2 - x^2}}`` by switching to ``\theta`` defined by ``x = a \sin \theta``, assume ``0 \leq x \leq \frac{\pi}{2}``
 """
 
 # ╔═╡ e6643a9d-63c3-4684-a518-923c90cd785d
 md"""
-```math
-\begin{align*}
-& \int_{x_1}^{x_2} \frac{1}{\sqrt{a^2 - x^2}} dx \\
-&\text{Let } x = a\sin\theta, \quad 0 \leq x \leq \frac{\pi}{2} \\
-& \int_{\theta_1}^{\theta_2} \frac{a\cos\theta}{\sqrt{a^2\cos^2\theta}} d\theta \\
-&= \int_{\theta_1}^{\theta_2} d\theta \\
-&= \theta\big|_{\theta_1}^{\theta_2} \\
-&= \theta_2 - \theta_1 \\
-&= a - 0 = \boxed{a}
-\end{align*}
-```
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	& \int_{x_1}^{x_2} \frac{1}{\sqrt{a^2 - x^2}} dx \\
+	&\text{Let } x = a\sin\theta, \quad 0 \leq x \leq \frac{\pi}{2} \\
+	& \int_{\theta_1}^{\theta_2} \frac{a\cos\theta}{\sqrt{a^2\cos^2\theta}} d\theta \\
+	&= \int_{\theta_1}^{\theta_2} d\theta \\
+	&= \theta\big|_{\theta_1}^{\theta_2} \\
+	&= \theta_2 - \theta_1 \\
+	&= a - 0 = \boxed{a}
+	\end{align*}
+	```
 """
+
+# ╔═╡ bb4baf11-8570-4446-88d7-e5ffec5647d6
+md"""
+#### With Symbolics
+Let's check this with Symbolics
+"""
+
+# ╔═╡ 7ee83853-cc29-4f28-bcb7-9a03e4a9eef2
+md"""
+!!! danger
+	It seems like this should be simple, but it's not as easy as this:
+	```julia
+	@variables a x
+	f = 1 / (sqrt(a^2 - x^2))
+	integrate(f, x)
+	```
+
+	To come back to this
+"""
+
+# ╔═╡ c1c02fb6-7944-4199-b9cc-9b57a1295953
+let
+	@variables a x
+	f = 1 / (sqrt(a^2 - x^2))
+	integrate(f, x)
+end
 
 # ╔═╡ 60333e2a-c56e-4682-8e70-8bdaca13f6ab
 md"""
-## Problem 2.2.8
-Given:
-
-```math
-\begin{align*}
-I_1(a) = \int_{0}^{\infty} e^{-ax^2} x dx
-\end{align*}
-```
-
-Show:
-```math
-\begin{align*}
-I_1(a) = \frac{1}{2a}
-\end{align*}
-```
-
+!!! info "Problem 2.2.8"
+	Given:
+	```math
+	\begin{align*}
+	I_1(a) = \int_{0}^{\infty} e^{-ax^2} x dx
+	\end{align*}
+	```
+	
+	Show that:
+	```math
+	\begin{align*}
+	I_1(a) = \frac{1}{2a}
+	\end{align*}
+	```
 """
 
 # ╔═╡ 334a0ac1-f645-472d-ad83-93ea04c31e2d
 md"""
-```math
-\begin{align*}
-I_1(a) &= \int_{0}^{\infty} e^{-ax^2} x dx \\
-&\text{Let } u = ax^2 \\
-\therefore I_1(a) &= \int_{0}^{\infty} \frac{1}{2a} e^{-u} du \\
-&= \left[-\frac{1}{2a}e^{-u}\right]_0^\infty \\
-&= \frac{1}{2a}
-\end{align*}
-```
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	I_1(a) &= \int_{0}^{\infty} e^{-ax^2} x dx \\
+	&\text{Let } u = ax^2 \\
+	\therefore I_1(a) &= \int_{0}^{\infty} \frac{1}{2a} e^{-u} du \\
+	&= \left[-\frac{1}{2a}e^{-u}\right]_0^\infty \\
+	&= \frac{1}{2a}
+	\end{align*}
+	```
 """
 
-# ╔═╡ 177eef94-2a63-4afe-8025-50d984b51306
-# let
-# 	@variables x a
-# 	f = exp(-a * x^2) * x
-# 	F = integrate(f, x)[1]
+# ╔═╡ d13332df-0373-406b-99f7-29af2fffed9b
+md"""
+#### With Symbolics
+Let's check this with Symbolics
+"""
 
-# 	# Fₓ₁ = substitute(F, x => Inf)
-# 	# Fₓ₀ = substitute(F, x => 0)
-# 	# answer = Fₓ₁ - Fₓ₀
-# end
+# ╔═╡ d676da3d-05fc-438c-b457-a5cd7cd67aa7
+md"""
+!!! danger
+	It seems like this should be simple, but it's not as easy as this:
+	```julia
+	@variables x a
+	f = exp(-a * x^2) * x
+	F = integrate(f, x)[1]
+	```
+
+	To come back to this
+"""
+
+# ╔═╡ eeec451a-939b-44e5-ab1e-363d0dbd99a4
+let
+	@variables x a
+	f = exp(-a * x^2) * x
+	F = integrate(f, x)[1]
+	@info F
+	F2 = integrate(f, x, 0, Inf)
+	@info F2
+end
 
 # ╔═╡ a8010ef2-53ba-4c59-9d52-b076ca69012a
 md"""
-## Problem 2.2.9
-"""
-
-# ╔═╡ 4e2756b5-9a0c-42d4-aadf-01e5fd5af718
-md"""
-Given:
-
-```math
-I_n(a) = \int_{0}^{\infty} (x^n) e^{-ax^2} dx
-```
-
-Evaluate:
-
-```math
-I_3(a) \ \text{and} \ I_4(a)
-```
+!!! info "Problem 2.2.9"
+	Given:
+	```math
+	I_n(a) = \int_{0}^{\infty} (x^n) e^{-ax^2} dx
+	```
+	
+	Evaluate:
+	```math
+	I_3(a) \ \text{and} \ I_4(a)
+	```
 """
 
 # ╔═╡ 4123bd88-5de4-4233-ad93-edb2fc26f766
 md"""
-```math
-\begin{align*}
-I_3(a) &= \int_0^\infty x^3 e^{-ax^2} dx \\
-&\text{Let } u=ax^2 , \frac{1}{2a}du = xdx \\
-&= \frac{1}{2a} \int_0^\infty u^{3/2} e^{-u} du \\
-&= \frac{1}{2a} \cdot \frac{1}{2} \Gamma\left(\frac{5}{2}\right) \\
-&= \boxed{\frac{3}{4a}}
-\end{align*}
-```math
-
-```math
-\begin{align*}
-I_4(a) &= \int_0^\infty x^4 e^{-ax^2} dx \\
-&\text{Let } u=ax^2 \frac{1}{2a}du = xdx \\
-\therefore \qquad I_4(a) &= \frac{1}{2a} \int_0^\infty u^2 e^{-u} du \\
-&= \frac{1}{2a} \cdot 2\Gamma(3) \\
-&= \boxed{\frac{2}{a}} \\
-\end{align*}
-```
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	I_3(a) &= \int_0^\infty x^3 e^{-ax^2} dx \\
+	&\text{Let } u=ax^2 , \frac{1}{2a}du = xdx \\
+	&= \frac{1}{2a} \int_0^\infty u^{3/2} e^{-u} du \\
+	&= \frac{1}{2a} \cdot \frac{1}{2} \Gamma\left(\frac{5}{2}\right) \\
+	&= \boxed{\frac{3}{4a}}
+	\end{align*}
+	```
+	
+	```math
+	\begin{align*}
+	I_4(a) &= \int_0^\infty x^4 e^{-ax^2} dx \\
+	&\text{Let } u=ax^2 \frac{1}{2a}du = xdx \\
+	\therefore \qquad I_4(a) &= \frac{1}{2a} \int_0^\infty u^2 e^{-u} du \\
+	&= \frac{1}{2a} \cdot 2\Gamma(3) \\
+	&= \boxed{\frac{2}{a}} \\
+	\end{align*}
+	```
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1678,31 +1835,33 @@ version = "17.4.0+0"
 # ╠═aefdfb86-c5df-44cc-ae56-00a7486ee14b
 # ╟─ab12574f-d559-40cc-9cc7-089f08e7dd1b
 # ╟─6cbb915e-2299-11ee-0a63-3f883aafe2f2
+# ╟─39230cd8-3e7e-4a29-9d16-6c4668791647
+# ╟─af47fdf3-5190-4f5c-bd58-ef0f491eade9
 # ╟─0d949853-bf76-45ba-8fb6-3870d78ffc5e
+# ╟─e135e6d4-09e6-40bb-bfb1-42655129b130
+# ╟─00ff8fae-234a-4fd2-a8d5-c4874efe45a6
 # ╠═67ceccec-8229-47d2-9ce7-0c3ef67a82a2
 # ╠═08146807-be78-4b5e-824b-9339ba74e5dd
-# ╠═2838d88a-5d04-4762-90a8-08f5412db9bd
-# ╠═b34c15a1-502a-4197-aa04-5a7f04ed94fd
-# ╠═b2ec0ab8-c0e8-413d-9f44-caa064ecdc53
-# ╠═847771d7-afdc-48f4-9a5e-1f7dfd7520a2
-# ╠═fa9ac258-8d20-469b-b8ec-1473a5bd0d95
-# ╠═e0c40bdb-01a3-47b1-97b5-d2b5c3fff3df
-# ╠═f61f1fac-cb1a-4a31-a5f2-d574b904e91e
-# ╠═69599054-68dc-41c9-a179-2adb8da373b2
-# ╠═977ccea8-4c15-48c6-808a-87c46ac6a178
-# ╠═674146c2-fc6c-4623-ac15-260a1ef4b487
-# ╠═c57d145e-3e10-4582-a9d5-864f09356cb8
-# ╠═9ab18383-5872-4fbd-b69c-8c3acf8c25fe
-# ╠═d0181d00-ca8f-4388-947f-db2090d6887f
-# ╠═6831bfdc-d66c-41ed-8da5-d1cbf915ef51
-# ╟─afc9193c-77df-4aa4-bef1-8032e6552541
+# ╟─0a462de2-6ac0-49a2-8363-7f71a151326e
+# ╠═4215ff54-de42-4443-9fc1-775467e0001a
+# ╠═57586f37-1b1a-4ebc-92e1-bb218e7cba81
+# ╠═d010dc88-b540-44cd-b3af-3a46e23e2b50
+# ╠═4e6db988-c227-488d-9345-d2cd4300e8b7
+# ╠═8ad718a9-061a-4757-9eb2-60068a743a14
+# ╟─ed87125e-23b5-4b4d-b42e-570552d36967
+# ╟─dcb8308e-22b1-421f-a0cc-86661aae92da
+# ╟─29225ab1-963c-4d03-8c43-54333cfa8d99
 # ╟─1af99b41-85dc-463d-8a02-35600a5c82e3
 # ╟─e6643a9d-63c3-4684-a518-923c90cd785d
+# ╟─bb4baf11-8570-4446-88d7-e5ffec5647d6
+# ╟─7ee83853-cc29-4f28-bcb7-9a03e4a9eef2
+# ╠═c1c02fb6-7944-4199-b9cc-9b57a1295953
 # ╟─60333e2a-c56e-4682-8e70-8bdaca13f6ab
 # ╟─334a0ac1-f645-472d-ad83-93ea04c31e2d
-# ╠═177eef94-2a63-4afe-8025-50d984b51306
+# ╟─d13332df-0373-406b-99f7-29af2fffed9b
+# ╟─d676da3d-05fc-438c-b457-a5cd7cd67aa7
+# ╠═eeec451a-939b-44e5-ab1e-363d0dbd99a4
 # ╟─a8010ef2-53ba-4c59-9d52-b076ca69012a
-# ╟─4e2756b5-9a0c-42d4-aadf-01e5fd5af718
 # ╟─4123bd88-5de4-4233-ad93-edb2fc26f766
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
