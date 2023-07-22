@@ -129,12 +129,9 @@ md"""
 Let's set up a function using Symbolics.jl that computes the Lagrangian of `f(x, y)`, given a constraint `g(x, y)`. We wil use that to solve the problem computationally and check with the "by hand" solution
 """
 
-# ╔═╡ 722bda22-2044-4e6c-b17b-df1fa9801faf
-@variables x y
-
 # ╔═╡ 09bd6290-b690-46e7-8a17-6c0ed0e5627f
 """
-    lagrangian(f, g)
+    lagrangian(f, g, x, y)
 
 Solve a constrained optimization problem using the Lagrangian method.
 
@@ -165,7 +162,7 @@ g = x^2 + y^2 - 1
 lagrangian(f, g)
 ```
 """
-function lagrangian(f, g)
+function lagrangian(f, g, x, y)
 	@variables λ
 	L = f - λ*g
 	
@@ -178,12 +175,15 @@ function lagrangian(f, g)
 	return solve_for(sys, [x, y, λ])
 end
 
+# ╔═╡ 722bda22-2044-4e6c-b17b-df1fa9801faf
+@variables x y
+
 # ╔═╡ fab2caac-b604-4fad-97c0-ff7e9579d9fc
 let
 	f = x^2 + y^2
 	g = x + 2y - 4	
-	x, y, _ = lagrangian(f, g)
-	x, y
+	x0, y0, _ = lagrangian(f, g, x, y)
+	x0, y0
 end
 
 # ╔═╡ 9d52232c-1f7a-40fe-82eb-4f2efa7014d6
@@ -252,8 +252,8 @@ let
 	@variables P
 	f = x*y
 	g = 2x + 2y - P
-	x, y, _ = lagrangian(f, g)
-	x, y
+	x0, y0, _ = lagrangian(f, g, x, y)
+	x0, y0
 end
 
 # ╔═╡ 2d99d71f-0293-44e1-bc01-0416f33fa7ef
@@ -1841,7 +1841,7 @@ version = "17.4.0+0"
 # ╠═09bd6290-b690-46e7-8a17-6c0ed0e5627f
 # ╠═722bda22-2044-4e6c-b17b-df1fa9801faf
 # ╠═fab2caac-b604-4fad-97c0-ff7e9579d9fc
-# ╠═9d52232c-1f7a-40fe-82eb-4f2efa7014d6
+# ╟─9d52232c-1f7a-40fe-82eb-4f2efa7014d6
 # ╟─c0d91c3c-cb4d-4d94-9d32-fb234caf69df
 # ╟─9273e916-ca5a-4c38-b446-e2ffd1c9cba3
 # ╠═b20edb50-db8c-45d3-95b6-70e0402cab0a

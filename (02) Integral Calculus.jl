@@ -178,15 +178,15 @@ Symbolics does not know how to do definite integration so we will create a simpl
 """
 
 # ╔═╡ 4215ff54-de42-4443-9fc1-775467e0001a
-function SymbolicNumericIntegration.integrate(f, x, x0, x1)
-	F = integrate(f, x)[1]
+function integrate_definite(f, x, x0, x1)
+	F = SymbolicNumericIntegration.integrate(f, x)[1]
 	F = substitute(F, x => x1) - substitute(F, x => x0)
 end
 
 # ╔═╡ 57586f37-1b1a-4ebc-92e1-bb218e7cba81
 begin
 	_F0 = substitute(f, n => 0)
-	F0 = integrate(_F0, x, 0, Inf)
+	F0 = integrate_definite(_F0, x, 0, Inf)
 end
 
 # ╔═╡ d010dc88-b540-44cd-b3af-3a46e23e2b50
@@ -351,7 +351,7 @@ let
 	f = exp(-a * x^2) * x
 	F = integrate(f, x)[1]
 	@info F
-	F2 = integrate(f, x, 0, Inf)
+	F2 = integrate_definite(f, x, 0, Inf)
 	@info F2
 end
 
