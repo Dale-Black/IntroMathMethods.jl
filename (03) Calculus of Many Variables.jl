@@ -5,10 +5,33 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ a129cc0c-73b6-4c18-ac17-d609d0b1bda4
-using PlutoUI, Symbolics, SymbolicNumericIntegration, SymbolicUtils
+using PlutoUI, Symbolics, SymbolicNumericIntegration
+
+# ╔═╡ b7b1609b-a83c-4ce6-9a84-c74fc390a74e
+using Symbolics: derivative, solve_for
 
 # ╔═╡ b37912b9-a9b0-4d69-952f-4d280f4ae382
 TableOfContents()
+
+# ╔═╡ b1be7b4c-1938-4c64-b27b-32a581223934
+md"""
+# Introduction
+
+In the previous two notebooks, we explored the fundamentals of differential and integral calculus primarily in the univariate setting using Julia and the Symbolics ecosystem. Now we'll extend those concepts to the multivariate case and see how to take partial derivatives, compute multiple integrals, find extrema of multivariable functions, and more.
+
+Some of the key topics we'll cover:
+
+- Partial derivatives - Computing the derivative of a function with respect to a single variable while treating others as constant
+- Gradient, divergence, curl - Important vector differential operators
+- Multiple integrals - Integrating over multiple dimensions like double and triple integrals
+- Multivariate optimization - Finding maxima/minima of functions with multiple variables using techniques like Lagrange multipliers
+- Coordinate transformations - Switching between coordinate systems like rectangular, polar, spherical, etc.
+
+
+As before, we'll take an interactive approach with both mathematical derivations and implementation in code. The goals are to solidify understanding of multivariate calculus concepts and gain proficiency applying them programmatically with Julia.
+
+Multivariate problems arise often in machine learning, physics, economics, and other technical fields. Mastering these methods provides a crucial foundation for tackling real-world modeling and analysis challenges. Let's dive in!
+"""
 
 # ╔═╡ e4ab3255-4fde-458a-a430-7dd6b3e1d521
 md"""
@@ -21,35 +44,89 @@ md"""
 - 3.2.4
 """
 
+# ╔═╡ 4d184f8a-afb3-41a5-a28d-f80a569eb3cb
+md"""
+## Differential Calculus of Many Variables
+"""
+
+# ╔═╡ 583957ab-728e-4b0b-bb07-512dac692a12
+md"""
+The *partial derivative* of a function of multiple variables is the derivative of the function with respect to one of those variables, with the others held constant. 
+
+For a function ``f(x, y, ...)`` the partial derivative with respect to ``x`` is denoted by ``\frac{\partial f}{\partial x}``, ``f_x``, or ``D_x f`` and is defined by:
+
+```math
+\begin{align*}
+\frac{\partial f}{\partial x} &= \lim_{h \to 0} \frac{f(x + h, y, ...) - f(x, y, ...)}{h}
+\end{align*}
+```
+
+The definitions for ``\frac{\partial f}{\partial y}``, ``\frac{\partial f}{\partial z}``, etc. are similar.
+
+Note that in the definition of the partial derivative, all variables other than the one we are differentiating with respect to are held constant during the differentiation.
+
+The method of Lagrange multipliers is a strategy for finding the local maxima and minima of a function subject to equality constraints. 
+
+Suppose we have a function `f(x, y, ..., z)` that we want to maximize or minimize subject to a constraint given by `g(x, y, ..., z) = 0`. 
+
+---
+
+The final topic in this section is about locating the extrema (maxima or minima) of a function ``f`` within a constraint ``g``. 
+
+To find these points, we introduce a new variable (the Lagrange multiplier) ``\lambda``, and study the Lagrange function defined by ``L(x, y, ..., z, \lambda) = f(x, y, ..., z) - \lambda g(x, y, ..., z)``.
+
+The points ``(x, y, ..., z)`` that maximize (or minimize) ``f`` subject to the constraint are solutions of the equations ``\nabla L = 0``, which expands to the system of equations
+
+```math
+\begin{align*}
+\frac{\partial L}{\partial x} &= 0, \\
+\frac{\partial L}{\partial y} &= 0, \\
+&\vdots \\
+\frac{\partial L}{\partial z} &= 0, \\
+\frac{\partial L}{\partial \lambda} &= 0. \\
+\end{align*}
+```
+
+Solving these equations yields the values of ``x, y, ..., z`` and ``\lambda`` that give the constrained extrema of ``f``.
+
+"""
+
 # ╔═╡ ecb118f8-3a4f-44b9-adc3-421d94cb7514
 md"""
-## Problem 3.1.5
+!!! info "Problem 3.1.5"
 
-Find the shortest distance from the origin to any point on the line ``x + 2y = 4`` by using Lagrange multipliers. Check this by more elementary means: by first finding the equation for the line which is perpendicular to the given line and passing through the origin.
+	Find the shortest distance from the origin to any point on the line ``x + 2y = 4`` by using Lagrange multipliers. Check this by more elementary means: by first finding the equation for the line which is perpendicular to the given line and passing through the origin.
 
 """
 
 # ╔═╡ d85c77a5-4b36-46ed-99f0-cb631c34baae
 md"""
-```math
-\begin{align*}
-f(x, y) &= x^2 + y^2 \\
-g(x, y) &= x + 2y - 4 = 0 \\
-L(x, y, λ) &= x^2 + y^2 - λ(x + 2y - 4) \\
-\frac{\partial L}{\partial x} &= 2x - λ = 0 \\
-\frac{\partial L}{\partial y} &= 2y - 2λ = 0\\
-\frac{\partial L}{\partial λ} &= -(x + 2y - 4) = 0
-\end{align*}
-```
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	f(x, y) &= x^2 + y^2 \\
+	g(x, y) &= x + 2y - 4 = 0 \\
+	L(x, y, λ) &= x^2 + y^2 - λ(x + 2y - 4) \\
+	\frac{\partial L}{\partial x} &= 2x - λ = 0 \\
+	\frac{\partial L}{\partial y} &= 2y - 2λ = 0\\
+	\frac{\partial L}{\partial λ} &= -(x + 2y - 4) = 0
+	\end{align*}
+	```
+	
+	Solving the system gives:
+	```math
+	\begin{align*}
+	x &= 4/5 \\
+	y &= 8/5 \\
+	\lambda &= 8/5 \\
+	\end{align*}
+	```
+"""
 
-Solving the system gives:
-```math
-\begin{align*}
-x &= 4/5 \\
-y &= 8/5 \\
-\lambda &= 8/5 \\
-\end{align*}
-```
+# ╔═╡ b65c173f-04d5-41a4-9ed2-9b59668991d2
+md"""
+#### With Symbolics
+Let's set up a function using Symbolics.jl that computes the Lagrangian of `f(x, y)`, given a constraint `g(x, y)`. We wil use that to solve the problem computationally and check with the "by hand" solution
 """
 
 # ╔═╡ 722bda22-2044-4e6c-b17b-df1fa9801faf
@@ -111,8 +188,63 @@ end
 
 # ╔═╡ 9d52232c-1f7a-40fe-82eb-4f2efa7014d6
 md"""
-## Problem 3.1.6
-Show using the Lagrangian, that among all rectangles of a given perimeter, the square has the greatest area
+!!! info "Problem 3.1.6"
+	Show using the Lagrangian, that among all rectangles of a given perimeter, the square has the greatest area
+"""
+
+# ╔═╡ c0d91c3c-cb4d-4d94-9d32-fb234caf69df
+md"""
+!!! warning "By Hand"
+	Consider a rectangle with sides of length ``x`` and ``y``. The area ``A`` of the rectangle is given by
+
+	```math
+	\begin{align*}
+	A(x, y) &= x \cdot y
+	\end{align*}
+	```
+	
+	We want to maximize this area given a fixed perimeter ``P``. The perimeter of the rectangle is given by
+
+	```math
+	\begin{align*}
+	P(x, y) &= 2x + 2y
+	\end{align*}
+	```
+	
+	Let's say the given fixed perimeter is ``P`, we can write the constraint as
+
+	```math
+	\begin{align*}
+	g(x, y) &= 2x + 2y - P = 0
+	\end{align*}
+	```
+
+	We can then form the Lagrangian ``L(x, y, λ)``:
+
+	```math
+	\begin{align*}
+	L(x, y, λ) &= A - λ (2x + 2y - P)
+	\end{align*}
+	```
+	
+	The solutions to the problem are given by the equations ``\frac{\partial L}{\partial x} = 0``, ``\frac{\partial L}{\partial y} = 0``, and ``\frac{\partial L}{\partial λ} = 0``, which gives us:
+
+	```math
+	\begin{align*}
+	\frac{\partial L}{\partial x} &= y - 2λ = 0 \\
+	\frac{\partial L}{\partial y} &= x - 2λ = 0 \\
+	\frac{\partial L}{\partial λ} &= -(2x + 2y - P) = 0
+	\end{align*}
+	```
+	
+	Solving this system of equations, we find that ``\boxed{x = y = P/4}``, which shows that the rectangle with the maximum area for a given perimeter is a square.
+
+"""
+
+# ╔═╡ 9273e916-ca5a-4c38-b446-e2ffd1c9cba3
+md"""
+#### With Symbolics
+This is a great example of how Julia and Symbolics.jl can speed up this process. Instead of computing all the partials again, we can just plug in the equation `f` to be optimized and the constraint `g`.
 """
 
 # ╔═╡ b20edb50-db8c-45d3-95b6-70e0402cab0a
@@ -126,185 +258,145 @@ end
 
 # ╔═╡ 2d99d71f-0293-44e1-bc01-0416f33fa7ef
 md"""
-## Problem 3.1.7
-
-Consider ``N`` particles in a box. According to quantum mechanics, the energies of the particles are quantized to some set of values or energy levels (``\epsilon_1, \epsilon_2, ...``). Let ``n_i`` be the number of particles in level ``i`` with energy ``\epsilon_i``. The multiplicity or number of distinct rearrangements of the particles consistent with any given distribution ``n_i``, is given by
-
-```math
-\begin{align*}
-W(n_1, n_2, \ldots) &= \frac{N!}{n_1!n_2!\ldots}
-\end{align*}
-```
-
-The question is this: which distribution of particles, subject to the constraint that the total number equal ``N`` and the total energy equal ``E``, gives the biggest ``W``? Use below
-
-```math
-\begin{align*}
-S &= \ln W \qquad (\text{Note: } \ln n! \approx n \ln n - n)
-\end{align*}
-```
-
-Then:
-- (1) write the constraints on the ``n_i``'s due to the total number ``N`` and energy ``E``
-- (2) treat all ``n_i``'s as continuous variables
-- (3) introduce Lagrange multipliers ``\alpha`` and ``\beta`` for ``N`` and ``E``
-- (4) maximize ``S``
+!!! info "Problem 3.1.7"
+	
+	Consider ``N`` particles in a box. According to quantum mechanics, the energies of the particles are quantized to some set of values or energy levels (``\epsilon_1, \epsilon_2, ...``). Let ``n_i`` be the number of particles in level ``i`` with energy ``\epsilon_i``. The multiplicity or number of distinct rearrangements of the particles consistent with any given distribution ``n_i``, is given by
+	
+	```math
+	\begin{align*}
+	W(n_1, n_2, \ldots) &= \frac{N!}{n_1!n_2!\ldots}
+	\end{align*}
+	```
+	
+	The question is this: which distribution of particles, subject to the constraint that the total number equal ``N`` and the total energy equal ``E``, gives the biggest ``W``? Use below
+	
+	```math
+	\begin{align*}
+	S &= \ln W \qquad (\text{Note: } \ln n! \approx n \ln n - n)
+	\end{align*}
+	```
+	
+	Then:
+	- (1) write the constraints on the ``n_i``'s due to the total number ``N`` and energy ``E``
+	- (2) treat all ``n_i``'s as continuous variables
+	- (3) introduce Lagrange multipliers ``\alpha`` and ``\beta`` for ``N`` and ``E``
+	- (4) maximize ``S``
 """
 
 # ╔═╡ 192cf150-6baf-4246-a0de-15ed1a93f8ce
 md"""
-Total particles and total energy (constraint equations)
-```math
-\begin{align*}
-N &= \sum_i n_i \\
-g_1 &= \sum_i n_i - N \\
-E &= \sum_i n_i \epsilon_i \\
-g_2 &= \sum_i n_i \epsilon_i - E
-\end{align*}
-```
+!!! warning "By Hand"
+	Total particles and total energy (constraint equations)
+	```math
+	\begin{align*}
+	N &= \sum_i n_i \\
+	g_1 &= \sum_i n_i - N \\
+	E &= \sum_i n_i \epsilon_i \\
+	g_2 &= \sum_i n_i \epsilon_i - E
+	\end{align*}
+	```
+	
+	Entropy (maximization equation)
+	```math
+	\begin{align*}
+	S &= \ln W \\
+	&= \ln(\frac{N!}{n_1! n_2! ...}) \\
+	&= \ln (N!) - \ln (n_1! n_2! ...) \\
+	&= N \ln N - N - [\ln(n_1 !) + \ln(n_2 !) + ...] \\
+	&= N \ln N - N - [n_1 \ln n_1 - n_1 + n_2 \ln n_2 - n_2 + ...] \\
+	&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)]
+	\end{align*}
+	```
+	
+	Lagrangian
+	```math
+	\begin{align*}
+	L &= S - \alpha(g_1) - \beta(g_2) \\
+	&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)] - [\alpha (\sum_i n_i - N)] - [\beta (\sum_i n_i \epsilon_i - E)]
+	\end{align*}
+	```
 
-Entropy (maximization equation)
-```math
-\begin{align*}
-S &= \ln W \\
-&= \ln(\frac{N!}{n_1! n_2! ...}) \\
-&= \ln (N!) - \ln (n_1! n_2! ...) \\
-&= N \ln N - N - [\ln(n_1 !) + \ln(n_2 !) + ...] \\
-&= N \ln N - N - [n_1 \ln n_1 - n_1 + n_2 \ln n_2 - n_2 + ...] \\
-&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)]
-\end{align*}
-```
-
-Lagrangian
-```math
-\begin{align*}
-L &= S - \alpha(g_1) - \beta(g_2) \\
-&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)] - [\alpha (\sum_i n_i - N)] - [\beta (\sum_i n_i \epsilon_i - E)]
-\end{align*}
-```
-"""
-
-# ╔═╡ 889ed804-81bd-4e87-97d5-d5b6f4986a1f
-md"""
-Answer
-```math
-\begin{align*}
-\frac{\partial L}{\partial n_i} &= 0 \\
-\frac{\partial }{\partial n_i}[-\int(n_i \ln n_i) + \int n_i - \alpha \int n_i - \beta \int (n_i \epsilon_i)] &= 0 \\
--\ln n_i - \alpha - \beta \epsilon &= 0 \\
-n_i &= \boxed{e^{- \alpha - \beta \epsilon}}
-\end{align*}
-```
+	Answer
+	```math
+	\begin{align*}
+	\frac{\partial L}{\partial n_i} &= 0 \\
+	\frac{\partial }{\partial n_i}[-\int(n_i \ln n_i) + \int n_i - \alpha \int n_i - \beta \int (n_i \epsilon_i)] &= 0 \\
+	-\ln n_i - \alpha - \beta \epsilon &= 0 \\
+	n_i &= \boxed{e^{- \alpha - \beta \epsilon}}
+	\end{align*}
+	```
 """
 
 # ╔═╡ 50b3d6e1-803a-497e-a8f0-01dbe2aec886
 md"""
-#### Symbolics.jl
+#### With Symbolics
 """
 
-# ╔═╡ b1b895cc-0b3a-43cc-b15d-85383f646cea
-@variables nᵢ ϵᵢ N E α β
-
-# ╔═╡ e06e61b9-8830-4750-8560-89a088ad2b7a
-@register_symbolic sum(..)
-
-# ╔═╡ 551f7515-7f3e-4591-a237-35fa16788b1d
-g₁ = sum(nᵢ) - N
-
-# ╔═╡ c5bdcab2-7e11-42d8-be11-545482709ba6
-g₂ = sum(nᵢ * ϵᵢ) - E
-
-# ╔═╡ 63b3c4b4-72b3-4bc8-ac26-289d59c26bfd
-S = N*log(N) - N - (sum(nᵢ * log(nᵢ)-nᵢ))
-
-# ╔═╡ 3b359c98-3a5a-4268-92b5-3f5b8289e758
-L = S - (α*g₁) - (β*g₂)
-
-# ╔═╡ 4ae1e515-641a-4c8e-b56a-bca7185a8a29
-function ∫(f, x)
-	integrate(f, x)
-end
-
-# ╔═╡ af7a8f75-4ccd-42c7-9152-43473aad5910
-function ∫(f)
-	integrate(f)
-end
-
-# ╔═╡ 56369cef-eb80-4a0a-91b9-0b68d2363c5c
-L_continous = substitute(L, sum => ∫)
-
-# ╔═╡ 18d07a4d-7cd7-4a6e-8c24-57ecc4a4eab4
-dLdnᵢ = derivative(L_continous, nᵢ) ~ 0
+# ╔═╡ d7aa9cd8-a38f-4905-b518-fac3c9b95266
+md"""
+!!! danger "IDK"
+	Not sure how to set this up. Should be able to do some sort of set up using discrete space ``\sum`` and convert to continous ``\int`` then solve the integrals using `integrate()` then finally solve the system of equations using `solve_for`
+"""
 
 # ╔═╡ 46a4a70c-305c-4c50-ab93-992b3002ce7e
 md"""
-## Problem 3.2.4
+!!! info "Problem 3.2.4"
 
-Show that the volume of a sphere is ``V(r) = \frac{4}{3} \pi r^3`` by integrating ``f = 1`` over a sphere
+	Show that the volume of a sphere is ``V(r) = \frac{4}{3} \pi r^3`` by integrating ``f = 1`` over a sphere
 """
 
 # ╔═╡ 952f53f4-555d-4074-904a-a0377e3e8b69
 md"""
-Given spherical coordinates:
-```math
-\begin{align*}
-x &= r \sin \theta \cos \phi \\
-y &= r \sin \theta \sin \phi \\
-z &= r \cos \theta
-\end{align*}
-```
+!!! warning "By Hand"
+	Given spherical coordinates:
+	```math
+	\begin{align*}
+	x &= r \sin \theta \cos \phi \\
+	y &= r \sin \theta \sin \phi \\
+	z &= r \cos \theta
+	\end{align*}
+	```
+	
+	```math
+	\begin{align*}
+	r &= \sqrt{x^2 + y^2 + z^2} \\
+	\theta &= \cos^{-1}(z / r) \\ 
+	\phi &= \tan^{-1}(y / x) \\ 
+	\end{align*}
+	```
 
-```math
-\begin{align*}
-r &= \sqrt{x^2 + y^2 + z^2} \\
-\theta &= \cos^{-1}(z / r) \\ 
-\phi &= \tan^{-1}(y / x) \\ 
-\end{align*}
-```
+	```math
+	\begin{align*}
+	V &=\int_r  \int_{\phi}  \int_{\theta}r^2 \sin\theta d\theta d\phi dr \\
+	V &= \int_0^R r^2 dr \int_0^{2\pi} d\phi \int_0^\pi \sin\theta d\theta \\
+	V &= (\frac{1}{3} R^3) (2\pi) (2) \\
+	V &= \boxed{\frac{4}{3} \pi R^3}
+	\end{align*}
+	```
 
 """
 
-# ╔═╡ 35d4162c-f6d1-4350-9337-836861fbcbad
+# ╔═╡ e63d67de-ff06-4b57-bb02-f21f7bec2b53
 md"""
-```math
-\begin{align*}
-V &=\int_r  \int_{\phi}  \int_{\theta}r^2 \sin\theta d\theta d\phi dr \\
-V &= \int_0^R r^2 dr \int_0^{2\pi} d\phi \int_0^\pi \sin\theta d\theta \\
-V &= (\frac{1}{3} R^3) (2\pi) (2) \\
-V &= \boxed{\frac{4}{3} \pi R^3}
-\end{align*}
-```
+#### With Symbolics
 """
 
-# ╔═╡ 94ac2cc2-706b-4359-97df-36fddfd17367
-@syms r θ ϕ π z
-
-# ╔═╡ c5047d2f-4786-4dff-80b0-71cc48c6c366
-f = r^2 + sin(θ)
-
-# ╔═╡ ef23f392-fa34-4020-b699-efbbfd4e3990
-function integrate_multivariate(f)
-	args = arguments(f)
-    for a in args
-		@info a
-    end
-end
-
-# ╔═╡ 3b4a3c28-08c1-4f22-9fa0-4b315437c94b
-integrate_multivariate(f)
+# ╔═╡ 928d5e9c-2f4a-44ee-b815-1aea8a776ca6
+md"""
+!!! danger "TODO"
+	...
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 SymbolicNumericIntegration = "78aadeae-fbc0-11eb-17b6-c7ec0477ba9e"
-SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 PlutoUI = "~0.7.52"
 SymbolicNumericIntegration = "~1.1.0"
-SymbolicUtils = "~1.0.5"
 Symbolics = "~5.5.0"
 """
 
@@ -314,7 +406,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "5a0fca921373271d8d04bd663cc0b25c647ba904"
+project_hash = "84875b7600a704d1156775d1f89f4f72be343c1d"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e58c18d2312749847a74f5be80bb0fa53da102bd"
@@ -1737,35 +1829,29 @@ version = "17.4.0+0"
 
 # ╔═╡ Cell order:
 # ╠═a129cc0c-73b6-4c18-ac17-d609d0b1bda4
+# ╠═b7b1609b-a83c-4ce6-9a84-c74fc390a74e
 # ╠═b37912b9-a9b0-4d69-952f-4d280f4ae382
+# ╟─b1be7b4c-1938-4c64-b27b-32a581223934
 # ╟─e4ab3255-4fde-458a-a430-7dd6b3e1d521
+# ╟─4d184f8a-afb3-41a5-a28d-f80a569eb3cb
+# ╟─583957ab-728e-4b0b-bb07-512dac692a12
 # ╟─ecb118f8-3a4f-44b9-adc3-421d94cb7514
 # ╟─d85c77a5-4b36-46ed-99f0-cb631c34baae
+# ╟─b65c173f-04d5-41a4-9ed2-9b59668991d2
 # ╠═09bd6290-b690-46e7-8a17-6c0ed0e5627f
 # ╠═722bda22-2044-4e6c-b17b-df1fa9801faf
 # ╠═fab2caac-b604-4fad-97c0-ff7e9579d9fc
-# ╟─9d52232c-1f7a-40fe-82eb-4f2efa7014d6
+# ╠═9d52232c-1f7a-40fe-82eb-4f2efa7014d6
+# ╟─c0d91c3c-cb4d-4d94-9d32-fb234caf69df
+# ╟─9273e916-ca5a-4c38-b446-e2ffd1c9cba3
 # ╠═b20edb50-db8c-45d3-95b6-70e0402cab0a
 # ╟─2d99d71f-0293-44e1-bc01-0416f33fa7ef
 # ╟─192cf150-6baf-4246-a0de-15ed1a93f8ce
-# ╟─889ed804-81bd-4e87-97d5-d5b6f4986a1f
 # ╟─50b3d6e1-803a-497e-a8f0-01dbe2aec886
-# ╠═b1b895cc-0b3a-43cc-b15d-85383f646cea
-# ╠═e06e61b9-8830-4750-8560-89a088ad2b7a
-# ╠═551f7515-7f3e-4591-a237-35fa16788b1d
-# ╠═c5bdcab2-7e11-42d8-be11-545482709ba6
-# ╠═63b3c4b4-72b3-4bc8-ac26-289d59c26bfd
-# ╠═3b359c98-3a5a-4268-92b5-3f5b8289e758
-# ╠═4ae1e515-641a-4c8e-b56a-bca7185a8a29
-# ╠═af7a8f75-4ccd-42c7-9152-43473aad5910
-# ╠═56369cef-eb80-4a0a-91b9-0b68d2363c5c
-# ╠═18d07a4d-7cd7-4a6e-8c24-57ecc4a4eab4
+# ╟─d7aa9cd8-a38f-4905-b518-fac3c9b95266
 # ╟─46a4a70c-305c-4c50-ab93-992b3002ce7e
 # ╟─952f53f4-555d-4074-904a-a0377e3e8b69
-# ╟─35d4162c-f6d1-4350-9337-836861fbcbad
-# ╠═94ac2cc2-706b-4359-97df-36fddfd17367
-# ╠═c5047d2f-4786-4dff-80b0-71cc48c6c366
-# ╠═ef23f392-fa34-4020-b699-efbbfd4e3990
-# ╠═3b4a3c28-08c1-4f22-9fa0-4b315437c94b
+# ╟─e63d67de-ff06-4b57-bb02-f21f7bec2b53
+# ╟─928d5e9c-2f4a-44ee-b815-1aea8a776ca6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

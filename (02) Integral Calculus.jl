@@ -205,7 +205,7 @@ Without doing integration by parts, we can see that Symbolics and `SymbolicNumer
 
 # ╔═╡ dcb8308e-22b1-421f-a0cc-86661aae92da
 md"""
-## Some tricks of the trade
+## Some Tricks of the Trade
 """
 
 # ╔═╡ 29225ab1-963c-4d03-8c43-54333cfa8d99
