@@ -4,459 +4,307 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ cb753c10-df5f-4a5d-a93d-f49e6e22f3d0
-using PlutoUI, Symbolics, SymbolicNumericIntegration
+# ╔═╡ a129cc0c-73b6-4c18-ac17-d609d0b1bda4
+using PlutoUI, Symbolics, SymbolicNumericIntegration, SymbolicUtils
 
-# ╔═╡ 97699ed6-cac0-4410-aa4e-b704b658ec7f
-using Symbolics: derivative, solve_for
-
-# ╔═╡ aefdfb86-c5df-44cc-ae56-00a7486ee14b
+# ╔═╡ b37912b9-a9b0-4d69-952f-4d280f4ae382
 TableOfContents()
 
-# ╔═╡ ab12574f-d559-40cc-9cc7-089f08e7dd1b
+# ╔═╡ e4ab3255-4fde-458a-a430-7dd6b3e1d521
 md"""
-# Introduction
-In the [previous notebook](), we explored various concepts in differential calculus using Pluto.jl and Symbolics.jl. We took derivatives of functions, analyzed limits, and more. Now we'll build on that foundation and introduce integral calculus.
-
-The integral is in some sense the opposite of the derivative. While derivatives allow us to find the rate of change of functions, integrals allow us to determine the area under curves. Some key properties we'll demonstrate:
-
-The fundamental theorem of calculus, connecting differentiation and integration
-Techniques like u-substitution and integration by parts for evaluating integrals
-How to compute integrals numerically using `SymbolicNumericIntegration.jl`
-We'll again take a hands-on approach, showing both manual derivations and implementing them programmatically with Julia Symbolics. By the end, we will hopefully have a solid grasp not only of the core concepts but also how to apply them in code.
-
-There are a few key reasons I wanted to create these tutorials on differential and integral calculus using Pluto notebooks:
-
-1. Learn by teaching: As the saying goes, the best way to truly understand a topic is to teach it. Creating these interactive notebooks forces me to solidify my own knowledge of calculus concepts. Writing explanations also identifies any gaps in my understanding.
-2. Master Pluto and Symbolics: Building these calculus demos gives hands-on practice using these Julia tools. I'm still relatively new to the Symbolics ecosystem, so this is great experience and will improve my skills.
-3. Share knowledge: By open-sourcing these notebooks, others can also learn from my process of exploring calculus with code. This contributes back to the Julia community.
-4. Fun and interactivity: The mix of text, math, code, and graphics makes learning more engaging. Readers can directly experiment with the techniques shown.
-5. Prepare for graduate studies: I'll be relying heavily on calculus in my upcoming graduate program. Solidifying my mental models will put me in a better position to succeed.
-6. [Glass Notebook](https://glassnotebook.io): Lastly, Connor Burns and I have spent the past couple years developing this product to publish interactive Pluto notebooks and I want to take advantage of this resource
-"""
-
-# ╔═╡ 6cbb915e-2299-11ee-0a63-3f883aafe2f2
-md"""
-# Integral Calculus
+# Calculus of Many Variables
 
 **Homework Problems**
-- 2.1.3
-- 2.2.1
-- 2.2.8
-- 2.2.9
+- 3.1.5
+- 3.1.6
+- 3.1.7
+- 3.2.4
 """
 
-# ╔═╡ 39230cd8-3e7e-4a29-9d16-6c4668791647
+# ╔═╡ ecb118f8-3a4f-44b9-adc3-421d94cb7514
 md"""
-## Basics of Integration
-"""
+## Problem 3.1.5
 
-# ╔═╡ af47fdf3-5190-4f5c-bd58-ef0f491eade9
-md"""
-The reverse problem of differention (the rate of change of something) is called integration. 
-
-```math
-\begin{align*}
-F(x) = F(x_0) + \int_{x_0}^{x} f(x) dx
-\end{align*}
-```
-
-Where ``f(x)`` is the rate of change of ``x``.
-
-Weirdly enough, many problems involving analytical integration solutions are solved by informed guessing and checking. This has been going on for centuries and there are very robust integration tables, which contain solutions to common types of integrals. Often our problems can be broken up to resemble these common types and then solved via a lookup table. These properties/rules are essential in transforming integrals into more approachable forms
-
-1. Linearity property
-
-```math
-\begin{align*}
-\int (af + bg)dx = \int(af)dx + \int(bg)dx
-\end{align*}
-```
-
-2. Composition rule
-```math
-\begin{align*}
-\int_a^b f(x) dx = \int_a^c f(x) dx + \int_c^b f(x) dx
-\end{align*}
-```
-
-3. Integration by parts
-```math
-\begin{align*}
-\int_{x_1}^{x^2} F g dx = FG|_{x_1}^{x_2} - \int_{x_1}^{x_2} G f dx
-\end{align*}
-```
-
-- Note, I learned this using ``u`` and ``v``, which gave the silly (but useful) mnemonic "**u**ltra**v**iolet **v**oo**du**"
-```math
-\begin{align*}
-\int udv = uv - \int vdu
-\end{align*}
-```
+Find the shortest distance from the origin to any point on the line ``x + 2y = 4`` by using Lagrange multipliers. Check this by more elementary means: by first finding the equation for the line which is perpendicular to the given line and passing through the origin.
 
 """
 
-# ╔═╡ 0d949853-bf76-45ba-8fb6-3870d78ffc5e
+# ╔═╡ d85c77a5-4b36-46ed-99f0-cb631c34baae
 md"""
-!!! info "Problem 2.1.3"
+```math
+\begin{align*}
+f(x, y) &= x^2 + y^2 \\
+g(x, y) &= x + 2y - 4 = 0 \\
+L(x, y, λ) &= x^2 + y^2 - λ(x + 2y - 4) \\
+\frac{\partial L}{\partial x} &= 2x - λ = 0 \\
+\frac{\partial L}{\partial y} &= 2y - 2λ = 0\\
+\frac{\partial L}{\partial λ} &= -(x + 2y - 4) = 0
+\end{align*}
+```
 
-	Given the function:
-	```math
-	\begin{align*}
-	F(n) = \int_0^{\infty} x^n e^{-x}dx
-	\end{align*}
-	```
+Solving the system gives:
+```math
+\begin{align*}
+x &= 4/5 \\
+y &= 8/5 \\
+\lambda &= 8/5 \\
+\end{align*}
+```
+"""
+
+# ╔═╡ 722bda22-2044-4e6c-b17b-df1fa9801faf
+@variables x y
+
+# ╔═╡ 09bd6290-b690-46e7-8a17-6c0ed0e5627f
+"""
+    lagrangian(f, g)
+
+Solve a constrained optimization problem using the Lagrangian method.
+
+Given an objective function `f` and a constraint `g`, find the critical points 
+that optimize `f` subject to `g` using the Lagrangian approach.
+
+The Lagrangian `L` is formed as:
+
+L(x, y, λ) = f(x, y) - λ(g(x, y))
+
+The optimal points are found by taking derivatives of `L` w.r.t. x, y, λ 
+and solving the resulting system of equations.
+
+# Arguments
+- `f`: Objective function to optimize
+- `g`: Constraint equation 
+
+# Returns
+- Optimal values for x, y, λ that maximize/minimize `f` subject to `g`
+
+# Examples
+```julia
+using Symbolics
+
+@variables x y λ
+f = x + y
+g = x^2 + y^2 - 1
+lagrangian(f, g)
+```
+"""
+function lagrangian(f, g)
+	@variables λ
+	L = f - λ*g
 	
-	Show using integration by parts:
-	```math
-	\begin{align*}
-	F(n) &= nF(n-1) \\
-	F(n) &= n!
-	\end{align*}
-	```
+	dLdx = derivative(L, x)
+	dLdy = derivative(L, y)
+	dLdλ = derivative(L, λ)
 
-"""
-
-# ╔═╡ e135e6d4-09e6-40bb-bfb1-42655129b130
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	F(n) = \int_0^{\infty} x^n e^{-x}dx
-	\end{align*}
-	```
-	---
-
-	```math
-	\begin{align*}
-	\int udv &= uv - \int vdu \\
-	&= \left[ -x^n e^{-x} \right]_0^\infty + \int_0^{\infty} n x^{n-1} e^{-x} dx \\
-	&= n \int_0^{\infty} x^{n-1} e^{-x} dx \\
-	&= \boxed{nF(n-1)}
-	\end{align*}
-	```
-	---
-
-	```math
-	\begin{align*}
-	F(0) &= \int_0^{\infty} e^{-x}dx \\
-	&= 1 \\
-
-	&\therefore \\
-	F(1) &= (1)(F(0))  = 1 \\
-	F(2) &= 2(F(1)) = 2(1) = 2 \\
-	F(3) &= 3(F(2)) = 3(2)(1) = 6 \\
-	&... \\
-	F(n) &= \boxed{n!}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 00ff8fae-234a-4fd2-a8d5-c4874efe45a6
-md"""
-#### With Symbolics
-Now let's solve this using Symbolics and `SymbolicNumericIntegration`, which provides the `integrate` function. SNI is unique in that it returns the symbolic answer along with the potential errors. From the docstring you can see
-
-```
-Returns 
-
-solved: the solved integral
-unsolved: the residual unsolved portion of the input
-err: the numerical error in reaching the solution
-```
-"""
-
-# ╔═╡ 67ceccec-8229-47d2-9ce7-0c3ef67a82a2
-@variables x n
-
-# ╔═╡ 08146807-be78-4b5e-824b-9339ba74e5dd
-f = x^n*exp(-x)
-
-# ╔═╡ 0a462de2-6ac0-49a2-8363-7f71a151326e
-md"""
-Symbolics does not know how to do definite integration so we will create a simple wrapper function for that.
-"""
-
-# ╔═╡ 4215ff54-de42-4443-9fc1-775467e0001a
-function SymbolicNumericIntegration.integrate(f, x, x0, x1)
-	F = integrate(f, x)[1]
-	F = substitute(F, x => x1) - substitute(F, x => x0)
+	sys = [dLdx ~ 0, dLdy ~ 0, dLdλ ~ 0]
+	
+	return solve_for(sys, [x, y, λ])
 end
 
-# ╔═╡ 57586f37-1b1a-4ebc-92e1-bb218e7cba81
-begin
-	_F0 = substitute(f, n => 0)
-	F0 = integrate(_F0, x, 0, Inf)
-end
-
-# ╔═╡ d010dc88-b540-44cd-b3af-3a46e23e2b50
-F1 = 1*F0
-
-# ╔═╡ 4e6db988-c227-488d-9345-d2cd4300e8b7
-F2 = 2*F1
-
-# ╔═╡ 8ad718a9-061a-4757-9eb2-60068a743a14
-F3 = 3*F2
-
-# ╔═╡ ed87125e-23b5-4b4d-b42e-570552d36967
-md"""
-Without doing integration by parts, we can see that Symbolics and `SymbolicNumericIntegration` does a decent job at showing ``F(n) = n!`` if we begin with the assumed knowledge of ``F(n) = n F(n-1)``
-"""
-
-# ╔═╡ dcb8308e-22b1-421f-a0cc-86661aae92da
-md"""
-## Some tricks of the trade
-"""
-
-# ╔═╡ 29225ab1-963c-4d03-8c43-54333cfa8d99
-md"""
-There are numerous ways to try to evaluate integrals, but two specifc "tricks" are frequently employed.
-
-1. Substitution or change of variable
-2. Differentiating with respect to a parameter
-
-As an example of (1) we see how substitution of the integrand with ``u`` can simplify the process of finding a solution
-
-We're given the function:
-```math
-\begin{align*}
-F(x_1, x_2) &= \int_{x_1}^{x_2} \frac{x^2}{(x^3 + 4)^2}dx
-\end{align*}
-```
-
-We can simplify the integration by using a substitution. Let's set ``u = x^3 + 4``. Then, the differential ``du`` is ``3x^2 dx``. Hence, ``dx = \frac{du}{3x^2}``.
-
-Now, we substitute ``u`` and ``dx`` into the integral:
-```math
-\begin{align*}
-F(x_1, x_2) &= \int_{u(x_1)}^{u(x_2)} \frac{1}{u^2} \cdot \frac{du}{3} = \frac{1}{3} \int_{u(x_1)}^{u(x_2)} \frac{du}{u^2}
-\end{align*}
-```
-
-This integral is now much easier to solve. The integral of ``\frac{1}{u^2}`` is ``-\frac{1}{u}``. Therefore, we have:
-```math
-\begin{align*}
-F(x_1, x_2) &= -\frac{1}{3} \left[ \frac{1}{u} \right]_{u(x_1)}^{u(x_2)} = -\frac{1}{3} \left( \frac{1}{x_2^3 + 4} - \frac{1}{x_1^3 + 4} \right)
-\end{align*}
-```
-
-This is the result of the integral after applying the substitution method.
-
-An important note is the Jacobian, which is just ``J = \frac{dx}{du}``. This will be included in every substitution
-
-"""
-
-# ╔═╡ 1af99b41-85dc-463d-8a02-35600a5c82e3
-md"""
-!!! info "Problem 2.2.1"
-	Evaluate ``\int_{x_1}^{x_2} \frac{dx}{\sqrt{a^2 - x^2}}`` by switching to ``\theta`` defined by ``x = a \sin \theta``, assume ``0 \leq x \leq \frac{\pi}{2}``
-"""
-
-# ╔═╡ e6643a9d-63c3-4684-a518-923c90cd785d
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	& \int_{x_1}^{x_2} \frac{1}{\sqrt{a^2 - x^2}} dx \\
-	&\text{Let } x = a\sin\theta, \quad 0 \leq x \leq \frac{\pi}{2} \\
-	& \int_{\theta_1}^{\theta_2} \frac{a\cos\theta}{\sqrt{a^2\cos^2\theta}} d\theta \\
-	&= \int_{\theta_1}^{\theta_2} d\theta \\
-	&= \theta\big|_{\theta_1}^{\theta_2} \\
-	&= \theta_2 - \theta_1 \\
-	&= a - 0 = \boxed{a}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ bb4baf11-8570-4446-88d7-e5ffec5647d6
-md"""
-#### With Symbolics
-Let's check this with Symbolics
-"""
-
-# ╔═╡ 7ee83853-cc29-4f28-bcb7-9a03e4a9eef2
-md"""
-!!! danger
-	It seems like this should be simple, but it's not as easy as this:
-	```julia
-	@variables a x
-	f = 1 / (sqrt(a^2 - x^2))
-	integrate(f, x)
-	```
-
-	To come back to this
-"""
-
-# ╔═╡ c1c02fb6-7944-4199-b9cc-9b57a1295953
+# ╔═╡ fab2caac-b604-4fad-97c0-ff7e9579d9fc
 let
-	@variables a x
-	f = 1 / (sqrt(a^2 - x^2))
+	f = x^2 + y^2
+	g = x + 2y - 4	
+	x, y, _ = lagrangian(f, g)
+	x, y
+end
+
+# ╔═╡ 9d52232c-1f7a-40fe-82eb-4f2efa7014d6
+md"""
+## Problem 3.1.6
+Show using the Lagrangian, that among all rectangles of a given perimeter, the square has the greatest area
+"""
+
+# ╔═╡ b20edb50-db8c-45d3-95b6-70e0402cab0a
+let
+	@variables P
+	f = x*y
+	g = 2x + 2y - P
+	x, y, _ = lagrangian(f, g)
+	x, y
+end
+
+# ╔═╡ 2d99d71f-0293-44e1-bc01-0416f33fa7ef
+md"""
+## Problem 3.1.7
+
+Consider ``N`` particles in a box. According to quantum mechanics, the energies of the particles are quantized to some set of values or energy levels (``\epsilon_1, \epsilon_2, ...``). Let ``n_i`` be the number of particles in level ``i`` with energy ``\epsilon_i``. The multiplicity or number of distinct rearrangements of the particles consistent with any given distribution ``n_i``, is given by
+
+```math
+\begin{align*}
+W(n_1, n_2, \ldots) &= \frac{N!}{n_1!n_2!\ldots}
+\end{align*}
+```
+
+The question is this: which distribution of particles, subject to the constraint that the total number equal ``N`` and the total energy equal ``E``, gives the biggest ``W``? Use below
+
+```math
+\begin{align*}
+S &= \ln W \qquad (\text{Note: } \ln n! \approx n \ln n - n)
+\end{align*}
+```
+
+Then:
+- (1) write the constraints on the ``n_i``'s due to the total number ``N`` and energy ``E``
+- (2) treat all ``n_i``'s as continuous variables
+- (3) introduce Lagrange multipliers ``\alpha`` and ``\beta`` for ``N`` and ``E``
+- (4) maximize ``S``
+"""
+
+# ╔═╡ 192cf150-6baf-4246-a0de-15ed1a93f8ce
+md"""
+Total particles and total energy (constraint equations)
+```math
+\begin{align*}
+N &= \sum_i n_i \\
+g_1 &= \sum_i n_i - N \\
+E &= \sum_i n_i \epsilon_i \\
+g_2 &= \sum_i n_i \epsilon_i - E
+\end{align*}
+```
+
+Entropy (maximization equation)
+```math
+\begin{align*}
+S &= \ln W \\
+&= \ln(\frac{N!}{n_1! n_2! ...}) \\
+&= \ln (N!) - \ln (n_1! n_2! ...) \\
+&= N \ln N - N - [\ln(n_1 !) + \ln(n_2 !) + ...] \\
+&= N \ln N - N - [n_1 \ln n_1 - n_1 + n_2 \ln n_2 - n_2 + ...] \\
+&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)]
+\end{align*}
+```
+
+Lagrangian
+```math
+\begin{align*}
+L &= S - \alpha(g_1) - \beta(g_2) \\
+&= N \ln N - N - [\sum_i (n_i \ln n_i - n_i)] - [\alpha (\sum_i n_i - N)] - [\beta (\sum_i n_i \epsilon_i - E)]
+\end{align*}
+```
+"""
+
+# ╔═╡ 889ed804-81bd-4e87-97d5-d5b6f4986a1f
+md"""
+Answer
+```math
+\begin{align*}
+\frac{\partial L}{\partial n_i} &= 0 \\
+\frac{\partial }{\partial n_i}[-\int(n_i \ln n_i) + \int n_i - \alpha \int n_i - \beta \int (n_i \epsilon_i)] &= 0 \\
+-\ln n_i - \alpha - \beta \epsilon &= 0 \\
+n_i &= \boxed{e^{- \alpha - \beta \epsilon}}
+\end{align*}
+```
+"""
+
+# ╔═╡ 50b3d6e1-803a-497e-a8f0-01dbe2aec886
+md"""
+#### Symbolics.jl
+"""
+
+# ╔═╡ b1b895cc-0b3a-43cc-b15d-85383f646cea
+@variables nᵢ ϵᵢ N E α β
+
+# ╔═╡ e06e61b9-8830-4750-8560-89a088ad2b7a
+@register_symbolic sum(..)
+
+# ╔═╡ 551f7515-7f3e-4591-a237-35fa16788b1d
+g₁ = sum(nᵢ) - N
+
+# ╔═╡ c5bdcab2-7e11-42d8-be11-545482709ba6
+g₂ = sum(nᵢ * ϵᵢ) - E
+
+# ╔═╡ 63b3c4b4-72b3-4bc8-ac26-289d59c26bfd
+S = N*log(N) - N - (sum(nᵢ * log(nᵢ)-nᵢ))
+
+# ╔═╡ 3b359c98-3a5a-4268-92b5-3f5b8289e758
+L = S - (α*g₁) - (β*g₂)
+
+# ╔═╡ 4ae1e515-641a-4c8e-b56a-bca7185a8a29
+function ∫(f, x)
 	integrate(f, x)
 end
 
-# ╔═╡ 60333e2a-c56e-4682-8e70-8bdaca13f6ab
-md"""
-!!! info "Problem 2.2.8"
-	Given:
-	```math
-	\begin{align*}
-	I_1(a) = \int_{0}^{\infty} e^{-ax^2} x dx
-	\end{align*}
-	```
-	
-	Show that:
-	```math
-	\begin{align*}
-	I_1(a) = \frac{1}{2a}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 334a0ac1-f645-472d-ad83-93ea04c31e2d
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	I_1(a) &= \int_{0}^{\infty} e^{-ax^2} x dx \\
-	&\text{Let } u = ax^2 \\
-	\therefore I_1(a) &= \int_{0}^{\infty} \frac{1}{2a} e^{-u} du \\
-	&= \left[-\frac{1}{2a}e^{-u}\right]_0^\infty \\
-	&= \frac{1}{2a}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ d13332df-0373-406b-99f7-29af2fffed9b
-md"""
-#### With Symbolics
-Let's check this with Symbolics
-"""
-
-# ╔═╡ d676da3d-05fc-438c-b457-a5cd7cd67aa7
-md"""
-!!! danger
-	It seems like this should be simple, but it's not as easy as this:
-	```julia
-	@variables x a
-	f = exp(-a * x^2) * x
-	F = integrate(f, x)[1]
-	```
-
-	To come back to this
-"""
-
-# ╔═╡ eeec451a-939b-44e5-ab1e-363d0dbd99a4
-let
-	@variables x a
-	f = exp(-a * x^2) * x
-	F = integrate(f, x)[1]
-	@info F
-	F2 = integrate(f, x, 0, Inf)
-	@info F2
+# ╔═╡ af7a8f75-4ccd-42c7-9152-43473aad5910
+function ∫(f)
+	integrate(f)
 end
 
-# ╔═╡ a8010ef2-53ba-4c59-9d52-b076ca69012a
+# ╔═╡ 56369cef-eb80-4a0a-91b9-0b68d2363c5c
+L_continous = substitute(L, sum => ∫)
+
+# ╔═╡ 18d07a4d-7cd7-4a6e-8c24-57ecc4a4eab4
+dLdnᵢ = derivative(L_continous, nᵢ) ~ 0
+
+# ╔═╡ 46a4a70c-305c-4c50-ab93-992b3002ce7e
 md"""
-!!! info "Problem 2.2.9"
-	Given:
-	```math
-	I_n(a) = \int_{0}^{\infty} (x^n) e^{-ax^2} dx
-	```
-	
-	Evaluate:
-	```math
-	I_3(a) \ \text{and} \ I_4(a)
-	```
+## Problem 3.2.4
+
+Show that the volume of a sphere is ``V(r) = \frac{4}{3} \pi r^3`` by integrating ``f = 1`` over a sphere
 """
 
-# ╔═╡ 4123bd88-5de4-4233-ad93-edb2fc26f766
+# ╔═╡ 952f53f4-555d-4074-904a-a0377e3e8b69
 md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	I_3(a) &= \int_0^\infty x^3 e^{-ax^2} dx \\
-	&\text{Let } u=ax^2 , \frac{1}{2a}du = xdx \\
-	&= \frac{1}{2a} \int_0^\infty u^{3/2} e^{-u} du \\
-	&= \frac{1}{2a} \cdot \frac{1}{2} \Gamma\left(\frac{5}{2}\right) \\
-	&= \boxed{\frac{3}{4a}}
-	\end{align*}
-	```
-	
-	```math
-	\begin{align*}
-	I_4(a) &= \int_0^\infty x^4 e^{-ax^2} dx \\
-	&\text{Let } u=ax^2 \frac{1}{2a}du = xdx \\
-	\therefore \qquad I_4(a) &= \frac{1}{2a} \int_0^\infty u^2 e^{-u} du \\
-	&= \frac{1}{2a} \cdot 2\Gamma(3) \\
-	&= \boxed{\frac{2}{a}} \\
-	\end{align*}
-	```
+Given spherical coordinates:
+```math
+\begin{align*}
+x &= r \sin \theta \cos \phi \\
+y &= r \sin \theta \sin \phi \\
+z &= r \cos \theta
+\end{align*}
+```
+
+```math
+\begin{align*}
+r &= \sqrt{x^2 + y^2 + z^2} \\
+\theta &= \cos^{-1}(z / r) \\ 
+\phi &= \tan^{-1}(y / x) \\ 
+\end{align*}
+```
+
 """
 
-# ╔═╡ 0030ab2f-b1cb-4ea3-ad98-5211464da519
+# ╔═╡ 35d4162c-f6d1-4350-9337-836861fbcbad
 md"""
-# Summary
-
-This section was brief and if this notebook is not meant to teach you integral calculus. The goal is mainly to provide an introduction to specific aspects of integral calculus with Julia and the Symbolics ecosystem. `SymbolicNumericIntegration.jl` is powerful and seems like it has all that it needs to be a very capable approach instead of something like Mathematica. Unfortunately it's still early in the development process and many more features need to be worked out for this to be ready for mass adoption.
-
-As always, the book does a nice job providing a summary of the key concepts listed in this chapter, which I will include below
-
----
-Reversibility
 ```math
 \begin{align*}
-\int_{x_1}^{x_2} f(x)dx &= - \int_{x_2}^{x_1} f(x)dx
-\end{align*}
-```
----
-Integration by parts
-```math
-\begin{align*}
-\int_{x_1}^{x^2} F g dx = FG|_{x_1}^{x_2} - \int_{x_1}^{x_2} G f dx
-\end{align*}
-```
-
-OR
-```math
-\begin{align*}
-\int udv = uv - \int vdu
-\end{align*}
-```
----
-Substitution
-```math
-\begin{align*}
-\int_{x_1}^{x_2} f(x)dx &= \int_{u(x_1)}^{u(x_2)} f(x(u)) \frac{dx(u)}{du}du
-\end{align*}
-```
-where ``\frac{dx(u)}{du}`` is the Jacobian
-
----
-If 
-```math
-\begin{align*}
-F(a) &= \int_{x_1}^{x_2} f(x, a)dx
-\end{align*}
-```
-
-Then
-```math
-\begin{align*}
-\frac{dF}{da} &= \int_{x_1}^{x_2} \frac{\partial f}{da}dx
+V &=\int_r  \int_{\phi}  \int_{\theta}r^2 \sin\theta d\theta d\phi dr \\
+V &= \int_0^R r^2 dr \int_0^{2\pi} d\phi \int_0^\pi \sin\theta d\theta \\
+V &= (\frac{1}{3} R^3) (2\pi) (2) \\
+V &= \boxed{\frac{4}{3} \pi R^3}
 \end{align*}
 ```
 """
+
+# ╔═╡ 94ac2cc2-706b-4359-97df-36fddfd17367
+@syms r θ ϕ π z
+
+# ╔═╡ c5047d2f-4786-4dff-80b0-71cc48c6c366
+f = r^2 + sin(θ)
+
+# ╔═╡ ef23f392-fa34-4020-b699-efbbfd4e3990
+function integrate_multivariate(f)
+	args = arguments(f)
+    for a in args
+		@info a
+    end
+end
+
+# ╔═╡ 3b4a3c28-08c1-4f22-9fa0-4b315437c94b
+integrate_multivariate(f)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 SymbolicNumericIntegration = "78aadeae-fbc0-11eb-17b6-c7ec0477ba9e"
+SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 PlutoUI = "~0.7.52"
 SymbolicNumericIntegration = "~1.1.0"
+SymbolicUtils = "~1.0.5"
 Symbolics = "~5.5.0"
 """
 
@@ -466,7 +314,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "84875b7600a704d1156775d1f89f4f72be343c1d"
+project_hash = "5a0fca921373271d8d04bd663cc0b25c647ba904"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e58c18d2312749847a74f5be80bb0fa53da102bd"
@@ -1888,39 +1736,36 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═cb753c10-df5f-4a5d-a93d-f49e6e22f3d0
-# ╠═97699ed6-cac0-4410-aa4e-b704b658ec7f
-# ╠═aefdfb86-c5df-44cc-ae56-00a7486ee14b
-# ╟─ab12574f-d559-40cc-9cc7-089f08e7dd1b
-# ╟─6cbb915e-2299-11ee-0a63-3f883aafe2f2
-# ╟─39230cd8-3e7e-4a29-9d16-6c4668791647
-# ╟─af47fdf3-5190-4f5c-bd58-ef0f491eade9
-# ╟─0d949853-bf76-45ba-8fb6-3870d78ffc5e
-# ╟─e135e6d4-09e6-40bb-bfb1-42655129b130
-# ╟─00ff8fae-234a-4fd2-a8d5-c4874efe45a6
-# ╠═67ceccec-8229-47d2-9ce7-0c3ef67a82a2
-# ╠═08146807-be78-4b5e-824b-9339ba74e5dd
-# ╟─0a462de2-6ac0-49a2-8363-7f71a151326e
-# ╠═4215ff54-de42-4443-9fc1-775467e0001a
-# ╠═57586f37-1b1a-4ebc-92e1-bb218e7cba81
-# ╠═d010dc88-b540-44cd-b3af-3a46e23e2b50
-# ╠═4e6db988-c227-488d-9345-d2cd4300e8b7
-# ╠═8ad718a9-061a-4757-9eb2-60068a743a14
-# ╟─ed87125e-23b5-4b4d-b42e-570552d36967
-# ╟─dcb8308e-22b1-421f-a0cc-86661aae92da
-# ╟─29225ab1-963c-4d03-8c43-54333cfa8d99
-# ╟─1af99b41-85dc-463d-8a02-35600a5c82e3
-# ╟─e6643a9d-63c3-4684-a518-923c90cd785d
-# ╟─bb4baf11-8570-4446-88d7-e5ffec5647d6
-# ╟─7ee83853-cc29-4f28-bcb7-9a03e4a9eef2
-# ╠═c1c02fb6-7944-4199-b9cc-9b57a1295953
-# ╟─60333e2a-c56e-4682-8e70-8bdaca13f6ab
-# ╟─334a0ac1-f645-472d-ad83-93ea04c31e2d
-# ╟─d13332df-0373-406b-99f7-29af2fffed9b
-# ╟─d676da3d-05fc-438c-b457-a5cd7cd67aa7
-# ╠═eeec451a-939b-44e5-ab1e-363d0dbd99a4
-# ╟─a8010ef2-53ba-4c59-9d52-b076ca69012a
-# ╟─4123bd88-5de4-4233-ad93-edb2fc26f766
-# ╟─0030ab2f-b1cb-4ea3-ad98-5211464da519
+# ╠═a129cc0c-73b6-4c18-ac17-d609d0b1bda4
+# ╠═b37912b9-a9b0-4d69-952f-4d280f4ae382
+# ╟─e4ab3255-4fde-458a-a430-7dd6b3e1d521
+# ╟─ecb118f8-3a4f-44b9-adc3-421d94cb7514
+# ╟─d85c77a5-4b36-46ed-99f0-cb631c34baae
+# ╠═09bd6290-b690-46e7-8a17-6c0ed0e5627f
+# ╠═722bda22-2044-4e6c-b17b-df1fa9801faf
+# ╠═fab2caac-b604-4fad-97c0-ff7e9579d9fc
+# ╟─9d52232c-1f7a-40fe-82eb-4f2efa7014d6
+# ╠═b20edb50-db8c-45d3-95b6-70e0402cab0a
+# ╟─2d99d71f-0293-44e1-bc01-0416f33fa7ef
+# ╟─192cf150-6baf-4246-a0de-15ed1a93f8ce
+# ╟─889ed804-81bd-4e87-97d5-d5b6f4986a1f
+# ╟─50b3d6e1-803a-497e-a8f0-01dbe2aec886
+# ╠═b1b895cc-0b3a-43cc-b15d-85383f646cea
+# ╠═e06e61b9-8830-4750-8560-89a088ad2b7a
+# ╠═551f7515-7f3e-4591-a237-35fa16788b1d
+# ╠═c5bdcab2-7e11-42d8-be11-545482709ba6
+# ╠═63b3c4b4-72b3-4bc8-ac26-289d59c26bfd
+# ╠═3b359c98-3a5a-4268-92b5-3f5b8289e758
+# ╠═4ae1e515-641a-4c8e-b56a-bca7185a8a29
+# ╠═af7a8f75-4ccd-42c7-9152-43473aad5910
+# ╠═56369cef-eb80-4a0a-91b9-0b68d2363c5c
+# ╠═18d07a4d-7cd7-4a6e-8c24-57ecc4a4eab4
+# ╟─46a4a70c-305c-4c50-ab93-992b3002ce7e
+# ╟─952f53f4-555d-4074-904a-a0377e3e8b69
+# ╟─35d4162c-f6d1-4350-9337-836861fbcbad
+# ╠═94ac2cc2-706b-4359-97df-36fddfd17367
+# ╠═c5047d2f-4786-4dff-80b0-71cc48c6c366
+# ╠═ef23f392-fa34-4020-b699-efbbfd4e3990
+# ╠═3b4a3c28-08c1-4f22-9fa0-4b315437c94b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
