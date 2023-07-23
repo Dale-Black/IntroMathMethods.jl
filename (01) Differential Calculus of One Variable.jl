@@ -29,10 +29,6 @@ TableOfContents()
 # ╔═╡ 81813bb0-5c1b-495b-aa8f-316117b4b80f
 md"""
 # Introduction
-"""
-
-# ╔═╡ 9ea967d0-8f24-4272-afdc-f959fdbb782f
-md"""
 I am entering my first year of graduate studies at the University of California, Irvine and as a big fan of Julia, I am going to attempt to use it everywhere I can. This course is not meant to be a computational mathematics course, but I feel like it's the perfect onramp for someone like me to get a grasp of the Symbolics ecosystem in Julia. I might abandon this idea (depending on time constraints and the maturity of the Symbolics ecosystem for this use case) but for now my plan is to solve all my homework in Pluto notebooks with Markdown/Latex (by hand) and Symbolics (computationally).
 
 I am going to attempt to write this notebooks in a way that could serve as a blog post if I want. There are a few reasons for that - (1) one of the toughest parts about using Julia is usually the lack of documentation so maybe one day these could be cleaned up and used as a supplement to the Symbolics.jl docs, (2) Julia makes math much more fun and trying to implement mathematical concepts in code helps me understand these concepts at a deeper level, (3) writing this in blog format (and potentially publishing on something like substack/medium) will force me to not only implement these concepts for homework problems but also understand them deeply enough to explain them to others, and (4) our new product [Glass Notebook](https://glassnotebook.io) is a fun way to publish interactive Pluto notebooks on the web and I want to use this service as much as possible (of course, since me and Connor Burns built it)
@@ -2433,7 +2429,6 @@ version = "3.5.0+0"
 # ╠═1bb4b0c9-5d04-4e62-807c-9f455ef49c89
 # ╠═25877aa4-8c2a-4112-be89-8a707f367019
 # ╟─81813bb0-5c1b-495b-aa8f-316117b4b80f
-# ╟─9ea967d0-8f24-4272-afdc-f959fdbb782f
 # ╟─495c8000-00f8-475a-8a34-6ea621ffd3c3
 # ╟─30047808-b3cf-458f-8b0c-e2b8799e16ab
 # ╟─aac632b9-2bfb-4656-92ec-5a8adc5d3ba5
