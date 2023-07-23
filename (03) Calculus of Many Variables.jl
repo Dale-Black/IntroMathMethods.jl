@@ -387,6 +387,155 @@ md"""
 	...
 """
 
+# ╔═╡ d7774f7b-f198-4de5-bb13-62aeed958538
+md"""
+## Integral Calculus of Many Variables
+"""
+
+# ╔═╡ 70d8b04b-b97e-4e44-88a2-5f678562b5dd
+md"""
+Integral Calculus of Many Variables
+- Integration of a function ``f(x, y)`` over a domain ``D`` can be performed using the following double integral:
+
+```math
+\begin{align*}
+F(D) = \int_{y_1}^{y_2} \left[\int_{x_1(y)}^{x_2(y)} f(x, y) dx\right] dy
+\end{align*}
+```
+
+This equation represents the integral of ``f`` over ``D``, where ``D`` is the region bounded by ``x_1(y)`` and ``x_2(y)`` in the x-direction, and ``y_1`` and ``y_2`` in the y-direction.
+
+- When shifting to non-Cartesian but orthogonal coordinates ``u_1, u_2, ...``, it's important to identify scale factors ``h_i`` such that ``h_i du_i`` is the displacement under a change in just ``u_i``. 
+
+    - The Jacobian, which is the determinant of the matrix of all first-order partial derivatives, is then ``J = h_1h_2...``. This determinant provides a measure of how a change in the ``u_i`` coordinates results in a change in the Cartesian coordinates.
+
+    - For example, when converting differential elements or integrals from Cartesian to spherical coordinates, the ``dx dy dz`` in Cartesian coordinates would become ``r^2 \sin θ dr dθ dφ`` in spherical coordinates.
+
+"""
+
+# ╔═╡ dbe67bf3-b869-4c2d-9336-e6b24b07e374
+md"""
+# Summary
+
+Below is the books summary for chapter 3
+
+---
+Partial Derivatives
+- The partial derivatives of a function ``f(x, y, ...)`` with respect to its variables ``x, y, ...``, denoted by ``f_x, f_y, ...``, are calculated using the following definition:
+
+```math
+\begin{align*}
+\frac{\partial f}{\partial x} &= \lim_{h \to 0} \frac{f(x + h, y, ...) - f(x, y, ...)}{h}
+\end{align*}
+```
+
+This equation represents the change in ``f`` with respect to a small change in ``x``, while keeping all other variables constant. Similar equations hold for ``f_y, f_z, ...``.
+
+---
+
+Stationary Points
+- Stationary points of a function are points where all first derivatives are zero (``f_x = 0, f_y = 0, ...``). These points could be local maxima, local minima, or saddle points of the function.
+
+---
+
+Lagrange Multipliers
+- The method of Lagrange multipliers is used to find the extrema of a function ``f`` subject to a constraint ``g(x, y) = 0``. The Lagrange function is defined as ``L = f - λg``, and the extrema are found by solving the following system of equations:
+
+```math
+\begin{align*}
+f_x &= \lambda g_x \\
+f_y &= \lambda g_y \\
+g(x, y) &= 0
+\end{align*}
+```
+
+---
+
+Integration Over a Domain
+- Integration of a function ``f(x, y)`` over a domain ``D`` can be performed using the following double integral:
+
+```math
+\begin{align*}
+F(D) = \int_{y_1}^{y_2} \left[\int_{x_1(y)}^{x_2(y)} f(x, y) dx\right] dy
+\end{align*}
+```
+
+This equation represents the integral of ``f`` over ``D``, where ``D`` is the region bounded by ``x_1(y)`` and ``x_2(y)`` in the x-direction, and ``y_1`` and ``y_2`` in the y-direction.
+
+---
+
+Polar coordinates
+- Polar coordinates are a two-dimensional coordinate system in which each point on a plane is determined by a distance from a reference point and an angle from a reference direction.
+
+- The reference point (analogous to the origin of a Cartesian system) is called the pole, and the ray from the pole in the reference direction is the polar axis. The distance from the pole is called the radial coordinate, radial distance or simply radius, and the angle is the angular coordinate, polar angle, or azimuth.
+
+  - **Radial coordinate (r)**: The radial coordinate, ``r``, represents the straight-line distance from the pole to the point.
+
+  - **Angular coordinate (θ)**: The angular coordinate, ``θ`` (theta), is the angle required to reach the point from the 0 degree ray, moving in a counterclockwise direction.
+
+- The polar coordinates ``(r, θ)`` are related to the Cartesian coordinates ``(x, y)`` by the following equations:
+
+```math
+\begin{align*}
+x &= r \cos θ \\
+y &= r \sin θ
+\end{align*}
+```
+
+- And conversely, we can convert from Cartesian coordinates to polar coordinates using:
+```math
+\begin{align*}
+r &= \sqrt{x^2 + y^2} \\
+θ &= \arctan\left(\frac{y}{x}\right)
+\end{align*}
+```
+
+---
+Spherical coordinates
+- Spherical coordinates (also known as spherical polar coordinates) are a system of coordinates for three-dimensional space where the position of a point is specified by three numbers: the radial distance from a fixed origin, the polar angle from a fixed zenith direction, and the azimuth angle from a fixed reference direction.
+
+  - **Radial distance (r)**: The radial distance, ``r``, is the Euclidean distance from the origin to the point.
+
+  - **Polar angle (θ)**: The polar angle, ``θ`` (theta), is the angle between the positive z-axis and the line segment from the origin to the point in question.
+
+  - **Azimuthal angle (φ)**: The azimuthal angle, ``φ`` (phi), is the angle between the positive x-axis and the projection of the line segment from the origin to the point in question onto the xy-plane. It's measured in the xy-plane counterclockwise from the positive x-axis.
+
+- The spherical coordinates ``(r, θ, φ)`` are related to the Cartesian coordinates ``(x, y, z)`` by the following equations:
+
+```math
+\begin{align*}
+x &= r \sin θ \cos φ \\
+y &= r \sin θ \sin φ \\
+z &= r \cos θ
+\end{align*}
+```
+
+- And conversely, we can convert from Cartesian coordinates to spherical coordinates using:
+```math
+\begin{align*}
+r &= \sqrt{x^2 + y^2 + z^2} \\
+θ &= \arccos\left(\frac{z}{\sqrt{x^2 + y^2 + z^2}}\right) \\
+φ &= \arctan\left(\frac{y}{x}\right)
+\end{align*}
+```
+
+---
+Change of Coordinates
+- When shifting to non-Cartesian but orthogonal coordinates ``u_1, u_2, ...``, it's important to identify scale factors ``h_i`` such that ``h_i du_i`` is the displacement under a change in just ``u_i``. 
+
+  - The Jacobian, which is the determinant of the matrix of all first-order partial derivatives, is then ``J = h_1h_2...``. This determinant provides a measure of how a change in the ``u_i`` coordinates results in a change in the Cartesian coordinates.
+
+- In the case of 2-dimensional polar coordinates, the scale factors are ``h_r = 1`` and ``h_θ = r``. This reflects that a small change in ``r`` corresponds to a small Cartesian displacement, while a small change in ``θ`` corresponds to a larger displacement the further you are from the origin.
+
+- In 3-dimensional cylindrical coordinates, the scale factors are ``h_r = 1``, ``h_θ = r``, and ``h_z = 1``. The factors for ``r`` and ``θ`` are the same as in 2-dimensional polar coordinates, while ``h_z = 1`` reflects that the z-coordinate is already a Cartesian coordinate.
+
+- In 3-dimensional spherical coordinates, the scale factors are ``h_r = 1``, ``h_θ = r``, and ``h_φ = r \sin θ``. The factor for ``r`` is the same as in 2-dimensional polar and 3-dimensional cylindrical coordinates. The factor for ``θ`` reflects that the displacement corresponding to a small change in ``θ`` gets larger the further you are from the origin. The factor for ``φ`` reflects that the displacement corresponding to a small change in ``φ`` gets larger the further you are from the origin, and also depends on the polar angle ``θ``.
+
+Thus, for example, when converting differential elements or integrals from Cartesian to spherical coordinates, the ``dx dy dz`` in Cartesian coordinates would become ``r^2 \sin θ dr dθ dφ`` in spherical coordinates.
+
+
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1853,5 +2002,8 @@ version = "17.4.0+0"
 # ╟─952f53f4-555d-4074-904a-a0377e3e8b69
 # ╟─e63d67de-ff06-4b57-bb02-f21f7bec2b53
 # ╟─928d5e9c-2f4a-44ee-b815-1aea8a776ca6
+# ╟─d7774f7b-f198-4de5-bb13-62aeed958538
+# ╟─70d8b04b-b97e-4e44-88a2-5f678562b5dd
+# ╟─dbe67bf3-b869-4c2d-9336-e6b24b07e374
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
