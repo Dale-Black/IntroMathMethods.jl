@@ -3,10 +3,6 @@ uuid = "5a20ada7-fe87-4287-9b8b-c63809322aa7"
 authors = ["Dale Black <djblack@uci.edu> and contributors"]
 version = "1.0.0-DEV"
 
-[deps]
-SymbolicNumericIntegration = "78aadeae-fbc0-11eb-17b6-c7ec0477ba9e"
-Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-
 [compat]
 julia = "1.9"
 
