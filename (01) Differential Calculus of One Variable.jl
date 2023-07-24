@@ -494,7 +494,7 @@ md"""
 # ╔═╡ 5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
 md"""
 #### With Symbolics
-*Note, the tricky `[0]`* : When working with Julia, the index starts at 1 but in Python the index starts at zero
+*Note, the tricky `[0]`* : When working with Julia, the index starts at 1 but in Python the index starts at 0
 """
 
 # ╔═╡ 85c5261e-3925-4cad-bd1d-fd8593156d6b
