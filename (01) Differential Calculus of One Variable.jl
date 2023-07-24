@@ -176,11 +176,11 @@ md"""
 Let's check our answer using SymPy. This will be a trend as you will see.
 """
 
-# ╔═╡ 4293024b-c33e-467b-8e21-416556eb4582
-let
-	f = 1/x
-	sp.diff(f, x)
-end
+# ╔═╡ d32a01e0-83a1-44dc-a486-03a5d61874c5
+f2 = 1/x
+
+# ╔═╡ faaee09d-ea43-458c-8f29-e551d018a2ba
+sp.diff(f, x)
 
 # ╔═╡ dcc46222-aa33-4646-a197-105528781dca
 md"""
@@ -428,19 +428,21 @@ md"""
 This is a great example of where a computer and SymPy comes in handy. Taking all those derivatives by hand was tedius. Let's see how SymPy can solve this. First let's create a function for the Taylor series about the origin
 """
 
-# ╔═╡ c913a4c3-1e64-45ae-95e1-e908b6fe2364
-let
-	f = sp.sin(x) / (sp.cosh(x) + 2)
-	f_ts = sp.series(f, x, n = 4).removeO()
+# ╔═╡ 38ef7a6f-e251-44ee-924e-e338289ec976
+f3 = sp.sin(x) / (sp.cosh(x) + 2)
 
-	@info "Original: " f
-	@info "Taylor Series Expansion: " f_ts
-	@info f.subs(x, 0.1), f_ts.subs(x, 0.1)
-end
+# ╔═╡ 38ee1cfa-6d98-4dc0-b2ac-1e7b610579c2
+f3.subs(x, 0.1)
+
+# ╔═╡ 99400156-cc9a-474f-96dd-0ad4e2443dbf
+f3_ts = sp.series(f3, x, n = 4).removeO()
+
+# ╔═╡ df9cd801-d34e-4193-a426-299286d623cb
+f3_ts.subs(x, 0.1)
 
 # ╔═╡ 7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
 md"""
-We see below that the taylor series expansion of the function `f_ts` is approximately equal to the true function at ``f(0.1)``
+We see above that the taylor series expansion of the function `f_ts` is approximately equal to the true function at ``f(0.1)``
 """
 
 # ╔═╡ 868ac754-fe57-4552-8eab-d9213fa66123
@@ -498,16 +500,23 @@ md"""
 # ╔═╡ 85c5261e-3925-4cad-bd1d-fd8593156d6b
 y, L = sp.symbols("y"), sp.symbols("L")
 
-# ╔═╡ d0734ab0-241f-4dbf-ab11-c18b4a886ee0
-let
-	perimeter = sp.Eq(2y + 2x, L)
-	y0 = sp.solve(perimeter, y)[0]
-	area = x*(y0)	
-	dxda = sp.diff(area, x)
-	x_ = sp.solve(sp.Eq(dxda, 0), x)[0]
-	y_ = y0.subs(x, x_)
-	@info x_, y_
-end
+# ╔═╡ bf004fd5-b5fb-45ed-bfb4-2a2c3f513e6a
+perimeter = sp.Eq(2y + 2x, L)
+
+# ╔═╡ 43bc9859-2adb-4098-acc9-9ee45a10b194
+y0 = sp.solve(perimeter, y)[0]
+
+# ╔═╡ e34ecb29-2dab-4ea3-aedf-06ecb34aa19b
+area = x*(y0)
+
+# ╔═╡ cd386992-ce31-4c10-8c28-df11ade397d6
+dxda = sp.diff(area, x)
+
+# ╔═╡ 62f6463d-578b-4ed9-b216-085765a0b101
+x_ = sp.solve(sp.Eq(dxda, 0), x)[0]
+
+# ╔═╡ 884afbd0-78d4-4994-a706-74e917a66345
+y_ = y0.subs(x, x_)
 
 # ╔═╡ 776c3c03-bbff-4705-b7c4-29002b25c840
 md"""
@@ -535,10 +544,10 @@ md"""
 """
 
 # ╔═╡ 30aaffef-9efd-40d6-a1e2-71fb249fd031
-eq = 3x^2 + 4y^2 - 48
+f4 = 3x^2 + 4y^2 - 48
 
 # ╔═╡ 954b95b6-7b1c-467d-93f2-c566690db784
-dxdy = sp.idiff(eq, y, x)
+dxdy = sp.idiff(f4, y, x)
 
 # ╔═╡ 14840094-3da5-4481-b9b0-76b771baedfb
 dxdy.subs([(x, 2), (y, 3)])
@@ -2348,7 +2357,8 @@ version = "3.5.0+0"
 # ╟─8e0acab8-b145-4fdb-83d5-99c6913fafcc
 # ╟─f4ba19f8-ed4c-48be-ab42-a6cae6824444
 # ╟─046531f7-0c18-417d-a5b2-119cdcd7420e
-# ╠═4293024b-c33e-467b-8e21-416556eb4582
+# ╠═d32a01e0-83a1-44dc-a486-03a5d61874c5
+# ╠═faaee09d-ea43-458c-8f29-e551d018a2ba
 # ╟─dcc46222-aa33-4646-a197-105528781dca
 # ╟─869a1b00-6ccb-472a-b517-cf68c1967735
 # ╟─33522b04-66c9-41e0-b35a-48344ee2f5bd
@@ -2376,13 +2386,21 @@ version = "3.5.0+0"
 # ╠═1b916de7-1336-45e1-bf3d-e6fbf48b9f8f
 # ╟─9114d095-1c90-4af3-b1c8-ee0e4b837e44
 # ╟─3c76acbf-6aa1-456c-a633-7dff4164f325
-# ╠═c913a4c3-1e64-45ae-95e1-e908b6fe2364
+# ╠═38ef7a6f-e251-44ee-924e-e338289ec976
+# ╠═38ee1cfa-6d98-4dc0-b2ac-1e7b610579c2
+# ╠═99400156-cc9a-474f-96dd-0ad4e2443dbf
+# ╠═df9cd801-d34e-4193-a426-299286d623cb
 # ╟─7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
 # ╟─868ac754-fe57-4552-8eab-d9213fa66123
 # ╟─76660d53-7a5b-4d1c-a025-aa6642d59853
 # ╟─5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
 # ╠═85c5261e-3925-4cad-bd1d-fd8593156d6b
-# ╠═d0734ab0-241f-4dbf-ab11-c18b4a886ee0
+# ╠═bf004fd5-b5fb-45ed-bfb4-2a2c3f513e6a
+# ╠═43bc9859-2adb-4098-acc9-9ee45a10b194
+# ╠═e34ecb29-2dab-4ea3-aedf-06ecb34aa19b
+# ╠═cd386992-ce31-4c10-8c28-df11ade397d6
+# ╠═62f6463d-578b-4ed9-b216-085765a0b101
+# ╠═884afbd0-78d4-4994-a706-74e917a66345
 # ╟─776c3c03-bbff-4705-b7c4-29002b25c840
 # ╟─81bd62e2-3adf-4449-a86a-2cbfb4cb33ad
 # ╟─502ff296-6868-4fe3-b894-2458c98c88e8
