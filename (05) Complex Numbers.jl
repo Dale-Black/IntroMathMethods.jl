@@ -4,11 +4,19 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ a7636f33-b33c-44ed-abf3-5577ac066b83
+# ╠═╡ show_logs = false
+using CondaPkg; CondaPkg.add("SymPy")
+
 # ╔═╡ c26eb347-19b1-46ef-b308-29ff9eb4aab1
-using PlutoUI, Symbolics, SymbolicNumericIntegration
+# ╠═╡ show_logs = false
+using PlutoUI, Symbolics, SymbolicNumericIntegration, PythonCall
 
 # ╔═╡ 6026fc2b-b3cd-46a8-a0ae-b685817975b5
 using Symbolics: derivative, solve_for
+
+# ╔═╡ 94f81753-4bca-4bad-b286-0388360389d5
+sp = pyimport("sympy");
 
 # ╔═╡ 14995a37-66cf-4bbb-925f-b0a276977669
 TableOfContents()
@@ -121,10 +129,10 @@ md"""
 # ╔═╡ a7f51817-04c4-4f93-b5e0-482bd0b359d7
 md"""
 !!! warning "By Hand"
-	Properties of Complex Numbers
-	- The properties of complex numbers can be proven algebraically. Let's consider a complex number ``z = a + bi``, where ``a`` and ``b`` are real numbers, and ``i`` is the imaginary unit. The modulus (or absolute value) of ``z`` is defined as ``|z| = sqrt(a^2 + b^2)``.
+	- ``z = a + bi``
+	- ``|z| = \sqrt{a^2 + b^2}``.
 
-	1 ``|Re \ z| ≤ |z|``:
+	(1) ``|Re \ z| ≤ |z|``:
 	
 	- The real part of ``z`` is ``a``, and its absolute value is ``|a|``. We have:
 	
@@ -135,7 +143,7 @@ md"""
 	\end{align*}
 	```
 	
-	2 ``|Im \ z| ≤ |z|``:
+	(2) ``|Im \ z| ≤ |z|``:
 	
 	- The imaginary part of ``z`` is ``b``, and its absolute value is ``|b|``. We have:
 	
@@ -146,7 +154,7 @@ md"""
 	\end{align*}
 	```
 	
-	3 ``|z_1 + z_2|^2 = |z_1|^2 + |z_2|^2 + 2 Re(z_1 z_2^*)``:
+	(3) ``|z_1 + z_2|^2 = |z_1|^2 + |z_2|^2 + 2 Re(z_1 z_2^*)``:
 	
 	- Let ``z_1 = a + bi`` and ``z_2 = c + di``
 
@@ -162,7 +170,7 @@ md"""
 	\end{align*}
 	```
 	
-	4 ``|z_1 + z_2| ≤ |z_1| + |z_2|``:
+	(4) ``|z_1 + z_2| ≤ |z_1| + |z_2|``:
 
 	```math
 	\begin{align*}
@@ -171,7 +179,7 @@ md"""
 	\end{align*}
 	```
 	
-	5 ``|z_1 z_2| = |z_1||z_2|``:
+	(5) ``|z_1 z_2| = |z_1||z_2|``:
 	
 	- Let ``z_1 = a + bi`` and ``z_2 = c + di``. Then ``z_1 z_2 = (ac - bd) + (ad + bc)i``. We have:
 
@@ -259,8 +267,15 @@ md"""
 	
 	```math
 	\begin{align*}
-	z_1 &= \sqrt{\frac{1}{2}} \left(\cos\left(\frac{\pi}{4}\right) + i \sin\left(\frac{\pi}{4}\right)\right) \\
-	z_2 &= 2 \left(\cos\left(-\frac{\pi}{6}\right) + i \sin\left(-\frac{\pi}{6}\right)\right)
+	r_1 &= \sqrt{1/2 + 1/2} = 1 \\
+	\theta_1 &= \tan^{-1}(1) = \pi/4 \\ \\
+
+	r_2 &= \sqrt{3 + 1} = 2 \\
+	\theta_2 &= \frac{\pi}{6} \\ \\ 
+
+
+	z_1 &= e^{i \frac{\pi}{4}} \\
+	z_2 &= 2 e^{i \frac{-\pi}{6}}
 	\end{align*}
 	```
 	
@@ -301,8 +316,54 @@ md"""
 	\left(\frac{z_1}{z_2}\right)^* &= \frac{1}{2} + i \frac{\sqrt{3}}{2}
 	\end{align*}
 	```
+"""
 
-	---
+# ╔═╡ 8f932fee-c1ff-43f3-9a1c-c5f33d8fabe6
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ 8ceb43aa-96db-4f4b-9d82-719584e8d709
+md"""
+#### a)
+"""
+
+# ╔═╡ c5b368fd-1fa5-4124-b312-e4dbae3fd6cd
+z1_a, z2_a = (1 + sp.I)/sp.sqrt(2), sp.sqrt(3) - sp.I
+
+# ╔═╡ 12c75ae4-5315-470f-ae96-f76857066991
+begin
+	# i)
+	r1_a, r2_a = sp.Abs(z1_a), sp.Abs(z2_a)
+	θ1_a, θ2_a = sp.arg(z1_a), sp.arg(z2_a)
+
+	polar_z1_a = r1_a * (sp.exp(sp.I * θ1_a))
+	polar_z2_a = r2_a * (sp.exp(sp.I * θ2_a))
+	@info polar_z1_a, polar_z2_a
+
+	# ii) 
+	conj_z1_a = sp.conjugate(z1_a)
+	conj_z2_a = sp.conjugate(z2_a) 
+	@info conj_z1_a, conj_z2_a
+
+	# iii)
+	mod_z1_a = sp.Abs(z1_a)
+	mod_z2_a = sp.Abs(z2_a)
+	@info mod_z1_a, mod_z2_a
+
+	# iv)
+	product_a = z1_a * z2_a
+	@info product_a
+
+	# v)
+	quotient_a = z1_a / z2_a
+	conj_quotient_a = sp.conjugate(quotient_a)
+	@info conj_quotient_a
+end
+
+# ╔═╡ 455dadfa-cb85-4236-a835-e3a58bd199d8
+md"""
+!!! warning "By hand"
 
 	b)
 
@@ -365,8 +426,45 @@ md"""
 	\left(\frac{z_1}{z_2}\right)^* &= 1
 	\end{align*}
 	```
-
 """
+
+# ╔═╡ 639d73ec-8c91-4e0a-9c63-ce8a49d6a5b2
+md"""
+#### b)
+"""
+
+# ╔═╡ cbd55a89-ff62-4b23-82a8-24395cbd50e9
+z1_b, z2_b = (3 + 4*sp.I)/(3 - 4*sp.I), ((1 + 2*sp.I)/(1 - 3*sp.I))^2
+
+# ╔═╡ 9721ac8a-e51b-49ce-a2ff-a170931f101e
+begin
+	# i)
+	r1_b, r2_b = sp.Abs(z1_b), sp.Abs(z2_b)
+	θ1_b, θ2_b = sp.arg(z1_b), sp.arg(z2_b)
+
+	polar_z1_b = r1_b * (sp.exp(sp.I * θ1_b))
+	polar_z2_b = r2_b * (sp.exp(sp.I * θ2_b))
+	@info polar_z1_b, polar_z2_b
+
+	# ii) 
+	conj_z1_b = sp.conjugate(z1_b)
+	conj_z2_b = sp.conjugate(z2_b) 
+	@info conj_z1_b, conj_z2_b
+
+	# iii)
+	mod_z1_b = sp.Abs(z1_b)
+	mod_z2_b = sp.Abs(z2_b)
+	@info mod_z1_b, mod_z2_b
+
+	# iv)
+	product_b = z1_b * z2_b
+	@info product_b
+
+	# v)
+	quotient_b = z1_b / z2_b
+	conj_quotient_b = sp.conjugate(quotient_b)
+	@info conj_quotient_b
+end
 
 # ╔═╡ 3e65ebbd-7ce9-462d-99f0-0ec20430f329
 md"""
@@ -460,7 +558,7 @@ Polar form
 ```math
 \begin{align*}
 z &= x + iy = re^{i\theta} \\
-r^2 &= \sqrt{x^2 + y^2} \\
+r &= \sqrt{x^2 + y^2} \\
 \tan(\theta) &= y/x
 \end{align*}
 ```
@@ -512,12 +610,16 @@ z^2 &= x^2 + y^2 = zz^*
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 SymbolicNumericIntegration = "78aadeae-fbc0-11eb-17b6-c7ec0477ba9e"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
+CondaPkg = "~0.2.18"
 PlutoUI = "~0.7.52"
+PythonCall = "~0.9.13"
 SymbolicNumericIntegration = "~1.1.0"
 Symbolics = "~5.5.0"
 """
@@ -528,7 +630,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "84875b7600a704d1156775d1f89f4f72be343c1d"
+project_hash = "19860d679d2d1ddb50ea62e6e9192a9067604046"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e58c18d2312749847a74f5be80bb0fa53da102bd"
@@ -741,6 +843,12 @@ version = "0.1.2"
     [deps.CompositionsBase.weakdeps]
     InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
 
+[[deps.CondaPkg]]
+deps = ["JSON3", "Markdown", "MicroMamba", "Pidfile", "Pkg", "TOML"]
+git-tree-sha1 = "741146cf2ced5859faae76a84b541aa9af1a78bb"
+uuid = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
+version = "0.2.18"
+
 [[deps.ConstructionBase]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "fe2838a593b5f776e1597e086dcd47560d94e816"
@@ -877,10 +985,14 @@ uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
 version = "1.15.1"
 
 [[deps.Distances]]
-deps = ["LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "49eba9ad9f7ead780bfb7ee319f962c811c6d3b2"
+deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "b6def76ffad15143924a2199f72a5cd883a2e8a9"
 uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.8"
+version = "0.10.9"
+weakdeps = ["SparseArrays"]
+
+    [deps.Distances.extensions]
+    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1124,6 +1236,12 @@ git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
 
+[[deps.JSON3]]
+deps = ["Dates", "Mmap", "Parsers", "PrecompileTools", "StructTypes", "UUIDs"]
+git-tree-sha1 = "5b62d93f2582b09e469b3099d839c2d2ebf5066d"
+uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+version = "1.13.1"
+
 [[deps.JuliaFormatter]]
 deps = ["CSTParser", "CommonMark", "DataStructures", "Glob", "Pkg", "PrecompileTools", "Tokenize"]
 git-tree-sha1 = "60567b51bd9e1e19ae2fd8a54dcd6bc5994727f0"
@@ -1305,6 +1423,12 @@ git-tree-sha1 = "629afd7d10dbc6935ec59b32daeb33bc4460a42e"
 uuid = "128add7d-3638-4c79-886c-908ea0c25c34"
 version = "0.1.4"
 
+[[deps.MicroMamba]]
+deps = ["Pkg", "Scratch", "micromamba_jll"]
+git-tree-sha1 = "6f0e43750a94574c18933e9456b18d4d94a4a671"
+uuid = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
+version = "0.1.13"
+
 [[deps.Missings]]
 deps = ["DataAPI"]
 git-tree-sha1 = "f66bdc5de519e8f8ae43bdc598782d35a25b1272"
@@ -1442,6 +1566,12 @@ git-tree-sha1 = "4b2e829ee66d4218e0cef22c0a64ee37cf258c29"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.7.1"
 
+[[deps.Pidfile]]
+deps = ["FileWatching", "Test"]
+git-tree-sha1 = "2d8aaf8ee10df53d0dfb9b8ee44ae7c04ced2b03"
+uuid = "fa939f87-e72e-5be4-a000-7fc836dbe307"
+version = "1.3.0"
+
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
@@ -1461,9 +1591,9 @@ version = "0.4.4"
 
 [[deps.Polyester]]
 deps = ["ArrayInterface", "BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "ManualMemory", "PolyesterWeave", "Requires", "Static", "StaticArrayInterface", "StrideArraysCore", "ThreadingUtilities"]
-git-tree-sha1 = "0c6a162cb9a0ab8b7345793dd8369b595cb30db8"
+git-tree-sha1 = "3d811babe092a6e7b130beee84998fe7663348b6"
 uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
-version = "0.7.4"
+version = "0.7.5"
 
 [[deps.PolyesterWeave]]
 deps = ["BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "Static", "ThreadingUtilities"]
@@ -1521,6 +1651,12 @@ deps = ["Distributed", "Printf"]
 git-tree-sha1 = "d7a7aef8f8f2d537104f170139553b14dfe39fe9"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.7.2"
+
+[[deps.PythonCall]]
+deps = ["CondaPkg", "Dates", "Libdl", "MacroTools", "Markdown", "Pkg", "REPL", "Requires", "Serialization", "Tables", "UnsafePointers"]
+git-tree-sha1 = "0d15cb32f52654921169b4305dae8f66a0e345dc"
+uuid = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+version = "0.9.13"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
@@ -1619,6 +1755,12 @@ deps = ["ArrayInterface", "DocStringExtensions", "Lazy", "LinearAlgebra", "Setfi
 git-tree-sha1 = "745755a5b932c9a664d7e9e4beb60c692b211d4b"
 uuid = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
 version = "0.3.5"
+
+[[deps.Scratch]]
+deps = ["Dates"]
+git-tree-sha1 = "30449ee12237627992a99d5e30ae63e4d78cd24a"
+uuid = "6c6a2e73-6563-6170-7368-637461726353"
+version = "1.2.0"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -1760,6 +1902,12 @@ deps = ["ArrayInterface", "CloseOpenIntervals", "IfElse", "LayoutPointers", "Man
 git-tree-sha1 = "f02eb61eb5c97b48c153861c72fbbfdddc607e06"
 uuid = "7792a7ef-975c-4747-a70f-980b88e8d1da"
 version = "0.4.17"
+
+[[deps.StructTypes]]
+deps = ["Dates", "UUIDs"]
+git-tree-sha1 = "ca4bccb03acf9faaf4137a9abc1881ed1841aa70"
+uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+version = "1.10.0"
 
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
@@ -1922,6 +2070,11 @@ git-tree-sha1 = "323e3d0acf5e78a56dfae7bd8928c989b4f3083e"
 uuid = "d80eeb9a-aca5-4d75-85e5-170c8b632249"
 version = "0.1.3"
 
+[[deps.UnsafePointers]]
+git-tree-sha1 = "c81331b3b2e60a982be57c046ec91f599ede674a"
+uuid = "e17b2a0c-0bdf-430a-bd0c-3a23cae4ff39"
+version = "1.0.0"
+
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
@@ -1938,6 +2091,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 version = "5.8.0+0"
 
+[[deps.micromamba_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "087555b0405ed6adf526cef22b6931606b5af8ac"
+uuid = "f8abcde7-e9b7-5caa-b8af-a437887ae8e4"
+version = "1.4.1+0"
+
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
@@ -1950,8 +2109,10 @@ version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
+# ╠═a7636f33-b33c-44ed-abf3-5577ac066b83
 # ╠═c26eb347-19b1-46ef-b308-29ff9eb4aab1
 # ╠═6026fc2b-b3cd-46a8-a0ae-b685817975b5
+# ╠═94f81753-4bca-4bad-b286-0388360389d5
 # ╠═14995a37-66cf-4bbb-925f-b0a276977669
 # ╟─9880bee2-4b03-4dd5-a6b6-940f24bc104b
 # ╟─f5a707d9-66a6-46f9-86ed-9bad2d270cd1
@@ -1966,7 +2127,15 @@ version = "17.4.0+0"
 # ╟─e56bbd32-a469-443b-bc27-6f25576fc7bc
 # ╟─5d614aac-58db-4f9c-b2ac-eaa4089f11fc
 # ╟─ab8adfe8-9b30-4b40-8120-fb1bea36f977
-# ╟─cc97ce3f-ccee-4b46-b571-2940a7d436ab
+# ╠═cc97ce3f-ccee-4b46-b571-2940a7d436ab
+# ╟─8f932fee-c1ff-43f3-9a1c-c5f33d8fabe6
+# ╟─8ceb43aa-96db-4f4b-9d82-719584e8d709
+# ╠═c5b368fd-1fa5-4124-b312-e4dbae3fd6cd
+# ╠═12c75ae4-5315-470f-ae96-f76857066991
+# ╟─455dadfa-cb85-4236-a835-e3a58bd199d8
+# ╟─639d73ec-8c91-4e0a-9c63-ce8a49d6a5b2
+# ╠═cbd55a89-ff62-4b23-82a8-24395cbd50e9
+# ╠═9721ac8a-e51b-49ce-a2ff-a170931f101e
 # ╟─3e65ebbd-7ce9-462d-99f0-0ec20430f329
 # ╟─3ae47da0-10ba-4842-92a3-ec6139caf0c5
 # ╟─f1e6ad89-c7d6-466a-9456-8c634720a3c4
