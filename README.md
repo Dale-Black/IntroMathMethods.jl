@@ -8,7 +8,7 @@ All the notebooks attempt to solve the problems (1) by hand using Markdown/Latex
 
 ## See Pluto.jl and PythonCall.jl/SymPy in Action
 ### Live docs & interactive
-![Pluto PythonCall SymPy](imgs/pluto_pythoncall_sympy.png)
+![Pluto PythonCall SymPy](imgs/pluto_pythoncall_sympy_dark.png)
 
 ### Seamless Mix of Latex, Markdown, Julia Syntax, and More
-![Latex Markdown Etc](imgs/latex_syntax.png)
+![Latex Markdown Etc](imgs/latex_syntax_dark.png)
