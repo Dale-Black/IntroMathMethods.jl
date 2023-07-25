@@ -223,19 +223,7 @@ function lagrangian(f, g, x, y)
 end
 
 # ╔═╡ c52ea066-8de1-4f0d-9273-b690b7badbf5
-l = lagrangian(f, g, x, y)
-
-# ╔═╡ 6f6e0891-0935-451e-8830-f2d965fa67b7
-dict = pyconvert(Dict, l)
-
-# ╔═╡ d084e6c7-8c19-47b9-a582-0a7a69f6cd8b
-8//5 in values(dict) && 4//5 in values(dict)
-
-# ╔═╡ 6b4d57c5-9b93-4319-a12e-cc8d549cef29
-haskey(dict, x) && haskey(dict, y) && haskey(dict, λ)
-
-# ╔═╡ be9cd620-9385-4fc3-b34a-ed92df54d5a7
-8//5 in [values(pyconvert(Dict, dict))...]
+lagrangian(f, g, x, y)
 
 # ╔═╡ 9d52232c-1f7a-40fe-82eb-4f2efa7014d6
 md"""
@@ -262,7 +250,7 @@ md"""
 	\end{align*}
 	```
 	
-	Let's say the given fixed perimeter is ``P`, we can write the constraint as
+	Let's say the given fixed perimeter is ``P``, we can write the constraint as
 
 	```math
 	\begin{align*}
@@ -295,17 +283,20 @@ md"""
 # ╔═╡ 9273e916-ca5a-4c38-b446-e2ffd1c9cba3
 md"""
 #### With Symbolics
-This is a great example of how Julia and Symbolics.jl can speed up this process. Instead of computing all the partials again, we can just plug in the equation `f` to be optimized and the constraint `g`.
+This is a great example of how Julia and SymPy can speed up this process. Instead of computing all the partials again, we can just plug in the equation `f` to be optimized with the constraint `g`.
 """
 
-# ╔═╡ b20edb50-db8c-45d3-95b6-70e0402cab0a
-let
-	@variables P
-	f = x*y
-	g = 2x + 2y - P
-	x0, y0, _ = lagrangian(f, g, x, y)
-	x0, y0
-end
+# ╔═╡ 31ee2725-259f-4876-980e-01e23f86844b
+P = sp.symbols("P")
+
+# ╔═╡ 41a3d72a-6874-4425-83f8-2c9b1b0ab262
+f2 = x*y
+
+# ╔═╡ 96e8c7fc-b556-49a4-8822-d89bbe02dbf3
+g2 = 2x + 2y - P
+
+# ╔═╡ becb53e8-127e-4d4e-b9da-34bdcea78790
+lagrangian(f, g, x, y)
 
 # ╔═╡ 2d99d71f-0293-44e1-bc01-0416f33fa7ef
 md"""
@@ -380,14 +371,33 @@ md"""
 
 # ╔═╡ 50b3d6e1-803a-497e-a8f0-01dbe2aec886
 md"""
-#### With Symbolics
+#### With SymPy
 """
 
-# ╔═╡ d7aa9cd8-a38f-4905-b518-fac3c9b95266
-md"""
-!!! danger "IDK"
-	Not sure how to set this up. Should be able to do some sort of set up using discrete space ``\sum`` and convert to continous ``\int`` then solve the integrals using `integrate()` then finally solve the system of equations using `solve_for`
-"""
+# ╔═╡ 2ebf7e8f-211e-4ee2-bebf-10125f520833
+N, E, α, β, nᵢ, ϵ = sp.symbols("N, E, α, β, nᵢ, ϵ")
+
+# ╔═╡ 48bb63ca-1513-4f18-942a-53f500c35721
+# Total number of particles
+g₁ = sp.integrate(nᵢ, nᵢ) - N
+
+# ╔═╡ 9f8fdbe9-0391-4021-ba1d-c32a2fd43b9c
+# Total energy
+g₂ = sp.integrate(nᵢ * ϵ, nᵢ) - E
+
+# ╔═╡ 185a01e1-3e58-4805-82f0-a1d0cf31ac71
+# Entropy
+S = N * sp.log(N) - N - sp.integrate(nᵢ * sp.log(nᵢ) - nᵢ, nᵢ)
+
+# ╔═╡ 07913cf8-9054-45b3-8a4b-9cccb620fad6
+# Lagrangian
+L2 = S - α * g₁ - β * g₂
+
+# ╔═╡ 406e909b-b81e-41de-94a8-c8f06278ee8a
+∂L2 = sp.diff(L2, nᵢ)
+
+# ╔═╡ 92afd41a-1d8d-4867-9a68-60dd1d993271
+sp.solve(∂L2 , nᵢ)[0]
 
 # ╔═╡ 46a4a70c-305c-4c50-ab93-992b3002ce7e
 md"""
@@ -429,14 +439,29 @@ md"""
 
 # ╔═╡ e63d67de-ff06-4b57-bb02-f21f7bec2b53
 md"""
-#### With Symbolics
+#### With SymPy
 """
 
-# ╔═╡ 928d5e9c-2f4a-44ee-b815-1aea8a776ca6
-md"""
-!!! danger "TODO"
-	...
-"""
+# ╔═╡ 97a62f92-923b-4488-b067-24338895a88c
+r, θ, ϕ, R = sp.symbols("r, θ, ϕ, R")
+
+# ╔═╡ 03380fd9-5539-448b-a7c1-4b1d74f4685c
+x1 = r * sp.sin(θ) * sp.cos(ϕ)
+
+# ╔═╡ b2a5a084-6119-4aae-b2ce-0f6d9014dc1a
+y1 = r * sp.sin(θ) * sp.sin(ϕ)
+
+# ╔═╡ 4f5a9ef6-97ef-4599-9dd2-77551d13a216
+z1 = r * sp.cos(θ)
+
+# ╔═╡ d2fbab3b-2883-4c3c-ba66-1ce6c0c75de6
+m = sp.Matrix([x1, y1, z1])
+
+# ╔═╡ 2846a22c-667b-48cf-b652-bf27371e4977
+J = sp.simplify(sp.det(m.jacobian([r, θ, ϕ])))
+
+# ╔═╡ a4bbc028-8d5a-44b6-9a8a-826a685dbcd6
+V = sp.integrate(1 * J, (r, 0, R), (θ, 0, sp.pi), (ϕ, 0, 2*sp.pi))
 
 # ╔═╡ d7774f7b-f198-4de5-bb13-62aeed958538
 md"""
@@ -2276,22 +2301,33 @@ version = "3.5.0+0"
 # ╟─51570d64-a3be-4765-8b0d-9d5ea3cb2d4d
 # ╠═7f4d0520-34f8-4c41-bc92-de3eea8fe73e
 # ╠═c52ea066-8de1-4f0d-9273-b690b7badbf5
-# ╠═6f6e0891-0935-451e-8830-f2d965fa67b7
-# ╠═d084e6c7-8c19-47b9-a582-0a7a69f6cd8b
-# ╠═6b4d57c5-9b93-4319-a12e-cc8d549cef29
-# ╠═be9cd620-9385-4fc3-b34a-ed92df54d5a7
 # ╟─9d52232c-1f7a-40fe-82eb-4f2efa7014d6
 # ╟─c0d91c3c-cb4d-4d94-9d32-fb234caf69df
 # ╟─9273e916-ca5a-4c38-b446-e2ffd1c9cba3
-# ╠═b20edb50-db8c-45d3-95b6-70e0402cab0a
+# ╠═31ee2725-259f-4876-980e-01e23f86844b
+# ╠═41a3d72a-6874-4425-83f8-2c9b1b0ab262
+# ╠═96e8c7fc-b556-49a4-8822-d89bbe02dbf3
+# ╠═becb53e8-127e-4d4e-b9da-34bdcea78790
 # ╟─2d99d71f-0293-44e1-bc01-0416f33fa7ef
 # ╟─192cf150-6baf-4246-a0de-15ed1a93f8ce
 # ╟─50b3d6e1-803a-497e-a8f0-01dbe2aec886
-# ╟─d7aa9cd8-a38f-4905-b518-fac3c9b95266
+# ╠═2ebf7e8f-211e-4ee2-bebf-10125f520833
+# ╠═48bb63ca-1513-4f18-942a-53f500c35721
+# ╠═9f8fdbe9-0391-4021-ba1d-c32a2fd43b9c
+# ╠═185a01e1-3e58-4805-82f0-a1d0cf31ac71
+# ╠═07913cf8-9054-45b3-8a4b-9cccb620fad6
+# ╠═406e909b-b81e-41de-94a8-c8f06278ee8a
+# ╠═92afd41a-1d8d-4867-9a68-60dd1d993271
 # ╟─46a4a70c-305c-4c50-ab93-992b3002ce7e
 # ╟─952f53f4-555d-4074-904a-a0377e3e8b69
 # ╟─e63d67de-ff06-4b57-bb02-f21f7bec2b53
-# ╟─928d5e9c-2f4a-44ee-b815-1aea8a776ca6
+# ╠═97a62f92-923b-4488-b067-24338895a88c
+# ╠═03380fd9-5539-448b-a7c1-4b1d74f4685c
+# ╠═b2a5a084-6119-4aae-b2ce-0f6d9014dc1a
+# ╠═4f5a9ef6-97ef-4599-9dd2-77551d13a216
+# ╠═d2fbab3b-2883-4c3c-ba66-1ce6c0c75de6
+# ╠═2846a22c-667b-48cf-b652-bf27371e4977
+# ╠═a4bbc028-8d5a-44b6-9a8a-826a685dbcd6
 # ╟─d7774f7b-f198-4de5-bb13-62aeed958538
 # ╟─70d8b04b-b97e-4e44-88a2-5f678562b5dd
 # ╟─dbe67bf3-b869-4c2d-9336-e6b24b07e374
