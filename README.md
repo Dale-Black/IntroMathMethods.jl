@@ -1,7 +1,7 @@
 # IntroMathMethods
 
 [![Build Status](https://github.com/Dale-Black/IntroMathMethods.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Dale-Black/IntroMathMethods.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)]([https://glassnotebook.io/repo/31](https://glassnotebook.io/r/jr1ZfgSBIXqmm-ae1dwXf))
+[![Glass Notebook](https://img.shields.io/badge/docs-dev-blue.svg)](https://glassnotebook.io/r/jr1ZfgSBIXqmm-ae1dwXf)
 
 Contains a collection of Pluto notebooks for the course [PHYSICS 208. Math Methods](https://catalogue.uci.edu/allcourses/physics/) at UCI. This is meant to be a refresher course on basic math concepts for the graduate physics program.
 
