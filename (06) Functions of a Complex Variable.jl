@@ -20,6 +20,14 @@ TableOfContents()
 # ╔═╡ 0997876f-ad4e-44f8-a5c2-43effa711032
 md"""
 # Introduction
+
+In this chapter, I'm exploring functions of a complex variable, particularly those that are defined by power series. I'm excited to delve deeper into the concept of analytic functions and their intriguing properties, such as the Cauchy-Riemann equations, singularities, the residue theorem, and the Taylor series.
+
+As always, we will be using SymPy, a Python library for symbolic mathematics that has been a great resource in my journey, and PlutoUI and PythonCall for interactive computing in Julia. We will tackle some homework assignments that span a range of topics related to complex variable functions. These assignments are my chance to solidify my understanding of these concepts and, hopefully, provide some insights for you too.
+
+My journey will begin with "Analytic Functions" and then move on to "Analytic Functions Defined by Power Series". From there, I'll dig into the "Calculus of Analytic Functions" and "The Residue Theorem". To wrap things up, I'll conclude with "Taylor Series for Analytic Functions".
+
+By sharing this notebook, my hope is that it can serve as a stepping stone for others on a similar learning path. I'm by no means an expert, but I believe that we can all learn something valuable from each other's experiences. So, let's dive in and see where this journey takes us!
 """
 
 # ╔═╡ 61dbb937-7fd9-4812-9d40-baebf342f730
@@ -70,7 +78,158 @@ Below are the highlights from this chapter
 
 ---
 
+- The function ``f(x, y) = u(x, y) + iv(x, y)`` is analytic in a domain ``D`` if ``u`` and ``v`` are continous and obey the Cauchy-Remann equations
+```math
+\begin{align*}
+u_x = v_y \ \ u_y = - v_x \\
+\end{align*}
+```
 
+- Which ensures that ``f(x, y) = f(x + iy)``
+
+- The functions ``u`` and ``v`` are then harmonic
+```math
+\begin{align*}
+u_{xx} + u_{yy} = v_{xx} + v_{yy} = 0
+\end{align*}
+```
+
+---
+
+An analytic function can have singularities at isolated points
+- At a pole it behaves as 
+```math
+\begin{align*}
+f(z) &\to \frac{Re(z_0)}{z - z_0} \\
+Re(z_0) &= \lim_{z \to z_0}(z - z_0)f(z)
+\end{align*}
+```
+
+- and one must know about the existence of higher-order poles, essential singularities and branch points
+
+---
+
+- To differentiate a function ``f(z)`` treat ``z`` just like ``x`` of real variable calculus. Thus ``\frac{dz^n}{dz} = nz^{n-1}``. If ``f`` is given in terms of ``x`` and ``y``, take the partial derivative with respect to ``x`` or ``iy``.
+
+---
+
+Power series
+
+```math
+\begin{align*}
+\sum_{n=0}^{\infty} a_nz^n
+\end{align*}
+```
+
+- converges within a radius
+```math
+\begin{align*}
+R = \lim_{n \to \infty} |\frac{a_n}{a_{n+1}}|
+\end{align*}
+```
+
+- inside this circle of convergence it defines a function ``f(z)``. The series may be differentiated any number of times to yield the series for the corresponding derivative of ``f(z)``. Similarly, it may be integrated
+
+---
+
+Know the first few terms of this series as well as the series for hyperbolic and trigonometric functions which are related to the exponential just like they are as real variables
+
+```math
+\begin{align*}
+e^z = \sum_{0}^{\infty} \frac{z^n}{n!}
+\end{align*}
+```
+
+- plus the logarithm
+
+```math
+\begin{align*}
+z &= e^{\ln z} \\
+\ln(1 + z) = z - \frac{z^2}{2} + \frac{z^3}{3} + ...
+\end{align*}
+```
+
+---
+
+The N-th root of ``z = re^{i \theta}`` has ``N`` values given by
+
+```math
+\begin{align*}
+z^{1/N} = r^{1/N} \exp[\frac{1}{N}(\theta + 2 \pi m)] \qquad (m = 0, 1, ..., N-1)
+\end{align*}
+```
+
+---
+
+You must know how ``\int f(z) dz`` along a path ``P`` is defined (as the limit of a sum over tiny segments of ``P``) and how to evaluate such integrals by parameterizing the path
+
+---
+
+The main properties of complex integrals
+
+- Is path independent
+```math
+\begin{align*}
+\int_{z_1}^{z_2} f(z) dz
+\end{align*}
+```
+
+- for paths lying entirely in the domain of analyticity ``D``
+
+```math
+\begin{align*}
+\int^{z} f(z) dz = F(z) + c
+\end{align*}
+```
+
+- where ``F(z)`` is any integral of ``f`` and ``c`` is a constant depending on the lower limit, thus for example
+
+```math
+\begin{align*}
+\int^{z} z^n dz = \frac{z^{n + 1}}{n + 1} + c
+\end{align*}
+```
+
+---
+
+Must know Cauchy's Residue Theorem for a meromorphic function
+```math
+\begin{align*}
+\oint f(z) dz = 2 \pi i \sum_i Re(z_i)
+\end{align*}
+```
+
+- where the contour goes counterclockwise and encolsed poles labeled ``i`` at points ``z_i`` with residues ``Re(z_i)``
+
+- A special case of the above is the result 
+```math
+\begin{align*}
+\oint \frac{f(z)}{z - z_0} dz = 2 \pi i f(z_0)
+\end{align*}
+```
+
+- if the contour lies in ``D``, the domain of analyticity of ``f(z)``. Thus a function is fully determined by its values on a contour surrounding the point ``z_0``. By taking the derivatives of both sides with respect to ``z_0`` one can relate the derivatives at ``z_0`` to integrals on the surrounding contour as per
+
+```math
+\begin{align*}
+\frac{n!}{2 \pi i} \oint_{C \in D} \frac{f(z)}{(z - z_0)^{n+1}} dz = \frac{d^n f(z_0)}{d z_0^n} = f^{(n)}(z_0)
+\end{align*}
+```
+
+---
+
+- To evaluate real integrates, try to first get the contour to run from ``-\infty`` to ``\infty``, using symmetries. For example the integral of an even function from ``0`` to ``\infty`` is half the integral from ``-\infty`` to ``\infty``. Then try to add on the semicircle at infinity. If only powers of ``z`` are involved in the integrand, do a power counting to see if it is allowed. If the exponential is present, make sure it converges in the half-plane where you are adding on a semicircle. if trigonometric functions are involved, break them into exponentials and do the integrals in pieces or relate the original problem to the real or imaginary part of an exponential. 
+
+
+---
+
+- Every function can be expanded in a Taylor series about a point of analyticity. The series will converge inside the circle that extends to the nearest singularity. Functional relations satisfied in a line segment (which lies within the region of analyticity) will continue to hold when the functions are analytically continues. Equivalently, if two analytic functions coincide in such a segment, they coincide everywhere. Thus for example
+
+```math
+\begin{align*}
+e^{iz} = \cos(z) + i \sin(z) \qquad \sin(-z) = - \sin(z) \qquad \sin^2(z) + \cos^2(z) = 1
+\end{align*}
+```
 
 """
 
@@ -1751,6 +1910,6 @@ version = "3.5.0+0"
 # ╟─3dde05ab-a0ef-4a73-ad31-f65962326963
 # ╟─d90a9cd6-a8a9-4bca-bb67-3f9febf6b76f
 # ╟─151d9582-f6ee-4b8d-95af-37146e76f714
-# ╠═e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
+# ╟─e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
