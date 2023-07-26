@@ -51,6 +51,290 @@ md"""
 ## Analytic Functions
 """
 
+# ╔═╡ 0702e36c-27d8-4616-9ed4-7d0fb2cb8c5f
+md"""
+Just like how functions ``f(x)`` in the ``x`` axis can be associated with imaginary coordinates ``z = x + iy``, so too can functions ``f(x, y)`` in the ``xy``-plane
+
+```math
+\begin{align*}
+f(x, y) = u(x, y) + i v(x, y)
+\end{align*}
+```
+
+``f`` is an analytic function of ``z`` if it does not depend on ``z^*``
+```math
+\begin{align*}
+f(x, y) = f(x + iy)
+\end{align*}
+```
+
+If ``f`` is a function of only ``z = x + iy`` then the partial derivatives with respect to ``x`` and ``y`` are related as follows
+```math
+\begin{align*}
+f_y &= i f_x \\
+u_y + i v_y &= i(u_x + i v_x)
+\end{align*}
+```
+
+Cauchy-Reimann Equations (CRE)
+```math
+\begin{align*}
+u_x &= v_y \\
+u_y &= -v_x
+\end{align*}
+```
+
+We say that ``f = u + iv`` is analytic at ``z_0`` if the partial derivatives obey CRE in it's ``\epsilon``-neighborhood
+
+"""
+
+# ╔═╡ c1277fa5-5481-4c55-b15b-ab2a1887df6e
+md"""
+!!! info "Problem 6.1.6"
+	Show by any means that ``f = x^2 + y^2`` is not analytic
+"""
+
+# ╔═╡ 6d1c131d-e731-4f14-9af2-aa7b39d7a53b
+md"""
+!!! warning "By Hand"
+
+	```math
+	\begin{align*}
+	f_y &= 2y \\
+	f_x &= 2x \\
+	f_y &\neq i f_x
+	\end{align*}
+	```
+"""
+
+# ╔═╡ f3621fde-46cf-490c-83b5-42c4d26d6733
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ f0c13b72-d3ab-49a2-b3ac-8db27deeb717
+x, y = sp.symbols("x, y")
+
+# ╔═╡ 5a31a6ab-4c4b-407b-b65b-80abe61c5a1a
+f = x^2 + y^2
+
+# ╔═╡ 5db211da-3f0d-4a98-9549-8285eb94344b
+sp.diff(f, x)
+
+# ╔═╡ 6bdd6906-65ca-4fb3-8d85-6a246d4e6654
+sp.diff(f, y)
+
+# ╔═╡ 9a99df2c-53f5-481a-ade6-d4b77738abde
+sp.diff(f, x) == sp.I*sp.diff(f, y)
+
+# ╔═╡ 71da2cb0-3dad-40bd-8b4a-582141115d5f
+md"""
+Here are some important singularities that we will encounter:
+
+
+Simple pole
+- We say that the residue of the pole at the origin is ``c``. Consider
+
+```math
+\begin{align*}
+f(z) = \frac{1}{z + i} \frac{1}{z - i}
+\end{align*}
+```
+
+- This function clearly has two poles at ``z \pm i``. Where the residue ``R(z = i)`` and ``R(z = -i)`` is given by
+
+```math
+\begin{align*}
+R(z = i)&= \lim_{z \to i} (z - i) f(z) = \frac{1}{2i} \\
+R(z = -i)&= \lim_{z \to i} (z + i) f(z) = \frac{1}{-2i} \\
+\end{align*}
+```
+
+- More generally, if a function has a simple pole at ``z_0`` its residue is 
+```math
+\begin{align*}
+R(z_0)&= \lim_{z \to z_0} (z - z_0) f(z)
+\end{align*}
+```
+
+N``^{th}`` order pole
+- also called a removable singularity
+
+```math
+\begin{align*}
+f(z) \to \frac{R(z_0)}{(z - z_0)^n}
+\end{align*}
+```
+
+Essential singularity
+- poles of arbitarily high order that cannot be eliminated by multiplication of ``(z - z_0)^n``, an example of this is:
+
+```math
+\begin{align*}
+f(z) = \sum_0^{\infty} \frac{1}{z^n n!}
+\end{align*}
+```
+
+Branch point
+- the function does not return to the starting point ``z_0`` after encircling ``z_0``, an example of such is
+
+```math
+\begin{align*}
+f(z) = z^{\frac{1}{2}} = r^{\frac{1}{2}} e^{i \theta / 2}
+\end{align*}
+```
+
+This chapter will mainly emphasize meromorphic functions
+- A function is *meromorphic* if its only singularities for finite ``z`` are poles
+
+
+"""
+
+# ╔═╡ cbf5968c-b9f5-477a-9d01-1645ba519912
+md"""
+!!! info "Problem 1.6.7"
+	Locate and name the singularities of ``f = 1 / (1 + z)^4`` and ``f = 1/(z^4 + 2z^2 + 1)``
+"""
+
+# ╔═╡ a6cdb2cd-aecb-42cd-9289-d6cfddcce351
+md"""
+!!! warning "By Hand"
+
+	a) ``f = 1 / (1 + z)^4``
+	- Undefined at ``z = -1``
+	- And multiplying by ``(z + 1)^4`` turns the function into ``f = 1``, which has no singularity
+	- ``\therefore \boxed{\text{nth order pole}}``
+
+	b) ``f = 1/(z^4 + 2z^2 + 1) = \frac{1}{(z^2 + 1)^2}``
+	- Undefined at ``z \pm i``
+	- And multiplying by ``(z - i)`` and ``(z + i)`` does not remove the singularity
+	- ``\therefore \boxed{\text{essential singularity}}``
+"""
+
+# ╔═╡ 17cc66d0-ab3d-43b1-8b58-367a4fe27908
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ eaeeca19-89b2-4022-8429-e2903b1da7e0
+z = sp.symbols("z")
+
+# ╔═╡ 5b9c344c-fc50-40f7-a97f-3e3679b6366a
+md"""
+**a)**
+"""
+
+# ╔═╡ 7523ac8b-07d3-45fa-9b48-ea5b1fed7290
+f2_a = 1 / (1 + z)^4
+
+# ╔═╡ b025d4c3-e521-4e8a-99a4-00d8984a0577
+sols_a = sp.solve((z + 1)^4, z)
+
+# ╔═╡ a368e3b7-a2d7-476c-aee1-5d38c90e9cec
+singularities_a = [sp.Eq(z, i) for i in sols_a]
+
+# ╔═╡ 789aee2d-74af-4744-bff7-8d5600cb5fa7
+f2_a * (z - sols_a[0])^4
+
+# ╔═╡ 4b940c28-9d3a-4974-a586-ff27937b5d65
+md"""
+``\boxed{\therefore \text{nth order pole}}``
+"""
+
+# ╔═╡ 44ae4e0f-845a-4acf-8642-04c3c296bd42
+md"""
+**b)**
+"""
+
+# ╔═╡ be6db87c-305d-4b0f-a2a3-ecb55ec38253
+sp.factor((z^4 + 2z^2 + 1))
+
+# ╔═╡ 24332af0-175c-4f14-9a93-cd2a309fea89
+f2_b = 1 / sp.factor(z^4 + 2z^2 + 1)
+
+# ╔═╡ d9514a92-01e5-496f-808d-6cd947d74f82
+sols_b = sp.solve(z^4 + 2z^2 + 1, z)
+
+# ╔═╡ ab61a0b6-a7ae-4afd-bc4c-d09bc5462204
+singularities_b = [sp.Eq(z, i) for i in sols_b]
+
+# ╔═╡ bde11b40-6c8b-4d44-a439-8528de359385
+f2_b * (z - sols_b[0])^2
+
+# ╔═╡ 66421cec-253d-476b-ac8c-d41d33789dbb
+f2_b * (z - sols_b[1])^2
+
+# ╔═╡ 950bd400-fb89-4eba-8d47-661297863a8b
+md"""
+``\boxed{\therefore \text{essential singularity}}``
+"""
+
+# ╔═╡ 9beb3172-4074-4007-8897-50291fa7f91a
+md"""
+!!! info "Problem 1.6.8"
+
+	Show that ``dz = (dr + i r d\theta) e^{i \theta}`` given ``z = re^{i \theta}``. Interpret the two factors in ``dz``, in particular the role of the exponential factor. Equating the derivatives in the radial and angular directions. Find the CRE in terms of ``u_r, u_{\theta}``. Begin now with ``f(r, \theta) = f(re^{i \theta})`` as the definition of analyticity, relate ``r`` and ``\theta`` derivatives of ``f`` and regain the CRE in polar form
+"""
+
+# ╔═╡ 333f523f-f468-4c61-8787-a4cf369fb1b1
+md"""
+!!! warning "By Hand"
+    
+    The complex variable ``z`` can be expressed in polar coordinates as:
+    
+    ```math
+    \begin{align*}
+    z &= re^{i \theta}
+    \end{align*}
+    ```
+    
+    Taking the differential of ``z``, we have:
+    
+    ```math
+    \begin{align*}
+    dz &= e^{i\theta} dr + ire^{i\theta} d\theta \\
+    &= (dr + i r d\theta) e^{i \theta}
+    \end{align*}
+    ```
+    
+    The two factors in ``dz`` represent the contributions to the change in ``z`` from changes in the radial and angular directions, with the exponential factor representing the rotation of these changes into the complex plane.
+    
+    Next, consider the Cauchy-Riemann equations (CRE) in polar form. If ``f(z) = u(r, \theta) + iv(r, \theta)``, then the CRE in polar form are:
+    
+    ```math
+    \begin{align*}
+    \frac{\partial u}{\partial r} &= \frac{1}{r} \frac{\partial v}{\partial \theta} \\
+    r\frac{\partial u}{\partial \theta} &= -\frac{\partial v}{\partial r}
+    \end{align*}
+    ```
+    
+    By substituting ``z = re^{i\theta}`` into the definition of analyticity ``f(r, \theta) = f(re^{i \theta})`` and comparing with ``f(z) = u(r, \theta) + iv(r, \theta)``, we can relate the ``r`` and ``\theta`` derivatives of ``f`` and regain the CRE in polar form.
+
+"""
+
+# ╔═╡ 005b91af-401c-44dd-8587-563492d367a3
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ 85c10785-1ec2-4043-8dda-355820ddfeb0
+r, θ, dr, dθ = sp.symbols("r, θ, dr, dθ")
+
+# ╔═╡ a26d69c6-d4af-457d-aac0-7381931f5675
+z1 = r * sp.exp(sp.I * θ)
+
+# ╔═╡ 92c77ca9-3563-4fd2-8730-65ddcc40c1a1
+∂z∂r = sp.diff(z1, r)
+
+# ╔═╡ 5b4c1590-2e4f-4abd-a85c-2fdc0e584b23
+∂z∂θ = sp.diff(z1, θ)
+
+# ╔═╡ 3a6ad0ef-7e25-4d30-9175-648f004acd16
+dz = ∂z∂r * dr + ∂z∂θ * dθ 
+
+# ╔═╡ b38fe78f-2dce-409b-9ece-c524914d42c6
+sp.factor(dz)
+
 # ╔═╡ dd4daad1-b2c3-4702-b36a-cb4ed5cc9f91
 md"""
 ## Analytic Functions Defined by Power Series
@@ -100,7 +384,7 @@ An analytic function can have singularities at isolated points
 - At a pole it behaves as 
 ```math
 \begin{align*}
-f(z) &\to \frac{Re(z_0)}{z - z_0} \\
+f(z) &\to \frac{R(z_0)}{z - z_0} \\
 Re(z_0) &= \lim_{z \to z_0}(z - z_0)f(z)
 \end{align*}
 ```
@@ -1906,10 +2190,47 @@ version = "3.5.0+0"
 # ╟─0997876f-ad4e-44f8-a5c2-43effa711032
 # ╟─61dbb937-7fd9-4812-9d40-baebf342f730
 # ╟─097011a7-47e8-41cb-9a68-ea4141035559
+# ╟─0702e36c-27d8-4616-9ed4-7d0fb2cb8c5f
+# ╟─c1277fa5-5481-4c55-b15b-ab2a1887df6e
+# ╟─6d1c131d-e731-4f14-9af2-aa7b39d7a53b
+# ╟─f3621fde-46cf-490c-83b5-42c4d26d6733
+# ╠═f0c13b72-d3ab-49a2-b3ac-8db27deeb717
+# ╠═5a31a6ab-4c4b-407b-b65b-80abe61c5a1a
+# ╠═5db211da-3f0d-4a98-9549-8285eb94344b
+# ╠═6bdd6906-65ca-4fb3-8d85-6a246d4e6654
+# ╠═9a99df2c-53f5-481a-ade6-d4b77738abde
+# ╟─71da2cb0-3dad-40bd-8b4a-582141115d5f
+# ╟─cbf5968c-b9f5-477a-9d01-1645ba519912
+# ╟─a6cdb2cd-aecb-42cd-9289-d6cfddcce351
+# ╟─17cc66d0-ab3d-43b1-8b58-367a4fe27908
+# ╠═eaeeca19-89b2-4022-8429-e2903b1da7e0
+# ╟─5b9c344c-fc50-40f7-a97f-3e3679b6366a
+# ╠═7523ac8b-07d3-45fa-9b48-ea5b1fed7290
+# ╠═b025d4c3-e521-4e8a-99a4-00d8984a0577
+# ╠═a368e3b7-a2d7-476c-aee1-5d38c90e9cec
+# ╠═789aee2d-74af-4744-bff7-8d5600cb5fa7
+# ╟─4b940c28-9d3a-4974-a586-ff27937b5d65
+# ╟─44ae4e0f-845a-4acf-8642-04c3c296bd42
+# ╠═be6db87c-305d-4b0f-a2a3-ecb55ec38253
+# ╠═24332af0-175c-4f14-9a93-cd2a309fea89
+# ╠═d9514a92-01e5-496f-808d-6cd947d74f82
+# ╠═ab61a0b6-a7ae-4afd-bc4c-d09bc5462204
+# ╠═bde11b40-6c8b-4d44-a439-8528de359385
+# ╠═66421cec-253d-476b-ac8c-d41d33789dbb
+# ╟─950bd400-fb89-4eba-8d47-661297863a8b
+# ╟─9beb3172-4074-4007-8897-50291fa7f91a
+# ╟─333f523f-f468-4c61-8787-a4cf369fb1b1
+# ╟─005b91af-401c-44dd-8587-563492d367a3
+# ╠═85c10785-1ec2-4043-8dda-355820ddfeb0
+# ╠═a26d69c6-d4af-457d-aac0-7381931f5675
+# ╠═92c77ca9-3563-4fd2-8730-65ddcc40c1a1
+# ╠═5b4c1590-2e4f-4abd-a85c-2fdc0e584b23
+# ╠═3a6ad0ef-7e25-4d30-9175-648f004acd16
+# ╠═b38fe78f-2dce-409b-9ece-c524914d42c6
 # ╟─dd4daad1-b2c3-4702-b36a-cb4ed5cc9f91
 # ╟─3dde05ab-a0ef-4a73-ad31-f65962326963
 # ╟─d90a9cd6-a8a9-4bca-bb67-3f9febf6b76f
 # ╟─151d9582-f6ee-4b8d-95af-37146e76f714
-# ╟─e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
+# ╠═e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
