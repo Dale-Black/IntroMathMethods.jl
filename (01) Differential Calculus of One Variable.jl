@@ -19,6 +19,7 @@ end
 using CondaPkg; CondaPkg.add("SymPy")
 
 # ╔═╡ 70c5e07f-c4e6-429c-a964-8893f35cedb6
+# ╠═╡ show_logs = false
 using PlutoUI, PythonCall, CairoMakie
 
 # ╔═╡ 18ef37b2-3490-4e0c-becc-13a4df541b81

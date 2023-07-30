@@ -340,20 +340,409 @@ md"""
 ## Analytic Functions Defined by Power Series
 """
 
+# ╔═╡ 48e51a69-7e6b-4a56-a05f-af3743fcad4a
+md"""
+The infinite series of complex terms ``a_n``
+
+```math
+\begin{align*}
+S = \sum_0^{\infty} a_n
+\end{align*}
+```
+
+converges if its real and imaginary parts converge
+
+Note also, a complex series which converges absolutely also converges
+
+"""
+
+# ╔═╡ c68c91b4-67a7-4c30-ad0f-2fe6f90d2dd5
+md"""
+!!! info "Problem 6.2.1"
+
+	Show why the absolute value of a sum of complex numbers is bounded by the sum of their absolute values. You may do this algebraically (in which case it is better to square both sides of the inequality) or by graphical arguments, i.e. by viewing the sum as addition of arrows in the complex plane. In the first approach you may want to start with a sum with just two numbers if you are having trouble.
+"""
+
+# ╔═╡ b0e9f28f-0ed9-4dc6-9b7a-61bdb2c8e58d
+md"""
+!!! warning "By Hand"
+
+	Given
+	```math
+	\begin{align*}
+	|z|^2 = a^2 + b^2
+	\end{align*}
+	```
+
+	Show
+	```math
+	\begin{align*}
+	|(z_1 + z_2)| &\leq (|z_1| + |z_2|) \qquad \text{OR} \qquad
+	|(z_1 + z_2)|^2 \leq (|z_1| + |z_2|)^2
+	\end{align*}
+	```
+
+	Answer
+	```math
+	\begin{align*}
+	&\text{lhs} \\
+	&|(a_1 + ib_1) + (a_2 + ib_2)|^2 \\
+	&|(a_1 + a_2) + i(b_1 + b_2)|^2 \\
+	&(a_1 + a_2)^2 + (b_1 + b_2)^2 \\
+	&(a_1^2 + 2 a_1 a_2 + a_2^2) + (b_1^2 + 2 b_1 b_2 + b_2^2) \\ 
+	&(a_1^2 + b_1^2) + (a_2^2 + b_2^2) + (2 a_1 a_2 + 2 b_1 b_2) \\ \\
+
+	&\text{rhs} \\
+	&|z_1|^2 + 2|z_1||z_2| + |z_2|^2 \\
+	&(a_1^2 + b_1^2) + (a_2^2 + b_2^2) + 2\sqrt{(a_1^2 + b_1^2)(a_2^2 + b_2^2)} \\ \\
+
+    &\text{Simplifies to} \\
+    (2 a_1 a_2 + 2 b_1 b_2) &\leq 2\sqrt{(a_1^2 + b_1^2)(a_2^2 + b_2^2)} \\
+    (2 a_1 a_2 + 2 b_1 b_2)^2 &\leq 4((a_1^2 + b_1^2)(a_2^2 + b_2^2)) \\
+    4(a_1^2a_2^2 + b_1^2b_2^2 + 2a_1a_2b_1b_2) &\leq 4(a_1^2a_2^2 + b_1^2b_2^2 + 2a_1^2b_2^2 + 2a_2^2b_1^2) \\
+	a_1a_2b_1b_2 &\leq a_1^2b_2^2 + a_2^2b_1^2 \\
+	0 &\leq a_1^2b_2^2 + a_2^2b_1^2 - a_1a_2b_1b_2 \\
+	0 &\leq x^2 - xy + y^2 \qquad (x = a_1b_2, y = a_2b_1) \\
+	0 &\leq (x - \frac{y}{2})^2 + \frac{3}{4}y^2 \\ \\
+
+	&\therefore \text{rhs} \geq 0
+    \end{align*}
+	```
+
+"""
+
+# ╔═╡ fbe28c29-3d7e-450a-baf7-c722bdbafe27
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ c57d14c0-3afe-47be-bd0a-d98371788337
+a₁, a₂, b₁, b₂ = sp.symbols("a₁, a₂, b₁, b₂")
+
+# ╔═╡ 78d422d3-7f97-4d42-833f-215065dd9c98
+z₁ = a₁ + sp.I*b₁
+
+# ╔═╡ 6495d6de-e4d9-46d7-afd2-60f09590a8b0
+z₂= a₂ + sp.I*b₂
+
+# ╔═╡ a9094f3d-69c2-4a52-99ad-275bacc5590f
+lhs = sp.Abs(z₁ + z₂)^2
+
+# ╔═╡ d9adecce-33e7-4a99-9f2a-7cb90f1ffba4
+rhs = sp.Abs(z₁)^2 + 2*sp.Abs(z₁)*sp.Abs(z₂) + sp.Abs(z₂)^2
+
+# ╔═╡ 6cfc30be-95b3-40eb-a1a9-8da085856112
+inequality = 0 ≤ sp.simplify(rhs - lhs) 
+
+# ╔═╡ eeb3d7eb-d9eb-432f-9b66-b9bf1abaf47c
+md"""
+!!! info "Problem 6.2.4"
+	Locate the zeros in the complex plane of ``\sin(z)``, ``\cos(z)``, ``\sinh(z)``, ``\cosh(z)``. A suggestion, work with the exponentials as long as possible
+"""
+
+# ╔═╡ 744034c6-83e6-434a-a02c-030a5943a9f1
+md"""
+!!! warning "By Hand"
+
+	```math
+	\begin{align*}
+	\sin(z) &= \frac{e^{iz} - e^{-iz}}{2i} = 0 \\
+	e^{iz} &= e^{-iz} \\
+	iz &= -iz + 2 \pi n \\
+	2z &= 2 \pi n \\
+	z &= \boxed{\pi n}
+	\end{align*}
+	```
+
+	```math
+	\begin{align*}
+	\cos(z) &= \frac{e^{iz} + e^{-iz}}{2} = 0 \\
+	e^{iz} &= -e^{-iz} \\
+	iz &= \ln(-1) - iz + 2 \pi n \\
+	2iz &= i\pi + 2\pi n \\
+	z &= \boxed{\pi (n + \frac{1}{2})}
+	\end{align*}
+	```
+
+	```math
+	\begin{align*}
+	\sinh(z) &= \frac{e^{z} - e^{-z}}{2} = 0 \\
+	e^{z} &= e^{-z} \\
+	z &= -z + 2 \pi n i \\
+	2z &= 2 \pi n i \\
+	z &= \boxed{n \pi i}
+	\end{align*}
+	```
+
+	```math
+	\begin{align*}
+	\cosh(z) &= \frac{e^{z} + e^{-z}}{2} = 0 \\
+	e^{z} &= -e^{-z} \\
+	z &= \ln(-1) - z + 2 \pi n i \\
+	2z &= i\pi + 2\pi n i \\
+	z &= \boxed{(n + \frac{1}{2})\pi i}
+	\end{align*}
+	```
+
+"""
+
+# ╔═╡ 39069e92-ffa2-47e0-8e69-1fdb3b56ebbd
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ 555f0d20-6623-4349-965b-f1deb90f47f3
+n = sp.symbols("n")
+
+# ╔═╡ fe602bda-bdb9-4938-9389-3c5bcd417e1d
+sinz = (sp.exp(sp.I * z) - sp.exp(- sp.I *z)) / 2*sp.I
+
+# ╔═╡ fb4bbf1d-8ef4-481c-a030-5c2a0f842398
+sp.solve(sp.Eq(sinz, 0), z)
+
+# ╔═╡ 0dcc8119-ba9a-46ff-8856-8cdedf2dc986
+cosz = (sp.exp(sp.I * z) + sp.exp(- sp.I *z)) / 2
+
+# ╔═╡ 78fb9c16-2ca3-487e-aa93-c326d7767021
+sp.solve(sp.Eq(cosz, 0), z)
+
+# ╔═╡ e860fa42-f797-435e-b7f9-020e1bfe0565
+sinhz = (sp.exp(z) - sp.exp(-z)) / 2
+
+# ╔═╡ 752040d9-9b65-4709-ac99-09c974c4ccab
+sp.solve(sp.Eq(sinhz, 0), z)
+
+# ╔═╡ d8548830-e569-4aa2-9f16-4f9b187dedf3
+coshz = (sp.exp(z) + sp.exp(-z)) / 2
+
+# ╔═╡ 67daf41e-cecc-4364-9b17-ebaa75212c70
+sp.solve(sp.Eq(coshz, 0), z)
+
+# ╔═╡ 6997d54f-6ff4-448f-83ee-14793740aa14
+md"""
+!!! info "Problem 6.2.16"
+
+	Give all the values of ``i^i``
+"""
+
+# ╔═╡ 01cc9ea6-b660-4981-a83e-6a85d3553c16
+md"""
+!!! warning "By Hand"
+
+	```math
+	\begin{align*}
+	i^i &= e^{i \ln i} \\
+	\end{align*}
+	```
+"""
+
 # ╔═╡ 3dde05ab-a0ef-4a73-ad31-f65962326963
 md"""
 ## Calculus of Analytic Functions
 """
+
+# ╔═╡ 2f5991fe-3b8e-41ac-9ab4-69c7c012b60e
+md"""
+Analytic functions that are integrated along a closed path are zero
+"""
+
+# ╔═╡ 8746ca53-7ee0-4ce5-9c7d-3874ed6b09f8
+md"""
+!!! info "Problem 6.3.4"
+	Evaluate the integral of z^2 on a rectangular path going from -1 to 1 to 1 + i to -1 + i and back
+"""
+
+# ╔═╡ bdfa3095-8150-4be6-b5b8-bf74a5861a07
+md"""
+!!! warning "By Hand"
+
+    ```math
+    \begin{align*}
+    &\int_{-1}^{1} z^2 dz + \int_{1}^{1+i} z^2 dz + \int_{1+i}^{-1+i} z^2 dz + \int_{-1+i}^{-1} z^2 dz \\
+    &= \int_{-1}^{1} z^2 dz + \int_{1}^{1+i} z^2 dz + \int_{1+i}^{-1+i} z^2 dz + \int_{-1+i}^{-1} z^2 dz \\
+    &= \left[\frac{z^3}{3}\right]_{-1}^{1} + \left[\frac{z^3}{3}\right]_{1}^{1+i} + \left[\frac{z^3}{3}\right]_{1+i}^{-1+i} + \left[\frac{z^3}{3}\right]_{-1+i}^{-1} \\
+    &= \frac{1}{3} - \frac{-1}{3} + \frac{(1+i)^3}{3} - \frac{1}{3} + \frac{(-1+i)^3}{3} - \frac{(1+i)^3}{3} + \frac{(-1)^3}{3} - \frac{(-1+i)^3}{3} \\
+    &= \frac{2}{3} + 0 + 0 + 0 \\
+    &= \frac{2}{3} - \frac{2}{3} \\
+    &= 0
+    \end{align*}
+    ```
+"""
+
+# ╔═╡ 2b13fe3c-a873-4206-ac9a-7337903cd737
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ b509ce25-f6b4-486e-aac8-6faa7a4a1d8c
+let
+	f = Figure()
+	
+	ax = CairoMakie.Axis(
+		f[1, 1],
+		title = "Complex plane path",
+		xlabel = "Real",
+		ylabel = "Imaginary (i)"
+	)
+	arrows!(-1:0, fill(0, 2), fill(1, 2), fill(0, 2), label = "Path 1", color = :red)
+	arrows!(1:1, 0:0, fill(0, 1), fill(1, 1), label = "Path 2", color = :blue)
+	arrows!(1:-1:0, 1:1, fill(-1, 2), fill(0, 2), label = "Path 3", color = :green)
+	arrows!(-1:-1, 1:-1:0.5, fill(0, 2), fill(-1, 2), label = "Path 4", color = :purple)
+	axislegend(ax)
+	
+	f
+end
+
+# ╔═╡ 4cf51697-7d31-46eb-b019-b7d81fc861fd
+md"""
+As we can see, the path is a closed loop and ``f = z^2`` is analytic, so we should expect to get 0 when integrating along this path
+"""
+
+# ╔═╡ e4b24fe9-a5fa-436e-8dc6-da35546da1b6
+I1 = sp.integrate(z^2, (z, -1, 1))
+
+# ╔═╡ fd9251b9-339a-40c0-94e6-9fc2d8438a96
+I2 = sp.integrate(z^2, (z, 1, 1 + sp.I))
+
+# ╔═╡ 3dd3c31b-dc35-4805-bf63-f1efead42d2f
+I3 = sp.integrate(z^2, (z, 1 + sp.I, -1 + sp.I))
+
+# ╔═╡ 4d9ee12d-47a9-457c-a6a3-d47c34bef933
+I4 = sp.integrate(z^2, (z, -1 + sp.I, -1))
+
+# ╔═╡ 966827d6-013a-4861-8a46-ecb9f503a1aa
+I = I1 + I2 + I3 + I4
 
 # ╔═╡ d90a9cd6-a8a9-4bca-bb67-3f9febf6b76f
 md"""
 ## The Residue Theorem
 """
 
+# ╔═╡ c8554291-187f-4276-9259-32af896e9048
+md"""
+!!! info "Problem 6.4.3"
+	Show that
+
+    ```math
+    \int_0^{\infty} \frac{\cos(\alpha x) + x \sin(\alpha x)}{1 + x^2} dx = 
+    \begin{cases} 
+    \pi e^{\alpha} & \text{if } \alpha > 0, \\
+    \frac{\pi}{2} & \text{if } \alpha = 0, \\
+    0 & \text{if } \alpha < 0.
+    \end{cases}
+    ```
+"""
+
+# ╔═╡ 01f411c5-b357-4336-9e7a-9134898d4839
+md"""
+!!! warning "By Hand"
+    ```math
+    \begin{align*}
+    &\int_0^{\infty} \frac{\cos(\alpha x) + x \sin(\alpha x)}{1 + x^2} dx \\
+    &= \int_0^{\infty} \frac{\text{Re}(e^{i\alpha x}) + x \text{Im}(e^{i\alpha x})}{1 + x^2} dx \\
+    &= \int_0^{\infty} \frac{e^{i\alpha x}(1 + ix)}{1 + x^2} dx
+    \end{align*}
+    ```
+"""
+
+# ╔═╡ 255d65a5-5f71-4ce4-9817-389333b8027f
+md"""
+#### With SymPy
+"""
+
+# ╔═╡ c354c9b3-e3f0-4d6a-9068-90f1d2e8afcd
+α = sp.symbols("α")
+
+# ╔═╡ 2b7b6f7b-b32d-4afd-aac0-3f388ba34f4e
+(sp.cos(α * x) + x*sp.sin(α * x))
+
+# ╔═╡ 677d9a6b-79da-4f4d-b25f-825e3e7bada0
+exp_full = sp.re(sp.exp(sp.I * α * x)) + x * (sp.im(sp.exp(sp.I * α * x)))
+
+# ╔═╡ c1c8ff86-0a5f-480b-bdcd-509d96074e92
+sp.simplify(exp_full)
+
+# ╔═╡ 049abac6-b161-4a83-acc4-41ef6672adf2
+md"""
+!!! info "Problem 6.4.5 (i, ii)"
+
+	Evaluate by residue thereom
+
+	i) 
+	```math
+	\begin{align*}
+	\int_0^{\infty} \frac{dx}{1 + x^4}
+	\end{align*}
+	```
+
+	ii)
+	```math
+	\begin{align*}
+	\oint_C \frac{\sin(z) dz}{z - \pi} \quad \text{on } |z| = 1, 2
+	\end{align*}
+	```
+"""
+
+# ╔═╡ bf81ed5b-caa2-48af-a077-864569ae942a
+md"""
+!!! warning "By Hand"
+
+	i) 
+    ```math
+    \begin{align*}
+    \int_0^{\infty} \frac{dx}{1 + x^4}
+    &\rightarrow \frac{1}{2} \oint_C \frac{dz}{1 + z^4} \\
+    &\rightarrow \frac{1}{2} \cdot 2\pi i \left[\text{Res}\left(\frac{1}{1 + z^4}, z = e^{i\pi/4}\right) + \text{Res}\left(\frac{1}{1 + z^4}, z = e^{5i\pi/4}\right)\right] \\
+    &\rightarrow \pi i \left[\frac{1}{4e^{i\pi/4}} + \frac{1}{4e^{5i\pi/4}}\right] \\
+    &\rightarrow \frac{\pi}{\sqrt{2}} (1 - i + 1 + i) \\
+    &\rightarrow \frac{2\pi}{\sqrt{2}} \\
+    \int_0^{\infty} \frac{dx}{1 + x^4} &= \frac{\pi}{\sqrt{2}}
+    \end{align*}
+    ```
+
+	ii)
+	```math
+    \begin{align*}
+    \int_0^{\infty} \frac{dx}{1 + x^4}
+    &\rightarrow \frac{1}{2} \oint_C \frac{dz}{1 + z^4} \\
+    &\rightarrow \frac{1}{2} \cdot 2\pi i \left[\text{Res}\left(\frac{1}{1 + z^4}, z = e^{i\pi/4}\right) + \text{Res}\left(\frac{1}{1 + z^4}, z = e^{5i\pi/4}\right)\right] \\
+    &\rightarrow \pi i \left[\frac{1}{4e^{i\pi/4}} + \frac{1}{4e^{5i\pi/4}}\right] \\
+    &\rightarrow \frac{\pi}{\sqrt{2}} (1 - i + 1 + i) \\
+    &\rightarrow \frac{2\pi}{\sqrt{2}} \\
+    \int_0^{\infty} \frac{dx}{1 + x^4} &= \frac{\pi}{\sqrt{2}} \\
+    \oint_C \frac{\sin(z)}{z - \pi} \, dz &= 0 \quad \text{on } |z| = 1, 2 \quad \text{[Residue theorem, no poles inside contour]}
+    \end{align*}
+    ```
+"""
+
 # ╔═╡ 151d9582-f6ee-4b8d-95af-37146e76f714
 md"""
 ## Taylor Series for Analytic Functions
 """
+
+# ╔═╡ dd50b961-074e-4143-98a2-fd42a0abb226
+md"""
+!!! info "Problem 6.53"
+
+	On the real axis ``e^{ix} = \cos(x) + i \sin(x)``. Is this an analytic relationship which will survive the continuation to complex ``z``?
+"""
+
+# ╔═╡ eac4aaf2-f426-49c5-9be7-a6ccbf818d2a
+md"""
+!!! warning "By Hand"
+
+    ```math
+	\begin{align*}
+    e^{ix} &= \cos(x) + i \sin(x) \\
+    e^{iz} &= \cos(z) + i \sin(z) \\
+    \cos(z) &= \frac{e^{iz} + e^{-iz}}{2} \\
+    \sin(z) &= \frac{e^{iz} - e^{-iz}}{2i} \cos(z) + i \sin(z) \\
+	&= \frac{e^{iz} + e^{-iz}}{2} + i \cdot \frac{e^{iz} - e^{-iz}}{2i} \\
+	&= e^{iz} 
+	\end{align*}
+    ```
+"""
+
 
 # ╔═╡ e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
 md"""
@@ -2228,9 +2617,55 @@ version = "3.5.0+0"
 # ╠═3a6ad0ef-7e25-4d30-9175-648f004acd16
 # ╠═b38fe78f-2dce-409b-9ece-c524914d42c6
 # ╟─dd4daad1-b2c3-4702-b36a-cb4ed5cc9f91
+# ╟─48e51a69-7e6b-4a56-a05f-af3743fcad4a
+# ╟─c68c91b4-67a7-4c30-ad0f-2fe6f90d2dd5
+# ╟─b0e9f28f-0ed9-4dc6-9b7a-61bdb2c8e58d
+# ╟─fbe28c29-3d7e-450a-baf7-c722bdbafe27
+# ╠═c57d14c0-3afe-47be-bd0a-d98371788337
+# ╠═78d422d3-7f97-4d42-833f-215065dd9c98
+# ╠═6495d6de-e4d9-46d7-afd2-60f09590a8b0
+# ╠═a9094f3d-69c2-4a52-99ad-275bacc5590f
+# ╠═d9adecce-33e7-4a99-9f2a-7cb90f1ffba4
+# ╠═6cfc30be-95b3-40eb-a1a9-8da085856112
+# ╟─eeb3d7eb-d9eb-432f-9b66-b9bf1abaf47c
+# ╟─744034c6-83e6-434a-a02c-030a5943a9f1
+# ╟─39069e92-ffa2-47e0-8e69-1fdb3b56ebbd
+# ╠═555f0d20-6623-4349-965b-f1deb90f47f3
+# ╠═fe602bda-bdb9-4938-9389-3c5bcd417e1d
+# ╠═fb4bbf1d-8ef4-481c-a030-5c2a0f842398
+# ╠═0dcc8119-ba9a-46ff-8856-8cdedf2dc986
+# ╠═78fb9c16-2ca3-487e-aa93-c326d7767021
+# ╠═e860fa42-f797-435e-b7f9-020e1bfe0565
+# ╠═752040d9-9b65-4709-ac99-09c974c4ccab
+# ╠═d8548830-e569-4aa2-9f16-4f9b187dedf3
+# ╠═67daf41e-cecc-4364-9b17-ebaa75212c70
+# ╟─6997d54f-6ff4-448f-83ee-14793740aa14
+# ╟─01cc9ea6-b660-4981-a83e-6a85d3553c16
 # ╟─3dde05ab-a0ef-4a73-ad31-f65962326963
+# ╟─2f5991fe-3b8e-41ac-9ab4-69c7c012b60e
+# ╟─8746ca53-7ee0-4ce5-9c7d-3874ed6b09f8
+# ╟─bdfa3095-8150-4be6-b5b8-bf74a5861a07
+# ╟─2b13fe3c-a873-4206-ac9a-7337903cd737
+# ╟─b509ce25-f6b4-486e-aac8-6faa7a4a1d8c
+# ╟─4cf51697-7d31-46eb-b019-b7d81fc861fd
+# ╠═e4b24fe9-a5fa-436e-8dc6-da35546da1b6
+# ╠═fd9251b9-339a-40c0-94e6-9fc2d8438a96
+# ╠═3dd3c31b-dc35-4805-bf63-f1efead42d2f
+# ╠═4d9ee12d-47a9-457c-a6a3-d47c34bef933
+# ╠═966827d6-013a-4861-8a46-ecb9f503a1aa
 # ╟─d90a9cd6-a8a9-4bca-bb67-3f9febf6b76f
+# ╟─c8554291-187f-4276-9259-32af896e9048
+# ╟─01f411c5-b357-4336-9e7a-9134898d4839
+# ╟─255d65a5-5f71-4ce4-9817-389333b8027f
+# ╠═c354c9b3-e3f0-4d6a-9068-90f1d2e8afcd
+# ╠═2b7b6f7b-b32d-4afd-aac0-3f388ba34f4e
+# ╠═677d9a6b-79da-4f4d-b25f-825e3e7bada0
+# ╠═c1c8ff86-0a5f-480b-bdcd-509d96074e92
+# ╟─049abac6-b161-4a83-acc4-41ef6672adf2
+# ╟─bf81ed5b-caa2-48af-a077-864569ae942a
 # ╟─151d9582-f6ee-4b8d-95af-37146e76f714
+# ╟─dd50b961-074e-4143-98a2-fd42a0abb226
+# ╟─eac4aaf2-f426-49c5-9be7-a6ccbf818d2a
 # ╠═e6546ad2-9f37-451f-aa3d-27d90ca0b2a5
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

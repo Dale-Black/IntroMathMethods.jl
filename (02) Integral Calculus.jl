@@ -9,6 +9,7 @@ using InteractiveUtils
 using CondaPkg; CondaPkg.add("SymPy")
 
 # ╔═╡ f7997b9b-6221-4546-81d6-6ba24128e39b
+# ╠═╡ show_logs = false
 using PlutoUI, PythonCall, CairoMakie
 
 # ╔═╡ 8b181e25-9c24-4d66-8167-6edf87f76862
