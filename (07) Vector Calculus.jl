@@ -4,673 +4,298 @@
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
-        el
-    end
-end
-
-# ╔═╡ 1531a556-ee42-479f-9f66-61e8aee9a7a3
+# ╔═╡ fe301fc0-d32b-40e7-8ab8-17d81b6bcf8a
 # ╠═╡ show_logs = false
 using CondaPkg; CondaPkg.add("SymPy")
 
-# ╔═╡ 70c5e07f-c4e6-429c-a964-8893f35cedb6
-# ╠═╡ show_logs = false
+# ╔═╡ 94e6fcb1-d73f-467b-97fa-82d536f1703b
 using PlutoUI, PythonCall, CairoMakie
 
-# ╔═╡ 18ef37b2-3490-4e0c-becc-13a4df541b81
+# ╔═╡ 0b3fe3e4-ae8e-4a58-955f-8c396f2047a8
 sp = pyimport("sympy");
 
-# ╔═╡ 25877aa4-8c2a-4112-be89-8a707f367019
+# ╔═╡ 908a8f10-6375-427a-97a5-cb2e5caf5cfb
 TableOfContents()
 
-# ╔═╡ 81813bb0-5c1b-495b-aa8f-316117b4b80f
+# ╔═╡ b61002b8-38ae-40a7-8344-a58ecb0ebffa
 md"""
 # Introduction
-I am entering my first year of graduate studies at the University of California, Irvine and as a big fan of Julia, I am going to attempt to use it everywhere I can. This course is not meant to be a computational mathematics course, but I feel like it's the perfect onramp for someone like me to get a grasp of computational symbolics, which is a fundamental skill that will be important throughout the rest of my graduate physics studies. I started out with the intention of doing everything "by hand" and in pure Julia, using the [Symbolics.jl](https://symbolics.juliasymbolics.org/stable/) ecosystem. Although Symbolics.jl is already extremely impressive for it's area of focus, it isn't quite ready to replace something like Mathematica for physicists. Still, I absolutely love Julia, Pluto.jl (these reactive notebooks), Makie.jl (plotting), Julia syntax (θ, y₁, etc), and all of the other features that come with this language, so I didn't want to abandon this idea.
-
-Luckily, the amazing library [PythonCall.jl](https://github.com/cjdoris/PythonCall.jl) combined with [SymPy](https://www.sympy.org/en/index.html) saved the day. I am sure to encounter some rough edges eventually, but being able to use Python and sympy from a Pluto notebook for my homework and notes has been heavenly.
-
-I am going to attempt to write these notebooks in a way that could serve as a blog post if I want. There are a few reasons for that - (1) maybe this will encourage Python developers to give Julia a look, (2) Julia makes math much more fun and trying to implement mathematical concepts in code helps me understand these concepts at a deeper level, (3) writing this in blog format (and potentially publishing on something like substack/medium) will force me to not only implement these concepts for homework problems but also understand them deeply enough to explain them to others, and (4) our new product [Glass Notebook](https://glassnotebook.io) is now functional so publishing interactive Pluto notebooks is super simple!
 """
 
-# ╔═╡ 495c8000-00f8-475a-8a34-6ea621ffd3c3
+# ╔═╡ 13cdd42b-25c8-4f61-bc4e-1b5588aa9918
 md"""
-# Differential Calculus of One Variable
-
-**Homework Problems**
-- 1.2.1
-- 1.2.2 
-- 1.3.3 
-- 1.6.1  
-- 1.6.7
-- 1.6.12
+# Vector Calculus
+**Homework Assignments**
+- 7.1.3
+- 7.2.4
+- 7.4.3
+- 7.5.1
+- 7.5.2
+- 7.5.3
+- 7.5.7
+- 7.6.1
+- 7.6.6
+- 7.6.12
+- 7.7.3
 """
 
-# ╔═╡ 30047808-b3cf-458f-8b0c-e2b8799e16ab
+# ╔═╡ 5161556a-deae-48c9-bf6c-36a8aaf5882d
 md"""
-## Differential Calculus
+## Review of Vectors Analysis
 """
 
-# ╔═╡ aac632b9-2bfb-4656-92ec-5a8adc5d3ba5
+# ╔═╡ 9a39c2cb-d2e2-424d-a04d-ec52b47cd2dc
 md"""
-The *derivative* of the function, denoted by ``f'(x)``, ``f^(1)``, ``Df``, or ``\frac{df}{dx}`` is defined by
+!!! info "Problem 7.1.3"
 
-```math
-\begin{align*}
-\frac{df}{dx} &= \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \\
-\end{align*}
-```
+	Consider three vectors ``\vec{a}``, ``\vec{b}``, ``\vec{c}`` not in the same plane. Show that the box product, also called scalar triple product (``\vec{c} \cdot \vec{a} \times \vec{b}``) gives the volume of the parallelepiped with these vectors as three adjacent edges. At least verify for the case when the ``\vec{c}`` is perpendicular to the ``\vec{a} - \vec{b}`` plane. Show that ``\vec{a} \cdot \vec{b} \times \vec{c} = \vec{b} \cdot \vec{c} \times \vec{a} = \vec{c} \cdot \vec{a} \times \vec{b}`` either geometrically or algebraically. What happens to the box product when two of the vectors are parallel.
 """
 
-# ╔═╡ 5a354cf1-6bed-4e50-96ae-113c3a290f0b
-md"""
-!!! info "Problem 1.2.1"
-	Now let's take a look at problem 1.2.1 from the book. It says
-	
-	Demonstrate these two results from first principles:
-	```math
-	\begin{aligned}
-	D[fg] = gDf + fDg
-	\end{aligned}
-	```
-	
-	```math
-	\begin{aligned}
-	Df(u(x)) &= \frac{df}{du} \frac{du}{dx}
-	\end{aligned}
-	```
-	
-	For example, if ``u(x) = x^2 + 1`` and ``f(u) = u^2``, then
-	
-	```math
-	\begin{aligned}
-	\frac{df}{dx} &= (2u)(2x) = 2(x^2 + 1)(2x)
-	\end{aligned}
-	```
-"""
-
-# ╔═╡ 2638525d-4273-4fe2-8934-915a148eee69
-md"""
-!!! warning "By Hand"
-	Let's first answer this question "by hand" and write out the step-by-step calculations
-	```math
-	\begin{aligned}
-	\frac{df}{du} &= 2u \\
-	\frac{du}{dx} &= 2x \\
-	\frac{df}{dx} &= \frac{df}{du}\frac{du}{dx} \\
-	&= (2u)(2x) = \boxed{2(x^2 + 1)(2x)}
-	\end{aligned}
-	```
-"""
-
-# ╔═╡ 733551f0-a11d-4e83-b121-8194567f04dc
-md"""
-#### With SymPy
-Now let's use SymPy to check our answer
-"""
-
-# ╔═╡ b50e7df1-bbea-4889-8b9a-a525727006ae
-x = sp.symbols("x")
-
-# ╔═╡ d086da44-5bf3-456a-aec7-7df3b9f9348f
-u = x^2 + 1
-
-# ╔═╡ 589472cb-7536-4326-8f09-553152690d38
-f = u^2
-
-# ╔═╡ 3f452666-1ef1-46cc-bf48-bf91396055f9
-sp.diff(f, x)
-
-# ╔═╡ 8e0acab8-b145-4fdb-83d5-99c6913fafcc
-md"""
-!!! info "Problem 1.2.2"
-
-	Problem 1.2.2 says
-	
-	Show from first principles that 
-	
-	```math
-	\begin{aligned}
-	D(1/x) = -1/x^2
-	\end{aligned}
-	```
-"""
-
-# ╔═╡ f4ba19f8-ed4c-48be-ab42-a6cae6824444
+# ╔═╡ 53fbf184-231b-488e-aaa9-0b0698be5a9e
 md"""
 !!! warning "By Hand"
 
-	Given: 
-	```math
-	\begin{aligned}
-	\frac{df}{dx} = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
-	\end{aligned}
-	```
-	```math
-	\begin{aligned}
-	f(x) &= \frac{1}{x} \\
-	\end{aligned}
-	```
-	
-	
-	Answer:
+	i)
 	```math
 	\begin{align*}
-	\frac{df}{dx} &= \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \\
-	&= \lim_{h \to 0} \frac{\frac{1}{x + h} - \frac{1}{x}}{h} \\
-	&= \lim_{h \to 0} \frac{-1}{x(x + h)} \\
-	&= \frac{1}{x^2} \\
-	\therefore \frac{d}{dx}\left(\frac{1}{x}\right) &= \boxed{-\frac{1}{x^2}}
-	\end{align*}
-	```
-"""
+	\vec{b} \cdot \vec{c} \times \vec{a} &= \vec{a} \cdot \vec{b} \times \vec{c} \\ \\
 
-# ╔═╡ 046531f7-0c18-417d-a5b2-119cdcd7420e
-md"""
-#### With SymPy
-Let's check our answer using SymPy. This will be a trend as you will see.
-"""
 
-# ╔═╡ d32a01e0-83a1-44dc-a486-03a5d61874c5
-f2 = 1/x
-
-# ╔═╡ faaee09d-ea43-458c-8f29-e551d018a2ba
-sp.diff(f2, x)
-
-# ╔═╡ dcc46222-aa33-4646-a197-105528781dca
-md"""
-The "formula" for computing any derivative can be found using the binomial theorem and some work. This is shown below
-```math
-\begin{aligned}
-Dx^n = n x^{n-1}
-\end{aligned}
-```
-"""
-
-# ╔═╡ 869a1b00-6ccb-472a-b517-cf68c1967735
-md"""
-## Exponential and Log Functions
-"""
-
-# ╔═╡ 33522b04-66c9-41e0-b35a-48344ee2f5bd
-md"""
-!!! info "Problem 1.3.3"
-	Problem 1.3.3 says:
-
-	Demonstrate:
-	
-	```math
-	\begin{align*}
-	\sinh(x) &= \frac{e^x - e^{-x}}{2} \\
-	&= x + \frac{x^3}{3!} + \frac{x^5}{5!} + ...
-	\end{align*}
-	```
-	
-	```math
-	\begin{align*}
-	\cosh(x) &= \frac{e^x + e^{-x}}{2} \\
-	&= 1 + \frac{x^2}{2!} + \frac{x^4}{4!} + ...
-	\end{align*}
+	\vec{b} \cdot (\vec{c} \times \vec{a}) &= \begin{vmatrix}
+    b_x & b_y & b_z \\
+    c_x & c_y & c_z \\
+    a_x & a_y & a_z
+    \end{vmatrix} \\
+    &= b_x \begin{vmatrix}
+    c_y & c_z \\
+    a_y & a_z
+    \end{vmatrix} - b_y \begin{vmatrix}
+    c_x & c_z \\
+    a_x & a_z
+    \end{vmatrix} + b_z \begin{vmatrix}
+    c_x & c_y \\
+    a_x & a_y
+    \end{vmatrix} \\
+    &= b_x (c_y a_z - c_z a_y) - b_y (c_x a_z - c_z a_x) + b_z (c_x a_y - c_y a_x) \\
+    &= a_x (b_y c_z - b_z c_y) - a_y (b_x c_z - b_z c_x) + a_z (b_x c_y - b_y c_x) \\
+    &= \vec{a} \cdot (\vec{b} \times \vec{c})
+    \end{align*}
 	```
 
-"""
-
-# ╔═╡ 9405e684-c195-47df-afa5-7842fe9bfd07
-md"""
-!!! warning "By Hand"
-
-	Let's start with the Taylor series expansion for ``e^x`` and ``e^{-x}`` which was given earlier in the chapter
+	ii) 
 
 	```math
-	\begin{align*}
-	e^x &= 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ... \\
-	e^{-x} &= 1 - x + \frac{x^2}{2!} - \frac{x^3}{3!} + ... \\
-	\end{align*}
-	```
+    \begin{align*}
+	\vec{c} \cdot \vec{a} \times \vec{b} &= \vec{b} \cdot \vec{c} \times \vec{a} \\ \\
 
-	Now we can demonstrate the above, but just plugging the series into the definitions of ``\cosh`` and ``\sinh``
+    \vec{c} \cdot (\vec{a} \times \vec{b}) &= \begin{vmatrix}
+    c_x & c_y & c_z \\
+    a_x & a_y & a_z \\
+    b_x & b_y & b_z
+    \end{vmatrix} \\
+    &= c_x \begin{vmatrix}
+    a_y & a_z \\
+    b_y & b_z
+    \end{vmatrix} - c_y \begin{vmatrix}
+    a_x & a_z \\
+    b_x & b_z
+    \end{vmatrix} + c_z \begin{vmatrix}
+    a_x & a_y \\
+    b_x & b_y
+    \end{vmatrix} \\
+    &= c_x (a_y b_z - a_z b_y) - c_y (a_x b_z - a_z b_x) + c_z (a_x b_y - a_y b_x) \\
+    &= a_x (b_y c_z - b_z c_y) - a_y (b_x c_z - b_z c_x) + a_z (b_x c_y - b_y c_x) \\
+    &= \vec{a} \cdot (\vec{b} \times \vec{c})
+    \end{align*}
+    ```
 
-	```math
-	\begin{align*}
-	\sinh(x) &= \frac{e^x - e^{-x}}{2} \\
-	&= \frac{(1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ...) - (1 - x + \frac{x^2}{2!} - \frac{x^3}{3!} + ...)}{2} \\
-	&= \frac{2x + 2\frac{x^3}{3!} + ...}{2} \\
-	&= \boxed{x + \frac{x^3}{3!} + ...}
-	\end{align*}
-	```
-
-	```math
-	\begin{align*}
-	\cosh(x) &= \frac{e^x + e^{-x}}{2} \\
-	&= \frac{(1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ...) + (1 - x + \frac{x^2}{2!} - \frac{x^3}{3!} + ...)}{2} \\
-	&= \frac{2 + 2\frac{x^2}{2!}}{2} \\
-	&= \boxed{1 + \frac{x^2}{2!} + ...}
-	\end{align*}
-	```
+	iii)
+    ```math
+    \begin{align*}
+    \vec{c} \cdot (\vec{a} \times \vec{b}) &= \vec{c} \cdot 0 \\
+    &= 0
+    \end{align*}
+    ```
 """
 
-# ╔═╡ 47f116d2-3ad6-482a-9a13-412d2de5ad36
+# ╔═╡ 5d7e3199-dc42-4870-904c-1906a99cfa97
 md"""
-#### With SymPy
+## Time Derivatives of Vectors
 """
 
-# ╔═╡ 30c592b4-282d-4d17-b830-7ed25bbc4690
+# ╔═╡ bef5c3ec-8f59-4f4b-8b6a-ec22f5c9b8eb
 md"""
-First, let's check that we understand the basic Taylor series expansion for ``e^x`` and ``e^-{x}``, then let's create series expansion functions for `sinh` and `cosh` that utilizes the exponential form
+!!! info "Problem 7.2.4"
+
+	A particle has a position vector ``\vec{r} = \cos(\omega t) \hat{i} + \sin(\omega t) \hat{j}``. (1) Describe its motion in cartesian coordinates with a sketch and in words. (2) Compute its velocity and accelaration. (3) Find the magnitudes of both. (4) Switch to polar coordinates and find the ``r`` and ``\theta`` for this problem. (5) What is ``\vec{a}``?
 """
 
-# ╔═╡ 0af73555-96e4-40f7-ae07-be3fe95c0260
-sp.series(sp.exp(x), n = 4)
-
-# ╔═╡ c4469c5c-d23d-484d-9a8d-da41690555ab
+# ╔═╡ 08bbdbdf-3778-415d-813b-f81922f64215
 md"""
-Great, now we can set up the `cosh` and `sinh` Taylor series expansions, using the Taylor series expansions for ``e`` that we verified above
+## Scalar and Vector Fields
 """
 
-# ╔═╡ bee68160-5c02-45e0-a61d-bfb0b3c21140
-function series_sinh(f, n)
-    return (sp.series(sp.exp(x), n = 4) - sp.series(sp.exp(-x), n = 4)) / 2
-end
-
-# ╔═╡ 60566da3-93f7-4d83-9c30-1c2a21ea844b
-function series_cosh(f, n)
-    return (sp.series(sp.exp(x), n = 4) + sp.series(sp.exp(-x), n = 4)) / 2
-end
-
-# ╔═╡ f984855b-b2af-4ecf-adef-9bca9a0d95ee
+# ╔═╡ 3b55ae9d-855f-4dca-a293-ad235ed7c8ff
 md"""
-Taking these expansions to the 5th term, gives us the exact results as our "by hand" approach. The only difference is the factorials (``!``) have been computed
+## Line and Surface Integrals
 """
 
-# ╔═╡ 52a0dae1-e85e-426b-a995-19e2a50a6612
-series_sinh(x, 5)
-
-# ╔═╡ eb3dcddb-c1b5-406b-8829-47cf0d991a4b
-series_cosh(x, 5)
-
-# ╔═╡ 60c8878c-2740-4ba4-86d0-6d555222bb0f
+# ╔═╡ 873551d7-aebb-41fc-8746-00c045d3a10f
 md"""
-## Plotting functions
+## Scalar Field and Gradient
 """
 
-# ╔═╡ 44b251b8-5e6d-4ee4-a189-83c455f65a0e
+# ╔═╡ 25112cba-34af-4ad7-9af2-27bf6b560374
 md"""
-This sections explains the basics of plotting functions by hand. Instead of going through that, I think it would be insightful to show how a Taylor series approximation of ``e^x`` improves with increasing `n` terms. This will showcase the power of Pluto.jl, PythonCall.jl/Sympy, Makie.jl, Symbolics.jl, and even [Glass Notebook](https://glassnotebook.io/).
-
-*Notice how easy it is to convert from a Python object to Julia* 🎉😍
+## Curl of a Vector Field
 """
 
-# ╔═╡ 9a2d9e3b-e012-4353-8f05-49b8f83bb6cb
-@bind n_term PlutoUI.Slider(1:5; show_value = true)
-
-# ╔═╡ 68e0a7f2-d913-402e-bab2-6da3e434f1af
-begin
-	xs = collect(-1:0.1:1)
-	ys = exp.(xs)
-
-	exp_series = sp.series(sp.exp(x), n = n_term).removeO()
-	taylor_series_ys = [pyconvert(Float64, exp_series.subs(x, i)) for i in xs]
-end
-
-# ╔═╡ 5961146a-c5f6-463a-82d5-6c8eb0b970ae
-let
-	f = Figure()
-	ax = Axis(f[1, 1])
-	
-	scatterlines!(xs, ys; label = L"e^x")
-	scatterlines!(xs, taylor_series_ys; label = L"\text{Taylor series expansion of e^x to the n^{th} term}")
-	xlims!(low = -1, high = 1)
-	ylims!(low = 0, high = 3)
-	axislegend(ax; position = :rb)
-	
-	f
-end
-
-# ╔═╡ 45f1f1e4-a853-4ae0-a7e2-d293d036509d
+# ╔═╡ 54468bc7-3115-4582-af0c-4d66f1cb0d3e
 md"""
-We can see from above, as we increase the amount of terms ``n`` in the expansion by moving the `Slider`, the Taylor series approximation approaches the ground truth ``e^x``
+## The Divergence of a Vector Field
 """
 
-# ╔═╡ ba25de9b-a0aa-4350-879d-96acaf046d68
-md"""
-## Miscellaneous Problems on Differential Calculus
-"""
-
-# ╔═╡ c1f5c48e-9aaf-46ae-96c3-c1a2837b251c
-md"""
-!!! info "Problem 1.6.1"
-	
-	Expand the function ``f(x) = \sin(x) / (\cosh(x) + 2)`` in a Taylor series around the origin going up to ``x^3``. Calculate ``f(0.1)`` from this series and compare to the exact answer obtained from a calculator
-"""
-
-# ╔═╡ abd50323-9f71-4d12-bc08-f82d3e2f7f98
-md"""
-!!! warning "By Hand"
-
-	Given the Taylor series expansion
-	```math
-	\begin{align*}
-	f(x) &= f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x^2) + \frac{f'''(0)}{3!}(x^3)
-	\end{align*}
-	```
-
-	We can find the first three derivatives and plug them in. (*This would take forever to do by hand, so I just used Symbolics.jl and Latexify.jl and copy-pasted these in, see below*)
-	```math
-	\begin{align*}
-	f'(x) &= \frac{\cos\left( x \right)}{2 + \cosh\left( x \right)} - \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right) \\
-
-	f''(x) &= \frac{ - \sin\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cosh\left( x \right) \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
-	&- \left( \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
-	&- \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right)\\
-
-	f'''(x) &= \frac{ - \cos\left( x \right) \cosh\left( x \right) - \sin\left( x \right) \sinh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\
-	&+ \left( \frac{ - \cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} + 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \cosh\left( x \right) \\ 
-	&+ \frac{ - \cos\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cos\left( x \right) \cosh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
-	&- \left( \frac{ - \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \left( 2 + \cosh\left( x \right) \right) \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
-	&+ \ ...
-	\end{align*}
-	```
-
-	Evaluating these at ``x = 0`` gives:
-	```math
-	\begin{align*}
-	f(0) &= 0 \\
-	f'(0) &= \frac{1}{3} \\
-	f''(0) &= 0 \\
-	f'''(0) &= -\frac{2}{3} \\
-	\end{align*}
-	```
-
-	The Taylor series expansion of ``f(x)`` around ``x = 0`` up to ``x^3`` is then:
-	```math
-	\begin{align*}
-	f(x) &= \frac{1}{3}x - \frac{2}{3}x^3 \\
-	f(0.1) &= 0.032667
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 0ce25fd4-79c7-4081-9a30-62ecdf2de9a3
-md"""
-Too lazy to calculate these derivatives truly by hand, so this is cheating
-"""
-
-# ╔═╡ d64bd4c1-95ec-4551-8e0a-e9394af342ef
-# using Latexify
-
-# ╔═╡ 1b916de7-1336-45e1-bf3d-e6fbf48b9f8f
-let
-	f = sp.sin(x) / (sp.cosh(x) + 2)
-	
-	dfx, dfxx, dfxxx = sp.diff(f, x), sp.diff(f, x, x), sp.diff(f, x, x, x)
-	@info dfx
-	@info dfxx
-	@info dfxxx
-
-	@info f.subs(x, 0)
-	@info dfx.subs(x, 0)
-	@info dfxx.subs(x, 0)
-	@info dfxxx.subs(x, 0)
-end
-
-# ╔═╡ 9114d095-1c90-4af3-b1c8-ee0e4b837e44
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 3c76acbf-6aa1-456c-a633-7dff4164f325
-md"""
-This is a great example of where a computer and SymPy comes in handy. Taking all those derivatives by hand was tedius. Let's see how SymPy can solve this. First let's create a function for the Taylor series about the origin
-"""
-
-# ╔═╡ 38ef7a6f-e251-44ee-924e-e338289ec976
-f3 = sp.sin(x) / (sp.cosh(x) + 2)
-
-# ╔═╡ 38ee1cfa-6d98-4dc0-b2ac-1e7b610579c2
-f3.subs(x, 0.1)
-
-# ╔═╡ 99400156-cc9a-474f-96dd-0ad4e2443dbf
-f3_ts = sp.series(f3, x, n = 4).removeO()
-
-# ╔═╡ df9cd801-d34e-4193-a426-299286d623cb
-f3_ts.subs(x, 0.1)
-
-# ╔═╡ 7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
-md"""
-We see above that the taylor series expansion of the function `f_ts` is approximately equal to the true function at ``f(0.1)``
-"""
-
-# ╔═╡ 868ac754-fe57-4552-8eab-d9213fa66123
-md"""
-!!! info "Problem 1.6.7"
-	A wire of length ``L`` is used to fence a rectangular piece of land. For a rectangle of general aspect ratio compute the area of the rectangle. Use the rule for finding the maximum of a function to find the shape that gives the largest area. Find this area. 
-"""
-
-# ╔═╡ 76660d53-7a5b-4d1c-a025-aa6642d59853
-md"""
-!!! warning "By Hand"
-
-	Let's denote the length and width of the rectangle as ``x`` and ``y`` respectively. Given that the perimeter of the rectangle is ``L``, we have:
-
-	```math
-	\begin{align*}
-	2x + 2y &= L \\
-	y &= \frac{L - 2x}{2}
-	\end{align*}
-	```
-
-	Area
-	```math
-	\begin{align*}
-	A(x) = x \cdot \frac{L - 2x}{2}
-	\end{align*}
-	```
-
-	Maximum area
-	```math
-	\begin{align*}
-	A'(x) & = 0 \\
-	A'(x) &= \frac{L}{2} - 2x\\
-	x &= \boxed{\frac{L}{4}} \\ \\
-
-	y &= \frac{L - 2x}{2} \\
-	y &= \frac{L - 2(\frac{L}{4})}{2} \\
-	y &= \boxed{\frac{L}{4}}
-	\end{align*}
-	```
-
-	```math
-	\begin{align*}
-
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
-md"""
-#### With Symbolics
-*Note, the tricky `[0]`* : When working with Julia, the index starts at 1 but in Python the index starts at 0
-"""
-
-# ╔═╡ 85c5261e-3925-4cad-bd1d-fd8593156d6b
-y, L = sp.symbols("y"), sp.symbols("L")
-
-# ╔═╡ bf004fd5-b5fb-45ed-bfb4-2a2c3f513e6a
-perimeter = sp.Eq(2y + 2x, L)
-
-# ╔═╡ 43bc9859-2adb-4098-acc9-9ee45a10b194
-y0 = sp.solve(perimeter, y)[0]
-
-# ╔═╡ e34ecb29-2dab-4ea3-aedf-06ecb34aa19b
-area = x*(y0)
-
-# ╔═╡ cd386992-ce31-4c10-8c28-df11ade397d6
-dxda = sp.diff(area, x)
-
-# ╔═╡ 62f6463d-578b-4ed9-b216-085765a0b101
-x_ = sp.solve(sp.Eq(dxda, 0), x)[0]
-
-# ╔═╡ 884afbd0-78d4-4994-a706-74e917a66345
-y_ = y0.subs(x, x_)
-
-# ╔═╡ 776c3c03-bbff-4705-b7c4-29002b25c840
-md"""
-!!! info "Problem 1.6.12"
-	Find the slope at the point (2, 3) on the ellipse ``3x^2 + 4y^2 = 48`` using implicit differentiation
-"""
-
-# ╔═╡ 81bd62e2-3adf-4449-a86a-2cbfb4cb33ad
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	3x^2 + 4y^2 &= 48 \\
-	\frac{d}{dx}(3x^2 + 4y^2) &= \frac{d}{dx}(48) \\
-	6x + 8 \frac{dy}{dx}(y) &= 0 \\
-	\frac{dy}{dx} &= \frac{-6x}{8y} \\
-	\frac{dy}{dx} &= \boxed{\frac{-1}{2}}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 502ff296-6868-4fe3-b894-2458c98c88e8
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 30aaffef-9efd-40d6-a1e2-71fb249fd031
-f4 = 3x^2 + 4y^2 - 48
-
-# ╔═╡ 954b95b6-7b1c-467d-93f2-c566690db784
-dxdy = sp.idiff(f4, y, x)
-
-# ╔═╡ 14840094-3da5-4481-b9b0-76b771baedfb
-dxdy.subs([(x, 2), (y, 3)])
-
-# ╔═╡ 06b0725a-9950-45b1-b04e-c723dfa0d3e8
+# ╔═╡ c607bfcc-fa55-46eb-bc5f-b47fb5f2f34b
 md"""
 # Summary
 
-There were many ideas discussed in this chapter of the book, and although this notebook doesn't touch on all of them, the book does a nice job at summarizing the most important concepts, which I included below. I am genuinely amazed by how smooth this combination of Pluto.jl/PythonCall.jl/SymPy is. I am looking forward to learning about symbolic computing through these exercises and playing around with different ways of formatting these Pluto.jl notebooks and tutorials. 
+As always, the book provides a great summary
 
 ---
-Definition of the deriative
+Know the dot product, its definition in terms of componenets in an arthonormal basis and its properties such as linearity. Same for cross product
 
-- derivative of a product of functions
-
-```math
-\begin{align*}
-&D(fg) = gDf + fDg \\
-\end{align*}
-```
-- a quotient of two functions
-```math
-\begin{align*}
-D(\frac{f}{g}) &= \frac{[gDf - fDg]}{g^2} \\
-\end{align*}
-```
-
-- chain rule for a function of a function
-```math
-\begin{align*}
-\frac{df(u(x))}{dx} = \frac{df}{du} \cdot \frac{du}{dx}
-\end{align*}
-```
 ---
+If ``\vec{r}(t)`` is a function of time then know
 
-The notion of the Taylor series
-
-- about the origin
 ```math
 \begin{align*}
-f(x) = f(0) + xf^{(1)}(0) + \frac{x^2}{2!}f^{(2)}(0) + ...
+\vec{r} &= \vec{i}x(t) + \vec{j}y(t) = \vec{e_r}r \\
+\frac{d \vec{r}}{dt} &= \vec{i} \dot{x}(t) + \vec{j} \dot{y}(t) = \vec{e_r}\dot{r} + r \omega\vec{e_{\theta}}
 \end{align*}
 ```
-
-- about point a
-```math
-\begin{align*}
-f(a + x) = f(a) + xf^{(1)}(a) + \frac{x^2}{2!}f^{(2)}(a) + ...
-\end{align*}
-```
----
-
-The following series
-```math
-\begin{align*}
-e^x &= 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ... \\
-e^x &= \lim_{N \to \infty} [1 + \frac{x}{N}]^N \\
-\cos(x) &= 1 - \frac{x^2}{2!} + ... \\
-\sin(x) &= x - \frac{x^3}{3!} + ... \\
-(1 + x)^p &= 1 + px + \frac{(p)(p-1)}{2}x^2 + ...
-\end{align*}
-```
----
-
-Definition of the hyperbolic function
-
-- in particular their symmetry under ``x \to -x``
-```math
-\begin{align*}
-\cosh(x) &= \frac{e^x + e^{-x}}{2} \\
-\sinh(x) &= \frac{e^x - e^{-x}}{2} \\
-\end{align*}
-```
-
-- and functional identities, especially
-```math
-\begin{align*}
-\cosh^2(x) - \sinh^2(x) = 1
-\end{align*}
-```
-
-- if you need a formula for ``\cosh(2x)`` or any other identity, you can get it from the definitieon of the hyperbolic functions in terms of exponentials - the power series can also be obtained in a similar approach
----
-
-The ``\ln(x)`` function
-
-- the identity
-```math
-\begin{align*}
-x = e^{\ln(x)}
-\end{align*}
-```
-
-- and the series
-```math
-\begin{align*}
-\ln(1 + x) = x - \frac{x^2}{2} + \frac{x^3}{3} + ...
-\end{align*}
-```
-
-- and its derivative
-```math
-\begin{align*}
-D\ln(x) &= \frac{1}{x} \\
-x^a &= e^{a \ln(x)}
-\end{align*}
-```
----
-
-Trig functions, identities, derivatives, radian measures, etc will not be listed since it's expected that we know them by heart
 
 ---
 
-Definition of a differential
-
-- exact relation
+The line integral of a vector field ``\vec{F}(\vec{r})`` is defined as
 ```math
 \begin{align*}
-df = f'dx
+\int_1^2 \vec{F}(\vec{r}) \cdot \vec{dr} = \lim_{n \to \infty} \sum_{i=1}^{n} \vec{F}(\vec{r_i}) \cdot \vec{dr_i}
 \end{align*}
 ```
 
-which defines ``df`` in terms of the derivative at the point ``x`` and that as ``dx \to 0``, ``df \to \Delta f``, the actual change in ``f``
+- If the answer is path independent, the field is conservative
+
+```math
+\begin{align*}
+\oint \vec{F}(\vec{r}) \cdot \vec{dr} = 0
+\end{align*}
+```
+
+---
+
+The surface integral of a vector field ``\vec{V}(\vec{r})`` over a surface ``S`` is defined as
+
+```math
+\begin{align*}
+\int_S \vec{V} \cdot \vec{dS} = \lim_{i \to 100} \sum_i \vec{V}(\vec{r_i}) \cdot \vec{dS_i}
+\end{align*}
+```
+
+---
+
+The gradient enters as follows
+
+```math
+\begin{align*}
+d \phi &= \frac{\partial \phi}{\partial x} dx + \frac{\partial \phi}{\partial y} dy + \frac{\partial \phi}{\partial z} dz \equiv \vec{\nabla \phi} \cdot \vec{dr} \text{ where} \\
+
+\vec{\nabla \phi} &= \frac{\partial \phi}{\partial x} \hat{i} + \frac{\partial \phi}{\partial y} \hat{j} + \frac{\partial \phi}{\partial z} \hat{k} \text{ and} \\
+
+\vec{dr} &= \hat{i} dx + \hat{j} dy + \hat{k} dz
+
+\end{align*}
+```
+
+- since ``d \phi = \vec{\nabla } \cdot \vec{dr} = |\vec{\nabla }| |\vec{dr}| \cos \theta``, the gradient gives the direction of greatest rate of change and equals in magnitude that rate of change
+
+---
+
+The integral of the gradient is path independent
+
+```math
+\begin{align*}
+\int_1^2 \vec{\nabla \phi} \cdot \vec{dr} = \phi(2) - \phi(1) = |\phi|_{\partial P}
+\end{align*}
+```
+
+- where ``1`` and ``2`` are short for ``\vec{r_1}`` and ``\vec{r_2}`` respectively
+
+---
+
+In non cartesian coordinates
+
+```math
+\begin{align*}
+\vec{\nabla \phi} = \sum_i \vec{e_i} \frac{1}{h_i} \frac{\partial \phi}{\partial u_i}
+\end{align*}
+```
+
+---
+
+Green's theorem says if ``\vec{W}`` and the loop ``C`` lie in a plane (say the x-y plane)
+
+```math
+\begin{align*}
+\oint_{C = \partial S} \vec{W} \cdot \vec{dr} = \int \int (\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}) dx dy
+\end{align*}
+```
+
+- ``\vec{W}`` is conservative ``\to (\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}) = 0``
+
+---
+
+The curl is given by
+```math
+\begin{align*}
+\vec{\nabla} \times \vec{W} = \left(\frac{\partial W_z}{\partial y} - \frac{\partial W_y}{\partial z}\right) \hat{i} - \left(\frac{\partial W_x}{\partial z} - \frac{\partial W_z}{\partial x}\right) \hat{j} + \left(\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}\right) \hat{k}
+\end{align*}
+```
+
+- If a field is conservative, its curl vanishes everywhere and vice versa. Look up the curl in general coordinates if needed
+
+---
+
+Stokes' theorem
+```math
+\begin{align*}
+\oint_{C = \partial S} \vec{W} \cdot \vec{dr} = \int_S \vec{\nabla } \times \vec{W} \cdot \vec{dS}
+\end{align*}
+```
+
+---
+
+Gauss's law
+
+```math
+\begin{align*}
+\oint_{S = \partial V} \vec{W} \cdot \vec{dS} = \int_V \vec{\nabla} \cdot \vec{W} dxdydz
+\end{align*}
+```
+
+- Where ``\vec{\nabla} \cdot \vec{W}`` is the divergence of ``\vec{W}``
+
+---
+
+The laplacian ``\nabla^2`` is defined as follows
+
+```math
+\begin{align*}
+\nabla \cdot \nabla \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}
+\end{align*}
+```
+
+- For general coordinates, look it up when needed
+
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -887,9 +512,9 @@ version = "0.3.0"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
-git-tree-sha1 = "4e88377ae7ebeaf29a047aa1ee40826e0b708a5d"
+git-tree-sha1 = "5ce999a19f4ca23ea484e92a1774a61b8ca4cf8e"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.7.0"
+version = "4.8.0"
 weakdeps = ["Dates", "LinearAlgebra"]
 
     [deps.Compat.extensions]
@@ -1674,9 +1299,9 @@ uuid = "91d4177d-7536-5919-b921-800302f37372"
 version = "1.3.2+0"
 
 [[deps.OrderedCollections]]
-git-tree-sha1 = "d321bf2de576bf25ec4d3e4360faca399afca282"
+git-tree-sha1 = "2e73fe17cac3c62ad1aebe70d44c963c3cfdc3e3"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.6.0"
+version = "1.6.2"
 
 [[deps.PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -2339,74 +1964,22 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═1531a556-ee42-479f-9f66-61e8aee9a7a3
-# ╠═70c5e07f-c4e6-429c-a964-8893f35cedb6
-# ╠═18ef37b2-3490-4e0c-becc-13a4df541b81
-# ╠═25877aa4-8c2a-4112-be89-8a707f367019
-# ╟─81813bb0-5c1b-495b-aa8f-316117b4b80f
-# ╟─495c8000-00f8-475a-8a34-6ea621ffd3c3
-# ╟─30047808-b3cf-458f-8b0c-e2b8799e16ab
-# ╟─aac632b9-2bfb-4656-92ec-5a8adc5d3ba5
-# ╟─5a354cf1-6bed-4e50-96ae-113c3a290f0b
-# ╟─2638525d-4273-4fe2-8934-915a148eee69
-# ╟─733551f0-a11d-4e83-b121-8194567f04dc
-# ╠═b50e7df1-bbea-4889-8b9a-a525727006ae
-# ╠═d086da44-5bf3-456a-aec7-7df3b9f9348f
-# ╠═589472cb-7536-4326-8f09-553152690d38
-# ╠═3f452666-1ef1-46cc-bf48-bf91396055f9
-# ╟─8e0acab8-b145-4fdb-83d5-99c6913fafcc
-# ╟─f4ba19f8-ed4c-48be-ab42-a6cae6824444
-# ╟─046531f7-0c18-417d-a5b2-119cdcd7420e
-# ╠═d32a01e0-83a1-44dc-a486-03a5d61874c5
-# ╠═faaee09d-ea43-458c-8f29-e551d018a2ba
-# ╟─dcc46222-aa33-4646-a197-105528781dca
-# ╟─869a1b00-6ccb-472a-b517-cf68c1967735
-# ╟─33522b04-66c9-41e0-b35a-48344ee2f5bd
-# ╟─9405e684-c195-47df-afa5-7842fe9bfd07
-# ╟─47f116d2-3ad6-482a-9a13-412d2de5ad36
-# ╟─30c592b4-282d-4d17-b830-7ed25bbc4690
-# ╠═0af73555-96e4-40f7-ae07-be3fe95c0260
-# ╟─c4469c5c-d23d-484d-9a8d-da41690555ab
-# ╠═bee68160-5c02-45e0-a61d-bfb0b3c21140
-# ╠═60566da3-93f7-4d83-9c30-1c2a21ea844b
-# ╟─f984855b-b2af-4ecf-adef-9bca9a0d95ee
-# ╠═52a0dae1-e85e-426b-a995-19e2a50a6612
-# ╠═eb3dcddb-c1b5-406b-8829-47cf0d991a4b
-# ╟─60c8878c-2740-4ba4-86d0-6d555222bb0f
-# ╟─44b251b8-5e6d-4ee4-a189-83c455f65a0e
-# ╠═68e0a7f2-d913-402e-bab2-6da3e434f1af
-# ╟─9a2d9e3b-e012-4353-8f05-49b8f83bb6cb
-# ╟─5961146a-c5f6-463a-82d5-6c8eb0b970ae
-# ╟─45f1f1e4-a853-4ae0-a7e2-d293d036509d
-# ╟─ba25de9b-a0aa-4350-879d-96acaf046d68
-# ╟─c1f5c48e-9aaf-46ae-96c3-c1a2837b251c
-# ╟─abd50323-9f71-4d12-bc08-f82d3e2f7f98
-# ╟─0ce25fd4-79c7-4081-9a30-62ecdf2de9a3
-# ╠═d64bd4c1-95ec-4551-8e0a-e9394af342ef
-# ╠═1b916de7-1336-45e1-bf3d-e6fbf48b9f8f
-# ╟─9114d095-1c90-4af3-b1c8-ee0e4b837e44
-# ╟─3c76acbf-6aa1-456c-a633-7dff4164f325
-# ╠═38ef7a6f-e251-44ee-924e-e338289ec976
-# ╠═38ee1cfa-6d98-4dc0-b2ac-1e7b610579c2
-# ╠═99400156-cc9a-474f-96dd-0ad4e2443dbf
-# ╠═df9cd801-d34e-4193-a426-299286d623cb
-# ╟─7b52c1b5-cdeb-4e43-ac5a-45afc7b12af8
-# ╟─868ac754-fe57-4552-8eab-d9213fa66123
-# ╟─76660d53-7a5b-4d1c-a025-aa6642d59853
-# ╟─5ebc2fd5-77e7-46b1-b0fa-0362e795f1b3
-# ╠═85c5261e-3925-4cad-bd1d-fd8593156d6b
-# ╠═bf004fd5-b5fb-45ed-bfb4-2a2c3f513e6a
-# ╠═43bc9859-2adb-4098-acc9-9ee45a10b194
-# ╠═e34ecb29-2dab-4ea3-aedf-06ecb34aa19b
-# ╠═cd386992-ce31-4c10-8c28-df11ade397d6
-# ╠═62f6463d-578b-4ed9-b216-085765a0b101
-# ╠═884afbd0-78d4-4994-a706-74e917a66345
-# ╟─776c3c03-bbff-4705-b7c4-29002b25c840
-# ╟─81bd62e2-3adf-4449-a86a-2cbfb4cb33ad
-# ╟─502ff296-6868-4fe3-b894-2458c98c88e8
-# ╠═30aaffef-9efd-40d6-a1e2-71fb249fd031
-# ╠═954b95b6-7b1c-467d-93f2-c566690db784
-# ╠═14840094-3da5-4481-b9b0-76b771baedfb
-# ╟─06b0725a-9950-45b1-b04e-c723dfa0d3e8
+# ╠═fe301fc0-d32b-40e7-8ab8-17d81b6bcf8a
+# ╠═94e6fcb1-d73f-467b-97fa-82d536f1703b
+# ╠═0b3fe3e4-ae8e-4a58-955f-8c396f2047a8
+# ╠═908a8f10-6375-427a-97a5-cb2e5caf5cfb
+# ╟─b61002b8-38ae-40a7-8344-a58ecb0ebffa
+# ╟─13cdd42b-25c8-4f61-bc4e-1b5588aa9918
+# ╟─5161556a-deae-48c9-bf6c-36a8aaf5882d
+# ╟─9a39c2cb-d2e2-424d-a04d-ec52b47cd2dc
+# ╟─53fbf184-231b-488e-aaa9-0b0698be5a9e
+# ╟─5d7e3199-dc42-4870-904c-1906a99cfa97
+# ╟─bef5c3ec-8f59-4f4b-8b6a-ec22f5c9b8eb
+# ╟─08bbdbdf-3778-415d-813b-f81922f64215
+# ╟─3b55ae9d-855f-4dca-a293-ad235ed7c8ff
+# ╟─873551d7-aebb-41fc-8746-00c045d3a10f
+# ╟─25112cba-34af-4ad7-9af2-27bf6b560374
+# ╟─54468bc7-3115-4582-af0c-4d66f1cb0d3e
+# ╠═c607bfcc-fa55-46eb-bc5f-b47fb5f2f34b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
