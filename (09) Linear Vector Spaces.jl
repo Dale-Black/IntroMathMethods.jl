@@ -4,991 +4,220 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ fe301fc0-d32b-40e7-8ab8-17d81b6bcf8a
+# ╔═╡ 89a979f9-0d21-45c2-86bd-28ed2454af57
 # ╠═╡ show_logs = false
 using CondaPkg; CondaPkg.add("SymPy")
 
-# ╔═╡ 94e6fcb1-d73f-467b-97fa-82d536f1703b
+# ╔═╡ 5ca9944e-d693-443a-b255-1dc09274a8da
 using PlutoUI, PythonCall, CairoMakie
 
-# ╔═╡ 0b3fe3e4-ae8e-4a58-955f-8c396f2047a8
+# ╔═╡ ca9bfea0-3a7e-48a7-bdb0-ba35bf52469f
 sp = pyimport("sympy");
 
-# ╔═╡ 908a8f10-6375-427a-97a5-cb2e5caf5cfb
+# ╔═╡ 9fe6a62d-768a-4df6-bf95-1b16337292c1
 TableOfContents()
 
-# ╔═╡ b61002b8-38ae-40a7-8344-a58ecb0ebffa
+# ╔═╡ 7e19b01b-7e36-4448-859d-ba2b84af7370
 md"""
 # Introduction
-
-In this notebook, we explore the world of vector calculus, an essential mathematical tool for physics and engineering. We will tackle concepts like vector fields, gradients, curls, and divergences. 
-
-We will be using the Python library SymPy and the Julia packages PlutoUI and PythonCall to work through homework assignments interactively. These assignments cover topics like:
-
-- Time derivatives of vectors
-- Line and surface integrals  
-- The gradient and its properties
-- The curl and its interpretation
-- The divergence theorem
-
-Vector calculus unlocks a powerful way of thinking about multivariate functions and vector fields. While the computations can be tricky, the payoff is immense: vector calculus provides the mathematical backbone for subjects like electromagnetism, fluid dynamics, and relativity.
-
-My goal here is to develop an intuitive understanding of these topics. We will lean heavily on visualizations and examples to build up an understanding before diving into the math. With hard work and a little luck, we just might gain some insight into this beautiful subject.
 """
 
-# ╔═╡ 13cdd42b-25c8-4f61-bc4e-1b5588aa9918
+# ╔═╡ f6900c14-f5b1-421f-9f22-af8bca069337
 md"""
-# Vector Calculus
-**Homework Assignments**
-- 7.1.3
-- 7.2.4
-- 7.4.3
-- 7.5.1
-- 7.5.2
-- 7.5.3
-- 7.5.7
-- 7.6.1
-- 7.6.6
-- 7.6.12
-- 7.7.3
+# Linear Vector Spaces
 """
 
-# ╔═╡ 5161556a-deae-48c9-bf6c-36a8aaf5882d
+# ╔═╡ 7899baa4-edfb-4a30-9a3b-869ec14e8600
 md"""
-## Review of Vectors Analysis
+## Basics
 """
 
-# ╔═╡ 9a39c2cb-d2e2-424d-a04d-ec52b47cd2dc
+# ╔═╡ 4d6ac932-79b3-4634-88a6-a1aba147d699
 md"""
-!!! info "Problem 7.1.3"
-
-	Consider three vectors ``\vec{a}``, ``\vec{b}``, ``\vec{c}`` not in the same plane. Show that the box product, also called scalar triple product (``\vec{c} \cdot \vec{a} \times \vec{b}``) gives the volume of the parallelepiped with these vectors as three adjacent edges. At least verify for the case when the ``\vec{c}`` is perpendicular to the ``\vec{a} - \vec{b}`` plane. Show that ``\vec{a} \cdot \vec{b} \times \vec{c} = \vec{b} \cdot \vec{c} \times \vec{a} = \vec{c} \cdot \vec{a} \times \vec{b}`` either geometrically or algebraically. What happens to the box product when two of the vectors are parallel.
-"""
-
-# ╔═╡ 53fbf184-231b-488e-aaa9-0b0698be5a9e
-md"""
-!!! warning "By Hand"
-
-	i)
+!!! info "Problem 9.1.5"
+	Consider three elements from the vector space of real ``2 \times 2`` matrices:
 	```math
 	\begin{align*}
-	\vec{b} \cdot \vec{c} \times \vec{a} &= \vec{a} \cdot \vec{b} \times \vec{c} \\ \\
+	\ket{1} &= 
+	\begin{bmatrix}
+    0 & 1 \\
+    0 & 0 \\
+    \end{bmatrix} \\
 
+	\ket{2} &= 
+	\begin{bmatrix}
+    1 & 1 \\
+    0 & 1 \\
+    \end{bmatrix} \\
 
-	\vec{b} \cdot (\vec{c} \times \vec{a}) &= \begin{vmatrix}
-    b_x & b_y & b_z \\
-    c_x & c_y & c_z \\
-    a_x & a_y & a_z
-    \end{vmatrix} \\
-    &= b_x \begin{vmatrix}
-    c_y & c_z \\
-    a_y & a_z
-    \end{vmatrix} - b_y \begin{vmatrix}
-    c_x & c_z \\
-    a_x & a_z
-    \end{vmatrix} + b_z \begin{vmatrix}
-    c_x & c_y \\
-    a_x & a_y
-    \end{vmatrix} \\
-    &= b_x (c_y a_z - c_z a_y) - b_y (c_x a_z - c_z a_x) + b_z (c_x a_y - c_y a_x) \\
-    &= a_x (b_y c_z - b_z c_y) - a_y (b_x c_z - b_z c_x) + a_z (b_x c_y - b_y c_x) \\
-    &= \vec{a} \cdot (\vec{b} \times \vec{c})
-    \end{align*}
-	```
-
-	ii) 
-
-	```math
-    \begin{align*}
-	\vec{c} \cdot \vec{a} \times \vec{b} &= \vec{b} \cdot \vec{c} \times \vec{a} \\ \\
-
-    \vec{c} \cdot (\vec{a} \times \vec{b}) &= \begin{vmatrix}
-    c_x & c_y & c_z \\
-    a_x & a_y & a_z \\
-    b_x & b_y & b_z
-    \end{vmatrix} \\
-    &= c_x \begin{vmatrix}
-    a_y & a_z \\
-    b_y & b_z
-    \end{vmatrix} - c_y \begin{vmatrix}
-    a_x & a_z \\
-    b_x & b_z
-    \end{vmatrix} + c_z \begin{vmatrix}
-    a_x & a_y \\
-    b_x & b_y
-    \end{vmatrix} \\
-    &= c_x (a_y b_z - a_z b_y) - c_y (a_x b_z - a_z b_x) + c_z (a_x b_y - a_y b_x) \\
-    &= a_x (b_y c_z - b_z c_y) - a_y (b_x c_z - b_z c_x) + a_z (b_x c_y - b_y c_x) \\
-    &= \vec{a} \cdot (\vec{b} \times \vec{c})
-    \end{align*}
-    ```
-
-	iii)
-    ```math
-    \begin{align*}
-    \vec{c} \cdot (\vec{a} \times \vec{b}) &= \vec{c} \cdot 0 \\
-    &= 0
-    \end{align*}
-    ```
-"""
-
-# ╔═╡ 5d7e3199-dc42-4870-904c-1906a99cfa97
-md"""
-## Time Derivatives of Vectors
-"""
-
-# ╔═╡ bef5c3ec-8f59-4f4b-8b6a-ec22f5c9b8eb
-md"""
-!!! info "Problem 7.2.4"
-
-	A particle has a position vector ``\vec{r} = \cos(\omega t) \hat{i} + \sin(\omega t) \hat{j}``. (1) Describe its motion in cartesian coordinates with a sketch and in words. (2) Compute its velocity and accelaration. (3) Find the magnitudes of both. (4) Switch to polar coordinates and find the ``r`` and ``\theta`` for this problem. (5) What is ``\vec{a}``?
-"""
-
-# ╔═╡ 4fadadf2-5b23-4038-92f2-8693918ca740
-md"""
-!!! warning "By Hand"
-	i)
-	```math
-	\begin{align*}
-	\vec{r} &= \cos(\omega t) \hat{i} + \sin(\omega t) \hat{j}
+	\ket{3} &= 
+	\begin{bmatrix}
+    -2 & -1 \\
+    0 & -2 \\
+    \end{bmatrix} \\
 	\end{align*}
 	```
 
-	ii)
-	```math
-	\begin{align*}
-	\vec{v} &= -\omega \sin(\omega t) \hat{i} + \omega \cos(\omega t) \hat{j} \\
-	\vec{a} &= -\omega^2 \cos(\omega t) \hat{i} - \omega^2 \sin(\omega t) \hat{j}
-	\end{align*}
-	```
-
-	iii)
-	```math
-	\begin{align*}
-	|\vec{v}| &= |\omega| \\
-	|\vec{a}| &= \omega^2
-	\end{align*}
-	```
-
-	iv)
-	```math
-	\begin{align*}
-	r &= 1 \\
-	\theta &= \omega t
-	\end{align*}
-	```
-
-	v)
-	```math
-	\begin{align*}
-	\vec{a} &= -\omega^2 \cos(\omega t) \hat{i} - \omega^2 \sin(\omega t) \hat{j}
-	\end{align*}
-	```
+	Are they linearly independent? Support your answer with details. (Notice we are calling these matrices vectors and using kets to represent them to emphasize their role as elements of a vector space)
 """
 
-# ╔═╡ b839496c-bc56-4504-ab53-ae2f257bb4ba
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 4cacb360-625c-40e7-bdf9-437e700a1657
-md"""
-#### (i)
-This is a circle with radius 1 and frequency ``\omega`` centered at the origin
-"""
-
-# ╔═╡ e1f7df8a-57c7-499e-b605-4be6604fae30
-t0 = range(0, 2π, length = 1000)
-
-# ╔═╡ 09a2bcab-1237-469e-ba0f-23cd9aad28d3
-ω0 = 1
-
-# ╔═╡ 72576547-e113-44aa-9b17-34bb5a575277
-x0, y0  = cos.(ω0*t0), sin.(ω0*t0)
-
-# ╔═╡ a3f36b49-526a-47cf-a55c-2648d4a367f1
-let
-	f = Figure()
-	ax = CairoMakie.Axis(
-		f[1, 1]
-	)
-	scatterlines!(x0, y0, markersize = 1)
-	f
-end
-
-# ╔═╡ 68487535-e065-4778-94e7-db8344cc6237
-md"""
-#### (ii)
-"""
-
-# ╔═╡ 4bf65708-3747-4eba-b523-641223ff4d99
-ω, t = sp.symbols("ω, t")
-
-# ╔═╡ 47220365-3466-4fb3-b86e-f0428e0d9fa9
-x₀, y₀ = sp.cos(ω * t), sp.sin(ω * t)
-
-# ╔═╡ 9f3f770a-3ee5-4aec-9953-1b73641074c5
-vᵢ, vⱼ = sp.diff(x₀, t), sp.diff(y₀, t)
-
-# ╔═╡ 544eef1f-d204-425b-85ff-e25884721f5f
-aᵢ, aⱼ = sp.diff(vᵢ, t), sp.diff(vⱼ, t)
-
-# ╔═╡ b6c7ac3d-f2aa-4c4f-b53d-75a8d5886839
-md"""
-#### (iii)
-"""
-
-# ╔═╡ 24cd17dc-678b-4c7d-ab4a-bd5c0eeb8e76
-v_magnitude = sp.sqrt(vᵢ^2 + vⱼ^2)
-
-# ╔═╡ 0d5dceac-4230-4a2c-8783-1563e1738df4
-sp.trigsimp(v_magnitude)
-
-# ╔═╡ f8daa2ec-5e87-48a8-92ac-609996d302b4
-a_magnitude = sp.sqrt(aᵢ^2 + aⱼ^2)
-
-# ╔═╡ 44ffdc2f-3ce5-4883-b1d5-555dc8a0dddd
-sp.trigsimp(a_magnitude)
-
-# ╔═╡ 5487b403-64cb-46f5-b007-ba563f9fc218
-md"""
-#### (iv)
-"""
-
-# ╔═╡ 7afa8504-6f1e-4b5e-9d86-67227bf1bd7d
-r = sp.sqrt(x₀^2 + y₀^2)
-
-# ╔═╡ 5ef84561-4daa-4b5d-ba97-d26b521554f3
-θ = sp.trigsimp(sp.atan(y₀ / x₀))
-
-# ╔═╡ 75d86070-6ab0-488d-b53e-50f69cda76dc
-md"""
-#### (v)
-"""
-
-# ╔═╡ fa4d3c70-f60d-4639-a176-9a61897c7088
-vᵣ, v₀ = sp.diff(r, t), sp.diff(θ, t)
-
-# ╔═╡ 419354e8-4975-43dc-a119-d3fadc02004a
-aᵣ, a₀ = sp.diff(vᵣ, t), sp.diff(v₀, t)
-
-# ╔═╡ 08bbdbdf-3778-415d-813b-f81922f64215
-md"""
-## Scalar and Vector Fields
-"""
-
-# ╔═╡ 3b55ae9d-855f-4dca-a293-ad235ed7c8ff
-md"""
-## Line and Surface Integrals
-"""
-
-# ╔═╡ acd8c7a1-7ba1-4819-a91b-711cd9a3ac3b
-md"""
-!!! info "Problem 7.4.3"
-	(i) Calculate the line integral of ``\vec{F} = 2xy^2\hat{i} + x^2\hat{j}`` between ``(0, 0)`` and ``(1, 1)``, but along ``y = x^2``. (ii) What is the line integral around a unit circle centered at the origin. First make a sensible choice for the parameter ``t`` that will move the coordinates along the circle. Note that even for a non-conservative field, the line integral along closed paths can vanish
-"""
-
-# ╔═╡ f159263e-72a9-4417-9cf3-cfd9e18214ac
-md"""
-!!! warning "By Hand"
-	i)
-	```math
-	\begin{align*}
-	y &= x^2 \\
-	f_{i} &= 2 \cdot x \cdot y^2 \\
-	f_{j} &= x^2 \\
-	\frac{\partial y}{\partial x} &= 2x \\
-	dy &= \frac{\partial y}{\partial x} \cdot dx \\
-	F_{i} &= \int_{0}^{1} f_{i} dx \\
-	F_{j} &= \int_{0}^{1} f_{j} dy \\
-	F &= f_{i} + f_{j} = \frac{1}{3} + \frac{1}{2} = \frac{5}{6}
-	\end{align*}
-	```
-
-	ii)
-	```math
-	\begin{align*}
-	x(t) &= \cos(t) \\
-	y(t) &= \sin(t) \\
-	\frac{dx}{dt} &= -\sin(t) \\
-	\frac{dy}{dt} &= \cos(t) \\
-	f_{it} &= 2 x(t) y(t)^2 \\
-	f_{jt} &= x(t)^2 \\
-	F_{it} &= \int_{0}^{2\pi} f_{it} \cdot \frac{dx}{dt} \,dt \\
-	F_{jt} &= \int_{0}^{2\pi} f_{jt} \cdot \frac{dy}{dt} \,dt \\
-	F &= F_{it} + F_{jt} = 0
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 8a9fa30c-49f8-4ae0-81a7-93ce3b3792fc
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 25f81dd0-27e2-4613-be93-fb8a9b4d0c57
-md"""
-**(i)**
-"""
-
-# ╔═╡ c139e863-0723-4cec-8131-3eda35a50e7a
-x, dx = sp.symbols("x, dx")
-
-# ╔═╡ 9e603a65-87d1-48ba-8052-37c9cd2b3a43
-y1 = x^2
-
-# ╔═╡ 14dfbbe8-5d0a-4572-8d22-3b73bbd22f93
-fᵢ = 2 * x * y1^2
-
-# ╔═╡ 9718a6c4-73ef-4fb7-a204-dd803fa5dc52
-fⱼ = x^2
-
-# ╔═╡ 24c4be9c-7c05-4925-a1c9-5a9aaaf6d878
-∂y∂x = sp.diff(y1, x)
-
-# ╔═╡ 117b734a-0d5a-4a6f-b239-d6067f399ef5
-dy = ∂y∂x
-
-# ╔═╡ 394f87f0-1046-4835-a9a6-3682fb8a1f03
-Fᵢ = sp.integrate(fᵢ, (x, 0, 1))
-
-# ╔═╡ 25877abf-5289-465e-8fab-7e147f1ca5b3
-Fⱼ = sp.integrate(fⱼ * dy.subs(dx, 1), (x, 0, 1))
-
-# ╔═╡ c7e9ba5f-5ce0-423c-86cd-015efca7137f
-F = Fᵢ + Fⱼ
-
-# ╔═╡ bc8c413f-8184-4d6d-a87b-a0ef3969c93a
-md"""
-**(ii)**
-"""
-
-# ╔═╡ 293e81fe-1744-40f6-bd49-c7476d281eb2
-x2, y2 = sp.cos(t), sp.sin(t)
-
-# ╔═╡ 7e47e8d2-65f3-4627-815c-d94212bac67b
-dx2dt, dy2dt = sp.diff(x2, t), sp.diff(y2, t)
-
-# ╔═╡ 451ae9c6-5ef6-4651-99bb-44132e844a89
-fᵢₜ = fᵢ.subs(x, x2)
-
-# ╔═╡ 5da3cbc8-6e1f-436a-a3b9-58c2992e2152
-fⱼₜ = fⱼ.subs(x, x2)
-
-# ╔═╡ da87a788-7538-43bd-abc6-510acb8999ff
-Fᵢₜ = sp.integrate(fᵢₜ * dx2dt, (t, 0, 2 * sp.pi))
-
-# ╔═╡ 61120a25-bd56-4d22-8431-dc0734117db7
-Fⱼₜ = sp.integrate(fⱼₜ * dy2dt, (t, 0, 2 * sp.pi))
-
-# ╔═╡ 1a722ba9-266f-4fc4-a521-c5038550b45e
-F2 = Fᵢₜ + Fⱼₜ
-
-# ╔═╡ 873551d7-aebb-41fc-8746-00c045d3a10f
-md"""
-## Scalar Field and Gradient
-"""
-
-# ╔═╡ 3ece13e7-18e9-4449-88d1-1d6e39b001ec
-md"""
-!!! info "Problem 7.5.1"
-	Consider a sphere of radius ``R`` centered at the origin. Write a formula for ``h(x, y)`` the height of the hemisphere above the point ``x, y``. Calculate its gradient and compare the results against your expectations.
-"""
-
-# ╔═╡ 3ece9a12-8071-409e-a313-c68135e20503
-md"""
-!!! warning "By Hand"
-	Formula for height of the hemisphere above the point ``(x, y)``:
-
-	```math
-	h(x, y) = \sqrt{R^2 - x^2 - y^2}
-	```
-
-	Gradient of ``h(x, y)``:
-
-	```math
-	\nabla h(x, y) = \left( -\frac{x}{\sqrt{R^2 - x^2 - y^2}}, -\frac{y}{\sqrt{R^2 - x^2 - y^2}} \right)
-	```
-"""
-
-
-# ╔═╡ c7fe4490-fd11-4c51-89ac-770d3adaadc5
-y, R = sp.symbols("y , R")
-
-# ╔═╡ 3446cb4b-3dad-4659-8e53-2ffab246e151
-h = sp.sqrt(R^2 - x^2 - y^2)
-
-# ╔═╡ fc2f149c-3aa2-4f8d-b1f3-59a69d073cf8
-∇h = [sp.diff(h, i) for i in (x, y)]
-
-# ╔═╡ 946cb3e1-ba80-4b91-8afb-a9939ec6ef0b
-md"""
-!!! info "Problem 7.5.2"
-	Show that
-	```math
-	\begin{align*}
-	\vec{\nabla} \phi \chi = \phi \vec{\nabla \chi} + \chi \vec{\nabla} \phi
-	\end{align*}
-	```
-"""
-
-# ╔═╡ c13032f9-d9ac-4856-a9eb-537c8c102827
+# ╔═╡ f5d72d6d-868e-4fc9-bb36-9cb49668b11a
 md"""
 !!! warning "By Hand"
 	```math
 	\begin{align*}
-	\vec{\nabla} (\phi \chi) &= \vec{\nabla} (\phi \chi_i + \phi \chi_j + \phi \chi_k) \\
-	&= \vec{\nabla} (\phi \chi_i) + \vec{\nabla} (\phi \chi_j) + \vec{\nabla} (\phi \chi_k) \\
-	&= \phi \vec{\nabla} \chi_i + \chi_i \vec{\nabla} \phi + \phi \vec{\nabla} \chi_j + \chi_j \vec{\nabla} \phi + \phi \vec{\nabla} \chi_k + \chi_k \vec{\nabla} \phi \\
-	&= \phi \vec{\nabla} \chi + \chi \vec{\nabla} \phi
+	&a_1 \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} + a_2 \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix} + a_3 \begin{bmatrix} -2 & -1 \\ 0 & -2 \end{bmatrix} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\
+	&a_1 \cdot 0 + a_2 \cdot 1 + a_3 \cdot -2 = 0 \\
+	&a_1 \cdot 1 + a_2 \cdot 1 + a_3 \cdot -1 = 0 \\
+	&a_1 \cdot 0 + a_2 \cdot 0 + a_3 \cdot 0 = 0 \\
+	&a_1 \cdot 0 + a_2 \cdot 1 + a_3 \cdot -2 = 0 \\
+	&\Rightarrow a_1 = -a_3, \, a_2 = 2a_3
 	\end{align*}
 	```
+
+	Not linearly independent
 """
 
-# ╔═╡ 77bfe4d8-c6ae-4832-8f00-a9e93bd1f540
-md"""
-#### With SymPy
-"""
+# ╔═╡ 74fe191b-e78f-48ea-8634-911f8176df12
+a1, a2, a3 = sp.symbols("a1, a2, a3")
 
-# ╔═╡ f1d8eaa1-9741-4988-8135-ac439c5f3005
-z = sp.symbols("z")
-
-# ╔═╡ 09c91686-5fab-4dfb-a906-3209abbbfa7d
-χ = sp.Function("χ")(x, y, z)
-
-# ╔═╡ 5a972777-a650-445f-b930-a05818559415
-ϕ = sp.Function("ϕ")(x, y, z)
-
-# ╔═╡ 3778e89a-b996-4fc2-87e1-b7a7af30cb56
-∇ϕ = [sp.diff(ϕ, i) for i in (x, y, z)]
-
-# ╔═╡ 2de36b1d-175f-496b-b5aa-6bc8dce4c064
-∇χ = [sp.diff(χ, i) for i in (x, y, z)]
-
-# ╔═╡ 37a2ffe4-49a3-46d6-87e5-dac31b9e82a8
-∇ϕχ = [ϕ * ∇χ[i] + χ * ∇ϕ[i] for i in 1:3]
-
-# ╔═╡ e5f68df7-144c-43b2-bef7-0df8905997ca
-∇_product = [sp.diff(ϕ * χ, i) for i in (x, y, z)]
-
-# ╔═╡ 3f5cabb9-546e-4cf3-8a79-2563d9d3ab61
-∇ϕχ .== ∇_product
-
-# ╔═╡ 27984f40-0d25-4216-95cb-8f15e1badd97
-md"""
-!!! info "Problem 7.5.3"
-	Recall the equations for cylindrical coordinates ``(ρ, φ, z)`` and spherical coordinates ``(r, θ, φ)`` in terms of cartesian coordinates. 
-
-	Verify that these are orthogonal coordinates, which means, for example, that the direction of purely increasing ``r`` (at fixed ``θ`` and ``φ``) is perpendicular to the direction of increasing ``θ`` and ``φ`` with the other two coordinates similarly held fixed. 
-
-	Argue that the direction in which just one coordinate increases is perpendicular to the gradients of the other two coordinates (with all three spherical or cylindrical coordinates expressed as a function of ``x, y, z``). 
-
-	Compute the three gradients for each coordinate system and verify orthogonality.
-"""
-
-# ╔═╡ d898d7fd-b6f8-4ec4-bcd4-6fd6611a8e70
-md"""
-!!! warning "By Hand"
-	The cylindrical coordinates ``(ρ, φ, z)`` are defined as follows:
-
-    ```math
-    \begin{align*}
-    \rho &= \sqrt{x^2 + y^2} \\
-    \phi &= \tan^{-1}\left(\frac{y}{x}\right) \\
-    z &= z
-    \end{align*}
-    ```
-
-	We compute the gradient of each of these coordinates:
-
-    ```math
-    \begin{align*}
-    \nabla \rho &= \left(\frac{\partial \rho}{\partial x}, \frac{\partial \rho}{\partial y}, \frac{\partial \rho}{\partial z}\right) \\
-    \nabla \phi &= \left(\frac{\partial \phi}{\partial x}, \frac{\partial \phi}{\partial y}, \frac{\partial \phi}{\partial z}\right) \\
-    \nabla z &= \left(\frac{\partial z}{\partial x}, \frac{\partial z}{\partial y}, \frac{\partial z}{\partial z}\right)
-    \end{align*}
-    ```
-
-	We then verify orthogonality by computing the dot product of each pair of gradients and confirming that the result is zero:
-
-    ```math
-    \begin{align*}
-    \nabla \rho \cdot \nabla \phi &= 0 \\
-    \nabla \phi \cdot \nabla z &= 0 \\
-    \nabla \rho \cdot \nabla z &= 0
-    \end{align*}
-    ```
-
-	The spherical coordinates ``(r, θ, φ)`` are defined as follows:
-
-    ```math
-    \begin{align*}
-    r &= \sqrt{x^2 + y^2 + z^2} \\
-    \theta &= \cos^{-1}\left(\frac{z}{\sqrt{x^2 + y^2 + z^2}}\right) \\
-    \phi &= \tan^{-1}\left(\frac{y}{x}\right)
-    \end{align*}
-    ```
-
-	We compute the gradient of each of these coordinates:
-
-    ```math
-    \begin{align*}
-    \nabla r &= \left(\frac{\partial r}{\partial x}, \frac{\partial r}{\partial y}, \frac{\partial r}{\partial z}\right) \\
-    \nabla \theta &= \left(\frac{\partial \theta}{\partial x}, \frac{\partial \theta}{\partial y}, \frac{\partial \theta}{\partial z}\right) \\
-    \nabla \phi &= \left(\frac{\partial \phi}{\partial x}, \frac{\partial \phi}{\partial y}, \frac{\partial \phi}{\partial z}\right)
-    \end{align*}
-    ```
-
-	We then verify orthogonality by computing the dot product of each pair of gradients and confirming that the result is zero:
-
-    ```math
-    \begin{align*}
-    \nabla r \cdot \nabla \theta &= 0 \\
-    \nabla r \cdot \nabla \phi &= 0 \\
-    \nabla \theta \cdot \nabla \phi &= 0
-    \end{align*}
-    ```
-"""
-
-# ╔═╡ 47894665-ac20-48f4-aa43-f6b27e854042
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 37f965aa-717d-43ec-adf5-8bc2790979b8
-md"""
-**Cylindrical**
-"""
-
-# ╔═╡ 185b0b11-7862-49c5-a28b-6b2d8c97e0b0
-ρ_cyl = sp.sqrt(x^2 + y^2)
-
-# ╔═╡ 0ebf5c1a-6287-4298-94f2-50361604bb0a
-ϕ_cyl = sp.atan(y / x)
-
-# ╔═╡ a45b5225-1c71-48a0-8cc4-0886dfe85cc3
-z_cyl = z
-
-# ╔═╡ 34bc2428-06d4-404c-b0b8-ac5d978119a5
-∇ρ_cyl = [sp.diff(ρ_cyl, coord) for coord in (x, y, z)]
-
-# ╔═╡ 16b9644c-aa6a-4665-a96d-ae4aa86d0b88
-∇ϕ_cyl = [sp.diff(ϕ_cyl, coord) for coord in (x, y, z)]
-
-# ╔═╡ 541fb80a-63a6-4b66-8a03-69ae1e0f4553
-∇z_cyl = [sp.diff(z_cyl, coord) for coord in (x, y, z)]
-
-# ╔═╡ cfd88052-e979-435b-bb41-2dc26552aa4a
-function dot_product(v1, v2)
-    return sum([v1[i] * v2[i] for i in 1:3])
-end
-
-# ╔═╡ 160e03a0-545e-4d86-bd8f-5fe0180580c5
-dot_product(∇ρ_cyl, ∇ϕ_cyl)
-
-# ╔═╡ 5bc43ec7-9720-411f-900e-cd5f3af68824
-dot_product(∇ϕ_cyl, ∇z_cyl)
-
-# ╔═╡ a3947c1e-3a5f-42fa-9ea3-7f0da19261c2
-dot_product(∇ρ_cyl, ∇z_cyl)
-
-# ╔═╡ 0c950c0c-a209-421f-8d25-b691a482334f
-md"""
-**Spherical**
-"""
-
-# ╔═╡ de382bf0-783d-487b-b3c0-83441bf7662a
-r_sph = sp.sqrt(x^2 + y^2 + z^2)
-
-# ╔═╡ c61be673-d114-47fc-9bfa-0457cf16aacf
-θ_sph = sp.acos(z / sp.sqrt(x^2 + y^2 + z^2))
-
-# ╔═╡ 8e2f5d10-a031-431a-a5a5-a475aa46533b
-ϕ_sph = sp.atan(y / x)
-
-# ╔═╡ d84d7137-cb72-426a-8866-a5156e5334de
-∇r_sph = [sp.diff(r_sph, coord) for coord in (x, y, z)]
-
-# ╔═╡ 2bc5ce49-f52a-48d6-be64-a040052927af
-∇θ_sph = [sp.diff(θ_sph, coord) for coord in (x, y, z)]
-
-# ╔═╡ 2e34d2ed-14c2-4746-8b3e-58510a5edf86
-∇ϕ_sph = [sp.diff(ϕ_sph, coord) for coord in (x, y, z)]
-
-# ╔═╡ 13deb593-c204-4b77-808f-62a7e333418e
-sp.simplify(dot_product(∇r_sph, ∇θ_sph))
-
-# ╔═╡ 7e81d4a3-2e75-4321-879a-df8259a93c1e
-dot_product(∇r_sph, ∇ϕ_sph)
-
-# ╔═╡ 5078c8e3-50ae-4312-ad4d-0e6416d8b360
-dot_product(∇θ_sph, ∇ϕ_sph)
-
-# ╔═╡ 32a3470d-2629-4e74-94fe-5383cb4af5b9
-md"""
-!!! info "Problem 7.5.7"
-	You are on a hot volcanic mountain where the temperature is given by ``T(x, y) = x^2 + xy^3``. (i) If you are located at ``(x = 1, y = 1)``, in which direction will you run to beat the heat? (ii) If your steps are ``1/10`` units long, by how much will the temperature drop after the first step? (Work to first order.)
-"""
-
-# ╔═╡ bfb3a382-f362-4b20-afb4-ae82af191a57
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	T &= x^2 + xy^3 \\
-	\nabla T &= \left(\frac{\partial T}{\partial x}, \frac{\partial T}{\partial y}\right) = (2x + y^3, 3xy^2) \\
-	\nabla T|_{(1,1)} &= (2 + 1, 3) = (3, 3) \\
-	-\nabla T|_{(1,1)} &= (-3, -3) \\
-	\hat{d} &= \frac{-\nabla T|_{(1,1)}}{||\nabla T|_{(1,1)}||} = \left(-\frac{\sqrt{2}}{2}, -\frac{\sqrt{2}}{2}\right) \\
-	\Delta T &= \text{step size} \times ||\nabla T|_{(1,1)}|| = \frac{1}{10} \times \sqrt{18} = 0.6
-	\end{align*}
-	```
-"""
-
-# ╔═╡ c00c7da9-b548-46c1-b53a-970539cc9780
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 088bd06b-5d6a-41c1-8a58-a4edbca9879e
-md"""
-**(i)**
-"""
-
-# ╔═╡ 933d3db0-470e-4e6b-8175-94290774af0c
-T = x^2 + x*y^3
-
-# ╔═╡ 710c5f83-871c-4eda-b10a-4f798c6b6fac
-∇T = sp.Matrix([sp.diff(T, i) for i in (x, y)])
-
-# ╔═╡ 94df1dd9-ee4c-4d23-bbb6-b5331f4196b4
-∇T₀ = ∇T.subs([(x, 1), (y, 1)]) * -1
-
-# ╔═╡ d85ad2a0-4cbc-45fb-a5dd-fbf0980181c0
-direction = ∇T₀ / ∇T₀.norm()
-
-# ╔═╡ 81e6ddce-0e8a-4d57-8e9c-f827dd613b9b
-md"""
-**(ii)**
-"""
-
-# ╔═╡ b7151a26-b9c9-4329-a317-2131c35f3dbc
-step_size = 1/10
-
-# ╔═╡ fc6e6bbd-8744-4369-bd7c-29e8f52c8048
-ΔT = step_size * ∇T₀.norm()
-
-# ╔═╡ 25112cba-34af-4ad7-9af2-27bf6b560374
-md"""
-## Curl of a Vector Field
-"""
-
-# ╔═╡ baa68d3f-8cd9-4f28-a8c6-a957ec5b3fb6
-md"""
-!!! info "Problem 7.6.1"
-	Consider the complex integral ``\oint f(z) dz`` where ``f = u + iv`` and ``dz = dx + i dy`` over a contour that lies on the domain of analyticity of ``f``. Write the real and imaginary parts as circulations of two real vector fields and verify that the CRE ensure that both fields are conservative.
-"""
-
-# ╔═╡ 9efddcb3-6c01-494b-9512-e9d098868aae
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	&\oint f(z) dz = \oint (u + iv)(dx + idy) \\
-	&\quad = \oint (u dx - v dy) + i \oint (v dx + u dy) \\
-	&\quad = \oint F \cdot dr + i \oint G \cdot dr \\
-	&\quad = \oint (u dx - v dy) + i \oint (v dx + u dy) \\
-	&\text{where } F = (u, -v) \text{ and } G = (v, u) \\
-	&\text{The curls of } F \text{ and } G \text{ are: } \\
-	&\nabla \times \mathbf{F} = \frac{\partial (-v)}{\partial x} - \frac{\partial u}{\partial y} \\
-	&\nabla \times \mathbf{G} = \frac{\partial u}{\partial x} - \frac{\partial v}{\partial y} \\
-	&\text{Substituting the CRE into the expressions for the curls, we find: } \\
-	&\nabla \times \mathbf{F} = - \frac{\partial u}{\partial y} - \frac{\partial u}{\partial y} = 0 \\
-	&\nabla \times \mathbf{G} = \frac{\partial u}{\partial x} - \frac{\partial u}{\partial x} = 0 \\
-	&\text{Therefore, both vector fields are conservative.}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ a81a50ff-5d1a-4e77-9567-46ff2be1be80
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 528d1bb7-d56b-4f63-84a9-0a8035878c95
-u, v = sp.Function("u")(x, y), sp.Function("v")(x, y)
-
-# ╔═╡ f4010731-0793-4342-a65f-21dfe418d608
-f = u + sp.I*v
-
-# ╔═╡ cefd5ebb-041d-416d-8e05-390829e215f8
-f_x, f_y = sp.diff(f, x), sp.diff(f, y)
-
-# ╔═╡ a3f4fa24-314a-42d3-b932-ce17cbb766c8
-F1, G1 = sp.Matrix([u, -v]), sp.Matrix([v, u])
-
-# ╔═╡ 796ddfba-ef94-450c-9ce1-a87eeb9670a9
-curl_F = sp.diff(F1[1], x) - sp.diff(F1[0], y)
-
-# ╔═╡ 75b74bde-ab81-4414-af83-f1868b59657a
-curl_G = sp.diff(G1[1], x) - sp.diff(G1[0], y)
-
-# ╔═╡ a1d4a670-ccb6-4bc5-8d35-4011d6003812
-curl_F_CRE = curl_F.subs([(sp.diff(u, x), sp.diff(v, y)), (sp.diff(u, y), sp.diff(-v, x))])
-
-# ╔═╡ c6b8eb02-d3f8-419f-b3dd-0c67e810254a
-curl_G_CRE = curl_G.subs([(sp.diff(u, x), sp.diff(v, y)), (sp.diff(u, y), sp.diff(-v, x))])
-
-# ╔═╡ 512817e6-114d-4b80-b7a0-bc77c5c7c1ab
-md"""
-!!! info "Problem 7.6.6"
-	If ``u + iv`` is an analytic function, show that the curves of constant ``u`` intersect the curves of constant ``v`` orthogonally at each point. (Bring in the gradient to solve this). For the case of ``f(z) = z^2``, sketch the curves of constant ``u`` and ``v`` and check this claim
-"""
-
-# ╔═╡ 2e283fd3-7cec-4926-96fa-b719eb288328
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	f(z) &= u + iv \\
-	F &= \nabla u = \left(\frac{\partial u}{\partial x}, \frac{\partial u}{\partial y}\right) \\
-	G &= \nabla v = \left(\frac{\partial v}{\partial x}, \frac{\partial v}{\partial y}\right). \\
-	F \cdot G &= \frac{\partial u}{\partial x} \frac{\partial v}{\partial x} + \frac{\partial u}{\partial y} \frac{\partial v}{\partial y}. \\
-	\frac{\partial u}{\partial x} &= \frac{\partial v}{\partial y} \text{ and } \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}. \\
-	F &\cdot G = \frac{\partial v}{\partial y} \frac{\partial v}{\partial x} - \frac{\partial v}{\partial x} \frac{\partial v}{\partial y} = 0. \\
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 760e58cc-d859-4ce5-8d6f-1f105ded77fe
-f2 = (u + sp.I*v)^2
-
-# ╔═╡ 76087030-4287-41a8-ae10-805188dc7f65
+# ╔═╡ fef0b609-e963-4d39-a1da-bc3ecffe47b9
 begin
-	u_x = sp.diff(u, x)
-	u_y = sp.diff(u, y)
-	v_x = sp.diff(v, x)
-	v_y = sp.diff(v, y)
+	ket1 = sp.Matrix(((0, 1), (0, 0)))
+	ket2 = sp.Matrix(((1, 1), (0, 1)))
+	ket3 = sp.Matrix(((-2, -1), (0, -2)))
 end
 
-# ╔═╡ d5d3381c-bbcf-41e6-9cbd-b821126d4570
-begin
-	F3 = sp.Matrix([u_x, u_y])
-	G3 = sp.Matrix([v_x, v_y])
-end
+# ╔═╡ 4f505723-c893-45d2-9524-553369b970c4
+eq = sp.Eq(a1*ket1 + a2*ket2 + a3*ket3, sp.zeros(2), evaluate = false)
 
-# ╔═╡ b3ae3846-26a3-4da0-9ca1-23400a22e2fe
-F_dot_G = F3.dot(G3)
+# ╔═╡ f4ad18b4-85cd-4da7-8ba0-c3f6b58d0cd3
+eq.rhs
 
-# ╔═╡ effd8948-af6c-4040-ba06-3e31a784df8d
-orthogonality_CRE = F_dot_G.subs([(u_x, v_y), (u_y, -v_x)])
+# ╔═╡ 86d8a4c2-1b13-42f8-bcc5-d65fa72704d0
+eq.lhs
 
-# ╔═╡ b51c8800-e410-4481-b853-0763caf20baa
+# ╔═╡ 3dcc030d-064f-44c3-976f-4e541ae6dc76
+system = [sp.Eq(eq.lhs[i,j], eq.rhs[i, j]) for i in 0:1 for j in 0:1]
+
+# ╔═╡ e78addf9-cc7c-453d-a1e8-9d79f440de2b
+sp.solve(system, (a1, a2, a3))
+
+# ╔═╡ 62d1c55e-0939-4f64-8aa8-253d5adee87d
 md"""
-!!! info "Problem 7.6.12"
-	Show that the area enclosed by a counter-clockwise curve ``C`` in the plane is given by ``\frac{1}{2} \oint_C (xdy - ydx)``
+## Inner Product Spaces
 """
 
-# ╔═╡ a47e7c7a-bb5b-462a-87b3-69a6ddbe18b7
+# ╔═╡ 45380cc3-e9b7-4827-b2a5-43bd9cfa9288
+md"""
+!!! info "Problem 9.2.2"
+	Form an orthonormal basis in two dimensions starting with ``\vec{A} = 3 \hat{i} + 4\hat{j}`` and ``\vec{B} = 2 \hat{i} - 6 \hat{j}``. Can you generate another orthonormal basis starting with these two vectors? If so, produce another.
+"""
+
+# ╔═╡ beba609f-3fea-4c15-9363-1491924b4a0c
 md"""
 !!! warning "By Hand"
 	```math
 	\begin{align*}
-	\oint_C \vec{F} \cdot \vec{dr} &= \oint P dx + Q dy \\
-	&= \int \int (\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}) dA \quad (\text{where } A = \frac{1}{2} \oint_C (xdy - ydx)) \\
-	P &= -y \\ 
-	Q &= x \\ \\
-	\int \int (\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}) dA &= \int \int (1 - (-1)) dA \\
-	&= 2 \int \int dA \\
-	&= 2A
+	&\vec{A} = \begin{bmatrix} 3 \\ 4 \end{bmatrix}, \quad \vec{B} = \begin{bmatrix} 2 \\ -6 \end{bmatrix} \\
+	&\text{Normalize } \vec{A} \text{ to get } \vec{u}_1: \\
+	&\vec{u}_1 = \frac{\vec{A}}{||\vec{A}||} = \begin{bmatrix} \frac{3}{5} \\ \frac{4}{5} \end{bmatrix} \\
+	&\text{Project } \vec{B} \text{ onto } \vec{u}_1 \text{ and subtract from } \vec{B} \text{ to get } \vec{u}_2: \\
+	&\vec{u}_2 = \vec{B} - (\vec{B} \cdot \vec{u}_1)\vec{u}_1 = \begin{bmatrix} \frac{4}{5} \\ -\frac{3}{5} \end{bmatrix} \\
+	&\text{So, the orthonormal basis is } \{ \vec{u}_1, \vec{u}_2 \} = \left\{ \begin{bmatrix} \frac{3}{5} \\ \frac{4}{5} \end{bmatrix}, \begin{bmatrix} \frac{4}{5} \\ -\frac{3}{5} \end{bmatrix} \right\} \\
+	&\text{Another orthonormal basis can be generated by taking the negative of } \vec{u}_1: \\
+	&\{ -\vec{u}_1, \vec{u}_2 \} = \left\{ \begin{bmatrix} -\frac{3}{5} \\ -\frac{4}{5} \end{bmatrix}, \begin{bmatrix} \frac{4}{5} \\ -\frac{3}{5} \end{bmatrix} \right\}
 	\end{align*}
 	```
 """
 
-# ╔═╡ 54468bc7-3115-4582-af0c-4d66f1cb0d3e
+# ╔═╡ f99d1ab7-3d43-49f2-8d6d-539ed124ace9
+begin
+	A = sp.Matrix([3, 4])
+	B = sp.Matrix([2, -6])
+end
+
+# ╔═╡ c6aa613e-ba82-4595-85fe-d98df8ef8411
+u1 = A / sp.sqrt(A.dot(A))
+
+# ╔═╡ f59d0369-17ab-4462-b797-bfd740d447c0
+begin
+	u2 = B - (B.dot(u1))*u1
+	u2 = u2 / sp.sqrt(u2.dot(u2))
+end
+
+# ╔═╡ 98b4dd13-1246-4ec4-ba88-84266f7e4bcc
 md"""
-## The Divergence of a Vector Field
+## Eigenvalue Problem
 """
 
-# ╔═╡ b1633978-2110-4bef-a704-2284b34bcadc
+# ╔═╡ eda89c38-5d66-4d86-8bff-3206e40396aa
 md"""
-!!! info "Problem 7.7.3"
-	Find the surface integral of ``\vec{W} = x^3y \hat{i} + y^2 x \hat{j} + z \hat{k}`` over a unit cube centered at the origin with edges parallel to the axes by direct computation and by Gauss' theorem. Use symmetries to save time
+!!! info "Problem 9.5.6"
+	The Cayley Hamilton Theorem states that every matrix obeys its characteristic equation. In other words, if ``P(\omega)`` is the characteristic polynomial for the matrix ``\Omega``, then ``P(\omega)`` vanishes as a matrix. This means that it will annihilate any vector. First prove the theorem for a hermitian ``\Omega`` with nondegenerate eigenvectors by starting with the action of ``P(\omega)`` on the eigenvectors. 
+
+	Next consider a non-hermitian but nondegenerate matrix. Now the eigenvectors are not assured to be orthogonal. Prove the theorem by first showing that they are still linearly independent. (To establish linear independence, show that any assumed linear relation with nonzero coefficients leads to a contradiction in the following way. If the vector ``\ket{\omega_i}`` is present in the sum, show that multiplication by ``\Omega - \omega_i``, gets rid of it and none of the others. Proceed in this fashion until you are left with just one vector times a nonzero coefficient which must equal zero, leading to a contradiction.) The Cayley-Hamilton theorem can be used to find inverses. Writing out P(R) = 0, we must get an expression of the form
 """
 
-# ╔═╡ dae97f2e-a2a5-4265-8af6-d61c2bbd78ac
+# ╔═╡ 3afc8307-5113-4bbf-93e0-960fa28725c9
 md"""
 !!! warning "By Hand"
-    ```math
-    \begin{align*}
-    \vec{W} &= x^3y \hat{i} + y^2 x \hat{j} + z \hat{k} \\
-    \Phi_{\text{top}} &= \int_{-1/2}^{1/2} \int_{-1/2}^{1/2} \frac{1}{2} \, dx \, dy = \left[\frac{1}{2} x\right]_{-1/2}^{1/2} \bigg|_{-1/2}^{1/2} = \frac{1}{2} - \left(-\frac{1}{2}\right) = \frac{1}{2} \\
-    \Phi_{\text{bottom}} &= \int_{-1/2}^{1/2} \int_{-1/2}^{1/2} -\left(-\frac{1}{2}\right) \, dx \, dy = \left[\frac{1}{2} x\right]_{-1/2}^{1/2} \bigg|_{-1/2}^{1/2} = \frac{1}{2} - \left(-\frac{1}{2}\right) = \frac{1}{2} \\
-    \Phi_{\text{total}} &= \Phi_{\text{top}} + \Phi_{\text{bottom}} = \frac{1}{2} + \frac{1}{2} = 1 \\
-    \nabla \cdot \vec{W} &= 3x^2y + 2y^2x + 1 \\
-    \int_V (\nabla \cdot \vec{W}) \, dV &= \int_{-1/2}^{1/2} \int_{-1/2}^{1/2} \int_{-1/2}^{1/2} (3x^2y + 2y^2x + 1) \, dx \, dy \, dz = 1 
-    \end{align*}
-    ```
+	```math
+	\begin{align*}
+	&\text{1. Hermitian matrix with nondegenerate eigenvectors:} \\
+	&P(\omega) = (\omega - \omega_1)(\omega - \omega_2)...(\omega - \omega_n) = 0 \\
+	&\text{Consider an eigenvector } \ket{\omega_i} \text{ of } \Omega. \\
+	&P(\Omega)\ket{\omega_i} = 0 \text{ for every eigenvector } \ket{\omega_i} \text{ of } \Omega. \\
+	&\text{Since the eigenvectors of } \Omega \text{ form a complete basis, } P(\Omega) = 0 \text{ as a matrix.} \\
+	& \\
+	&\text{2. Non-Hermitian matrix with nondegenerate eigenvectors:} \\
+	&a_1\ket{\omega_1} + a_2\ket{\omega_2} + ... + a_n\ket{\omega_n} = 0 \\
+	&(\Omega - \omega_i)(a_1\ket{\omega_1} + a_2\ket{\omega_2} + ... + a_n\ket{\omega_n}) = 0 \\
+	&\text{So, } P(\Omega) = 0 \text{ as a matrix.} \\
+	\end{align*}
+	```
 """
 
-# ╔═╡ 7b80df03-eeb4-4130-9b56-0a765a7d232b
+# ╔═╡ 8e85ed5b-ac8b-4322-a8cf-b6390a5f22eb
 md"""
-#### With SymPy
+!!! info "Problem 9.5.10"
+	Show that the following matrices commute and find a common eigenbasis
+	```math
+	\begin{align*}
+	M &=
+	\begin{bmatrix}
+	1 & 0 & 1 \\
+	0 & 0 & 0 \\
+	1 & 0 & 1
+	\end{bmatrix} \\ \\
+
+	N &=
+	\begin{bmatrix}
+	2 & 1 & 1 \\
+	1 & 0 & -1 \\
+	1 & -1 & 2
+	\end{bmatrix}
+	\end{align*}
+	```
 """
 
-# ╔═╡ 37203e2b-8c2c-4fa0-997a-a8f59da022cc
-W = sp.Matrix([x^3 * y, y^2 * x, z])
+# ╔═╡ 44822f3e-c131-4198-bff2-ed47d7c73e9b
+md"""
+!!! warning "By Hand"
+	```math
+	\begin{align*}
+	&\text{Their product is the same regardless of the order in which they are multiplied} \\
+	&MN - NM = 0 \\
+	&\text{The common eigenvector between these two matrices is } \\
+	&\begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} \\
+	&\text{This vector forms a basis in which both } M \text{ and } N \text{ are diagonal.}
+	\end{align*}
+	```
+"""
 
-# ╔═╡ c967a4b7-7c4d-41c0-b0f7-2b326c86ebde
-limits = ((x, -1/2, 1/2), (y, -1/2, 1/2), (z, -1/2, 1/2))
-
-# ╔═╡ 49106849-ba23-45b4-90c4-54a13aa95b8d
-div_W = W[0].diff(x) + W[1].diff(y) + W[2].diff(z)
-
-# ╔═╡ fb10a998-87cb-476e-96d9-a232fa6fa5b8
-volume_integral = sp.integrate(div_W, limits...)
-
-# ╔═╡ c607bfcc-fa55-46eb-bc5f-b47fb5f2f34b
+# ╔═╡ 3d6c7452-5aa8-4a6b-8a0c-ea0b63799ed1
 md"""
 # Summary
-
-As always, the book provides a great summary
-
----
-Know the dot product, its definition in terms of componenets in an arthonormal basis and its properties such as linearity. Same for cross product
-
----
-If ``\vec{r}(t)`` is a function of time then know
-
-```math
-\begin{align*}
-\vec{r} &= \vec{i}x(t) + \vec{j}y(t) = \vec{e_r}r \\
-\frac{d \vec{r}}{dt} &= \vec{i} \dot{x}(t) + \vec{j} \dot{y}(t) = \vec{e_r}\dot{r} + r \omega\vec{e_{\theta}}
-\end{align*}
-```
-
----
-
-The line integral of a vector field ``\vec{F}(\vec{r})`` is defined as
-```math
-\begin{align*}
-\int_1^2 \vec{F}(\vec{r}) \cdot \vec{dr} = \lim_{n \to \infty} \sum_{i=1}^{n} \vec{F}(\vec{r_i}) \cdot \vec{dr_i}
-\end{align*}
-```
-
-- If the answer is path independent, the field is conservative
-
-```math
-\begin{align*}
-\oint \vec{F}(\vec{r}) \cdot \vec{dr} = 0
-\end{align*}
-```
-
----
-
-The surface integral of a vector field ``\vec{V}(\vec{r})`` over a surface ``S`` is defined as
-
-```math
-\begin{align*}
-\int_S \vec{V} \cdot \vec{dS} = \lim_{i \to 100} \sum_i \vec{V}(\vec{r_i}) \cdot \vec{dS_i}
-\end{align*}
-```
-
----
-
-The gradient enters as follows
-
-```math
-\begin{align*}
-d \phi &= \frac{\partial \phi}{\partial x} dx + \frac{\partial \phi}{\partial y} dy + \frac{\partial \phi}{\partial z} dz \equiv \vec{\nabla \phi} \cdot \vec{dr} \text{ where} \\
-
-\vec{\nabla \phi} &= \frac{\partial \phi}{\partial x} \hat{i} + \frac{\partial \phi}{\partial y} \hat{j} + \frac{\partial \phi}{\partial z} \hat{k} \text{ and} \\
-
-\vec{dr} &= \hat{i} dx + \hat{j} dy + \hat{k} dz
-
-\end{align*}
-```
-
-- since ``d \phi = \vec{\nabla } \cdot \vec{dr} = |\vec{\nabla }| |\vec{dr}| \cos \theta``, the gradient gives the direction of greatest rate of change and equals in magnitude that rate of change
-
----
-
-The integral of the gradient is path independent
-
-```math
-\begin{align*}
-\int_1^2 \vec{\nabla \phi} \cdot \vec{dr} = \phi(2) - \phi(1) = |\phi|_{\partial P}
-\end{align*}
-```
-
-- where ``1`` and ``2`` are short for ``\vec{r_1}`` and ``\vec{r_2}`` respectively
-
----
-
-In non cartesian coordinates
-
-```math
-\begin{align*}
-\vec{\nabla \phi} = \sum_i \vec{e_i} \frac{1}{h_i} \frac{\partial \phi}{\partial u_i}
-\end{align*}
-```
-
----
-
-Green's theorem says if ``\vec{W}`` and the loop ``C`` lie in a plane (say the x-y plane)
-
-```math
-\begin{align*}
-\oint_{C = \partial S} \vec{W} \cdot \vec{dr} = \int \int (\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}) dx dy
-\end{align*}
-```
-
-- ``\vec{W}`` is conservative ``\to (\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}) = 0``
-
----
-
-The curl is given by
-```math
-\begin{align*}
-\vec{\nabla} \times \vec{W} = \left(\frac{\partial W_z}{\partial y} - \frac{\partial W_y}{\partial z}\right) \hat{i} - \left(\frac{\partial W_x}{\partial z} - \frac{\partial W_z}{\partial x}\right) \hat{j} + \left(\frac{\partial W_y}{\partial x} - \frac{\partial W_x}{\partial y}\right) \hat{k}
-\end{align*}
-```
-
-- If a field is conservative, its curl vanishes everywhere and vice versa. Look up the curl in general coordinates if needed
-
----
-
-Stokes' theorem
-```math
-\begin{align*}
-\oint_{C = \partial S} \vec{W} \cdot \vec{dr} = \int_S \vec{\nabla } \times \vec{W} \cdot \vec{dS}
-\end{align*}
-```
-
----
-
-Gauss's law
-
-```math
-\begin{align*}
-\oint_{S = \partial V} \vec{W} \cdot \vec{dS} = \int_V \vec{\nabla} \cdot \vec{W} dxdydz
-\end{align*}
-```
-
-- Where ``\vec{\nabla} \cdot \vec{W}`` is the divergence of ``\vec{W}``
-
----
-
-The laplacian ``\nabla^2`` is defined as follows
-
-```math
-\begin{align*}
-\nabla \cdot \nabla \phi = \frac{\partial^2 \phi}{\partial x^2} + \frac{\partial^2 \phi}{\partial y^2} + \frac{\partial^2 \phi}{\partial z^2}
-\end{align*}
-```
-
-- For general coordinates, look it up when needed
-
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1003,7 +232,7 @@ PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 CairoMakie = "~0.10.7"
 CondaPkg = "~0.2.18"
 PlutoUI = "~0.7.52"
-PythonCall = "~0.9.13"
+PythonCall = "~0.9.14"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -1012,17 +241,18 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "d23030f7311d94861c8bd7107c1347a09cb2fc7d"
+project_hash = "0f51bc0c0f1d556ec4ed04c122406a404ce85637"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "cad4c758c0038eea30394b1b671526921ca85b21"
+git-tree-sha1 = "d92ad398961a3ed262d8bf04a1a2b8340f915fef"
 uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
-version = "1.4.0"
-weakdeps = ["ChainRulesCore"]
+version = "1.5.0"
+weakdeps = ["ChainRulesCore", "Test"]
 
     [deps.AbstractFFTs.extensions]
     AbstractFFTsChainRulesCoreExt = "ChainRulesCore"
+    AbstractFFTsTestExt = "Test"
 
 [[deps.AbstractLattices]]
 git-tree-sha1 = "f35684b7349da49fcc8a9e520e30e45dbb077166"
@@ -1205,9 +435,9 @@ version = "0.3.0"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
-git-tree-sha1 = "5ce999a19f4ca23ea484e92a1774a61b8ca4cf8e"
+git-tree-sha1 = "e460f044ca8b99be31d35fe54fc33a5c33dd8ed7"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.8.0"
+version = "4.9.0"
 weakdeps = ["Dates", "LinearAlgebra"]
 
     [deps.Compat.extensions]
@@ -1247,9 +477,9 @@ version = "1.15.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "cf25ccb972fec4e4817764d01c82386ae94f77b4"
+git-tree-sha1 = "3dbd312d370723b6bb43ba9d02fc36abade4518d"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.18.14"
+version = "0.18.15"
 
 [[deps.DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -1287,10 +517,10 @@ deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
-deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns", "Test"]
-git-tree-sha1 = "e76a3281de2719d7c81ed62c6ea7057380c87b1d"
+deps = ["FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns", "Test"]
+git-tree-sha1 = "27a18994a5991b1d2e2af7833c4f8ecf9af6b9ea"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.98"
+version = "0.25.99"
 
     [deps.Distributions.extensions]
     DistributionsChainRulesCoreExt = "ChainRulesCore"
@@ -1357,10 +587,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "74faea50c1d007c85837327f6775bea60b5492dd"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "b8660105ccaff705c70894c5f1e24f5c18974220"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.2+2"
+version = "4.4.4+0"
 
 [[deps.FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
@@ -1391,9 +621,9 @@ uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
-git-tree-sha1 = "f0af9b12329a637e8fba7d6543f915fff6ba0090"
+git-tree-sha1 = "f372472e8672b1d993e93dada09e23139b509f9e"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "1.4.2"
+version = "1.5.0"
 
 [[deps.FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "Setfield", "SparseArrays"]
@@ -1528,9 +758,9 @@ version = "2.8.1+1"
 
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]
-git-tree-sha1 = "83e95aaab9dc184a6dcd9c4c52aa0dc26cd14a1d"
+git-tree-sha1 = "f218fe3736ddf977e0e772bc9a586b2383da2685"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
-version = "0.3.21"
+version = "0.3.23"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
@@ -1624,10 +854,14 @@ uuid = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
 version = "0.20.9"
 
 [[deps.IntervalSets]]
-deps = ["Dates", "Random", "Statistics"]
-git-tree-sha1 = "16c0cc91853084cb5f58a78bd209513900206ce6"
+deps = ["Dates", "Random"]
+git-tree-sha1 = "8e59ea773deee525c99a8018409f64f19fb719e6"
 uuid = "8197267c-284f-5f27-9208-e0e47529a953"
-version = "0.7.4"
+version = "0.7.7"
+weakdeps = ["Statistics"]
+
+    [deps.IntervalSets.extensions]
+    IntervalSetsStatisticsExt = "Statistics"
 
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
@@ -1664,9 +898,9 @@ version = "0.21.4"
 
 [[deps.JSON3]]
 deps = ["Dates", "Mmap", "Parsers", "PrecompileTools", "StructTypes", "UUIDs"]
-git-tree-sha1 = "5b62d93f2582b09e469b3099d839c2d2ebf5066d"
+git-tree-sha1 = "95220473901735a0f4df9d1ca5b171b568b2daa3"
 uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-version = "1.13.1"
+version = "1.13.2"
 
 [[deps.JpegTurbo]]
 deps = ["CEnum", "FileIO", "ImageCore", "JpegTurbo_jll", "TOML"]
@@ -1873,9 +1107,9 @@ version = "2.28.2+0"
 
 [[deps.MicroMamba]]
 deps = ["Pkg", "Scratch", "micromamba_jll"]
-git-tree-sha1 = "6f0e43750a94574c18933e9456b18d4d94a4a671"
+git-tree-sha1 = "011cab361eae7bcd7d278f0a7a00ff9c69000c51"
 uuid = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
-version = "0.1.13"
+version = "0.1.14"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
@@ -1969,9 +1203,9 @@ version = "0.8.1+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "1aa4b74f80b01c6bc2b89992b861b5f210e665b5"
+git-tree-sha1 = "cae3153c7f6cf3f069a853883fd1919a6e5bab5b"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.21+0"
+version = "3.0.9+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -2039,9 +1273,9 @@ version = "0.12.3"
 
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
-git-tree-sha1 = "4b2e829ee66d4218e0cef22c0a64ee37cf258c29"
+git-tree-sha1 = "716e24b21538abc91f6205fd1d8363f39b442851"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.7.1"
+version = "2.7.2"
 
 [[deps.Permutations]]
 deps = ["Combinatorics", "LinearAlgebra", "Random"]
@@ -2141,9 +1375,9 @@ version = "1.7.2"
 
 [[deps.PythonCall]]
 deps = ["CondaPkg", "Dates", "Libdl", "MacroTools", "Markdown", "Pkg", "REPL", "Requires", "Serialization", "Tables", "UnsafePointers"]
-git-tree-sha1 = "0d15cb32f52654921169b4305dae8f66a0e345dc"
+git-tree-sha1 = "70af6bdbde63d7d0a4ea99f3e890ebdb55e9d464"
 uuid = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
-version = "0.9.13"
+version = "0.9.14"
 
 [[deps.QOI]]
 deps = ["ColorTypes", "FileIO", "FixedPointNumbers"]
@@ -2298,9 +1532,9 @@ version = "0.3.0"
 
 [[deps.SimplePolynomials]]
 deps = ["Mods", "Multisets", "Polynomials", "Primes"]
-git-tree-sha1 = "d073c45302132b324ca653e1053966b4beacc2a5"
+git-tree-sha1 = "ac7b9bd0d2d2ee86e9c7016fb76ff7c1037838e9"
 uuid = "cc47b68c-3164-5771-a705-2bc0097375a0"
-version = "0.2.11"
+version = "0.2.12"
 
 [[deps.SimpleRandom]]
 deps = ["Distributions", "LinearAlgebra", "Random"]
@@ -2629,9 +1863,9 @@ version = "1.3.7+1"
 
 [[deps.micromamba_jll]]
 deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
-git-tree-sha1 = "087555b0405ed6adf526cef22b6931606b5af8ac"
+git-tree-sha1 = "ed38e87f1a2f42427603a2a188b4ec5d9d28fb44"
 uuid = "f8abcde7-e9b7-5caa-b8af-a437887ae8e4"
-version = "1.4.1+0"
+version = "1.4.7+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -2657,144 +1891,33 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═fe301fc0-d32b-40e7-8ab8-17d81b6bcf8a
-# ╠═94e6fcb1-d73f-467b-97fa-82d536f1703b
-# ╠═0b3fe3e4-ae8e-4a58-955f-8c396f2047a8
-# ╠═908a8f10-6375-427a-97a5-cb2e5caf5cfb
-# ╟─b61002b8-38ae-40a7-8344-a58ecb0ebffa
-# ╟─13cdd42b-25c8-4f61-bc4e-1b5588aa9918
-# ╟─5161556a-deae-48c9-bf6c-36a8aaf5882d
-# ╟─9a39c2cb-d2e2-424d-a04d-ec52b47cd2dc
-# ╟─53fbf184-231b-488e-aaa9-0b0698be5a9e
-# ╟─5d7e3199-dc42-4870-904c-1906a99cfa97
-# ╟─bef5c3ec-8f59-4f4b-8b6a-ec22f5c9b8eb
-# ╟─4fadadf2-5b23-4038-92f2-8693918ca740
-# ╟─b839496c-bc56-4504-ab53-ae2f257bb4ba
-# ╟─4cacb360-625c-40e7-bdf9-437e700a1657
-# ╠═e1f7df8a-57c7-499e-b605-4be6604fae30
-# ╠═09a2bcab-1237-469e-ba0f-23cd9aad28d3
-# ╠═72576547-e113-44aa-9b17-34bb5a575277
-# ╟─a3f36b49-526a-47cf-a55c-2648d4a367f1
-# ╟─68487535-e065-4778-94e7-db8344cc6237
-# ╠═4bf65708-3747-4eba-b523-641223ff4d99
-# ╠═47220365-3466-4fb3-b86e-f0428e0d9fa9
-# ╠═9f3f770a-3ee5-4aec-9953-1b73641074c5
-# ╠═544eef1f-d204-425b-85ff-e25884721f5f
-# ╟─b6c7ac3d-f2aa-4c4f-b53d-75a8d5886839
-# ╠═24cd17dc-678b-4c7d-ab4a-bd5c0eeb8e76
-# ╠═0d5dceac-4230-4a2c-8783-1563e1738df4
-# ╠═f8daa2ec-5e87-48a8-92ac-609996d302b4
-# ╠═44ffdc2f-3ce5-4883-b1d5-555dc8a0dddd
-# ╟─5487b403-64cb-46f5-b007-ba563f9fc218
-# ╠═7afa8504-6f1e-4b5e-9d86-67227bf1bd7d
-# ╠═5ef84561-4daa-4b5d-ba97-d26b521554f3
-# ╟─75d86070-6ab0-488d-b53e-50f69cda76dc
-# ╠═fa4d3c70-f60d-4639-a176-9a61897c7088
-# ╠═419354e8-4975-43dc-a119-d3fadc02004a
-# ╟─08bbdbdf-3778-415d-813b-f81922f64215
-# ╟─3b55ae9d-855f-4dca-a293-ad235ed7c8ff
-# ╟─acd8c7a1-7ba1-4819-a91b-711cd9a3ac3b
-# ╟─f159263e-72a9-4417-9cf3-cfd9e18214ac
-# ╟─8a9fa30c-49f8-4ae0-81a7-93ce3b3792fc
-# ╟─25f81dd0-27e2-4613-be93-fb8a9b4d0c57
-# ╟─c139e863-0723-4cec-8131-3eda35a50e7a
-# ╠═9e603a65-87d1-48ba-8052-37c9cd2b3a43
-# ╠═14dfbbe8-5d0a-4572-8d22-3b73bbd22f93
-# ╠═9718a6c4-73ef-4fb7-a204-dd803fa5dc52
-# ╠═24c4be9c-7c05-4925-a1c9-5a9aaaf6d878
-# ╠═117b734a-0d5a-4a6f-b239-d6067f399ef5
-# ╠═394f87f0-1046-4835-a9a6-3682fb8a1f03
-# ╠═25877abf-5289-465e-8fab-7e147f1ca5b3
-# ╠═c7e9ba5f-5ce0-423c-86cd-015efca7137f
-# ╟─bc8c413f-8184-4d6d-a87b-a0ef3969c93a
-# ╠═293e81fe-1744-40f6-bd49-c7476d281eb2
-# ╠═7e47e8d2-65f3-4627-815c-d94212bac67b
-# ╠═451ae9c6-5ef6-4651-99bb-44132e844a89
-# ╠═5da3cbc8-6e1f-436a-a3b9-58c2992e2152
-# ╠═da87a788-7538-43bd-abc6-510acb8999ff
-# ╠═61120a25-bd56-4d22-8431-dc0734117db7
-# ╠═1a722ba9-266f-4fc4-a521-c5038550b45e
-# ╟─873551d7-aebb-41fc-8746-00c045d3a10f
-# ╟─3ece13e7-18e9-4449-88d1-1d6e39b001ec
-# ╟─3ece9a12-8071-409e-a313-c68135e20503
-# ╟─c7fe4490-fd11-4c51-89ac-770d3adaadc5
-# ╠═3446cb4b-3dad-4659-8e53-2ffab246e151
-# ╠═fc2f149c-3aa2-4f8d-b1f3-59a69d073cf8
-# ╟─946cb3e1-ba80-4b91-8afb-a9939ec6ef0b
-# ╟─c13032f9-d9ac-4856-a9eb-537c8c102827
-# ╟─77bfe4d8-c6ae-4832-8f00-a9e93bd1f540
-# ╠═f1d8eaa1-9741-4988-8135-ac439c5f3005
-# ╠═09c91686-5fab-4dfb-a906-3209abbbfa7d
-# ╠═5a972777-a650-445f-b930-a05818559415
-# ╠═3778e89a-b996-4fc2-87e1-b7a7af30cb56
-# ╠═2de36b1d-175f-496b-b5aa-6bc8dce4c064
-# ╠═37a2ffe4-49a3-46d6-87e5-dac31b9e82a8
-# ╠═e5f68df7-144c-43b2-bef7-0df8905997ca
-# ╠═3f5cabb9-546e-4cf3-8a79-2563d9d3ab61
-# ╟─27984f40-0d25-4216-95cb-8f15e1badd97
-# ╟─d898d7fd-b6f8-4ec4-bcd4-6fd6611a8e70
-# ╟─47894665-ac20-48f4-aa43-f6b27e854042
-# ╟─37f965aa-717d-43ec-adf5-8bc2790979b8
-# ╠═185b0b11-7862-49c5-a28b-6b2d8c97e0b0
-# ╠═0ebf5c1a-6287-4298-94f2-50361604bb0a
-# ╠═a45b5225-1c71-48a0-8cc4-0886dfe85cc3
-# ╠═34bc2428-06d4-404c-b0b8-ac5d978119a5
-# ╠═16b9644c-aa6a-4665-a96d-ae4aa86d0b88
-# ╠═541fb80a-63a6-4b66-8a03-69ae1e0f4553
-# ╠═cfd88052-e979-435b-bb41-2dc26552aa4a
-# ╠═160e03a0-545e-4d86-bd8f-5fe0180580c5
-# ╠═5bc43ec7-9720-411f-900e-cd5f3af68824
-# ╠═a3947c1e-3a5f-42fa-9ea3-7f0da19261c2
-# ╟─0c950c0c-a209-421f-8d25-b691a482334f
-# ╠═de382bf0-783d-487b-b3c0-83441bf7662a
-# ╠═c61be673-d114-47fc-9bfa-0457cf16aacf
-# ╠═8e2f5d10-a031-431a-a5a5-a475aa46533b
-# ╠═d84d7137-cb72-426a-8866-a5156e5334de
-# ╠═2bc5ce49-f52a-48d6-be64-a040052927af
-# ╠═2e34d2ed-14c2-4746-8b3e-58510a5edf86
-# ╠═13deb593-c204-4b77-808f-62a7e333418e
-# ╠═7e81d4a3-2e75-4321-879a-df8259a93c1e
-# ╠═5078c8e3-50ae-4312-ad4d-0e6416d8b360
-# ╟─32a3470d-2629-4e74-94fe-5383cb4af5b9
-# ╟─bfb3a382-f362-4b20-afb4-ae82af191a57
-# ╟─c00c7da9-b548-46c1-b53a-970539cc9780
-# ╟─088bd06b-5d6a-41c1-8a58-a4edbca9879e
-# ╠═933d3db0-470e-4e6b-8175-94290774af0c
-# ╠═710c5f83-871c-4eda-b10a-4f798c6b6fac
-# ╠═94df1dd9-ee4c-4d23-bbb6-b5331f4196b4
-# ╠═d85ad2a0-4cbc-45fb-a5dd-fbf0980181c0
-# ╟─81e6ddce-0e8a-4d57-8e9c-f827dd613b9b
-# ╠═b7151a26-b9c9-4329-a317-2131c35f3dbc
-# ╠═fc6e6bbd-8744-4369-bd7c-29e8f52c8048
-# ╟─25112cba-34af-4ad7-9af2-27bf6b560374
-# ╟─baa68d3f-8cd9-4f28-a8c6-a957ec5b3fb6
-# ╟─9efddcb3-6c01-494b-9512-e9d098868aae
-# ╟─a81a50ff-5d1a-4e77-9567-46ff2be1be80
-# ╠═528d1bb7-d56b-4f63-84a9-0a8035878c95
-# ╠═f4010731-0793-4342-a65f-21dfe418d608
-# ╠═cefd5ebb-041d-416d-8e05-390829e215f8
-# ╠═a3f4fa24-314a-42d3-b932-ce17cbb766c8
-# ╠═796ddfba-ef94-450c-9ce1-a87eeb9670a9
-# ╠═75b74bde-ab81-4414-af83-f1868b59657a
-# ╠═a1d4a670-ccb6-4bc5-8d35-4011d6003812
-# ╠═c6b8eb02-d3f8-419f-b3dd-0c67e810254a
-# ╟─512817e6-114d-4b80-b7a0-bc77c5c7c1ab
-# ╟─2e283fd3-7cec-4926-96fa-b719eb288328
-# ╠═760e58cc-d859-4ce5-8d6f-1f105ded77fe
-# ╠═76087030-4287-41a8-ae10-805188dc7f65
-# ╠═d5d3381c-bbcf-41e6-9cbd-b821126d4570
-# ╠═b3ae3846-26a3-4da0-9ca1-23400a22e2fe
-# ╠═effd8948-af6c-4040-ba06-3e31a784df8d
-# ╟─b51c8800-e410-4481-b853-0763caf20baa
-# ╟─a47e7c7a-bb5b-462a-87b3-69a6ddbe18b7
-# ╟─54468bc7-3115-4582-af0c-4d66f1cb0d3e
-# ╟─b1633978-2110-4bef-a704-2284b34bcadc
-# ╟─dae97f2e-a2a5-4265-8af6-d61c2bbd78ac
-# ╟─7b80df03-eeb4-4130-9b56-0a765a7d232b
-# ╠═37203e2b-8c2c-4fa0-997a-a8f59da022cc
-# ╠═c967a4b7-7c4d-41c0-b0f7-2b326c86ebde
-# ╠═49106849-ba23-45b4-90c4-54a13aa95b8d
-# ╠═fb10a998-87cb-476e-96d9-a232fa6fa5b8
-# ╟─c607bfcc-fa55-46eb-bc5f-b47fb5f2f34b
+# ╠═89a979f9-0d21-45c2-86bd-28ed2454af57
+# ╠═5ca9944e-d693-443a-b255-1dc09274a8da
+# ╠═ca9bfea0-3a7e-48a7-bdb0-ba35bf52469f
+# ╠═9fe6a62d-768a-4df6-bf95-1b16337292c1
+# ╟─7e19b01b-7e36-4448-859d-ba2b84af7370
+# ╟─f6900c14-f5b1-421f-9f22-af8bca069337
+# ╟─7899baa4-edfb-4a30-9a3b-869ec14e8600
+# ╟─4d6ac932-79b3-4634-88a6-a1aba147d699
+# ╟─f5d72d6d-868e-4fc9-bb36-9cb49668b11a
+# ╠═74fe191b-e78f-48ea-8634-911f8176df12
+# ╠═fef0b609-e963-4d39-a1da-bc3ecffe47b9
+# ╠═4f505723-c893-45d2-9524-553369b970c4
+# ╠═f4ad18b4-85cd-4da7-8ba0-c3f6b58d0cd3
+# ╠═86d8a4c2-1b13-42f8-bcc5-d65fa72704d0
+# ╠═3dcc030d-064f-44c3-976f-4e541ae6dc76
+# ╠═e78addf9-cc7c-453d-a1e8-9d79f440de2b
+# ╟─62d1c55e-0939-4f64-8aa8-253d5adee87d
+# ╟─45380cc3-e9b7-4827-b2a5-43bd9cfa9288
+# ╟─beba609f-3fea-4c15-9363-1491924b4a0c
+# ╠═f99d1ab7-3d43-49f2-8d6d-539ed124ace9
+# ╠═c6aa613e-ba82-4595-85fe-d98df8ef8411
+# ╠═f59d0369-17ab-4462-b797-bfd740d447c0
+# ╟─98b4dd13-1246-4ec4-ba88-84266f7e4bcc
+# ╟─eda89c38-5d66-4d86-8bff-3206e40396aa
+# ╟─3afc8307-5113-4bbf-93e0-960fa28725c9
+# ╟─8e85ed5b-ac8b-4322-a8cf-b6390a5f22eb
+# ╟─44822f3e-c131-4198-bff2-ed47d7c73e9b
+# ╟─3d6c7452-5aa8-4a6b-8a0c-ea0b63799ed1
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
