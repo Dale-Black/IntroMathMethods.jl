@@ -14,59 +14,59 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 3410c11b-c560-4ef1-a261-e5603edc4d65
+# ╔═╡ 9a313865-02b2-4d0d-88f1-2d864b6c1994
 # ╠═╡ show_logs = false
 using CondaPkg; CondaPkg.add("SymPy")
 
-# ╔═╡ 5accbc9a-553a-4417-b562-e7bc09464e02
+# ╔═╡ be2a42dc-9bc7-4f3f-8923-7cb8b8f44e31
 using PlutoUI, PythonCall, CairoMakie
 
-# ╔═╡ 4df50d93-e9d5-4527-9aae-80ababbe3727
+# ╔═╡ ba651d97-8963-450a-b3d0-0a1f8177ee2b
+md"""
+# Julia: The Ultimate Python Superset
+**Interactive Math with Python, Julia, and Glass Notebook**
+
+I recently stumbled upon what feels like a superpower: Julia & Python in harmony. Clearly, Julia (un?)fortunately does not classify as a superset of Python, but I am so amazed by the seamless interaction between Python and Julia that I felt this title was justified. 
+
+With all of the recent hype and discussion regarding fast "Python" (see [Mojo](https://www.modular.com/mojo), [LPython](https://lpython.org/blog/2023/07/lpython-novel-fast-retargetable-python-compiler/), etc.) and the recent JuliaCon excitement, I figured I would share my recent experience with Julia and Python together. This post is put together from my interactive Pluto notebooks, which are now available with [Glass Notebook](https://glassnotebook.io/)
+"""
+
+# ╔═╡ e0c651fa-c0a3-45e2-9f12-1a49af44732b
+html"""
+<img style="border: 1px solid; border-radius: 5px" src="https://i.imgur.com/zS5FJI6.gif" alt="Your GIF description">
+"""
+
+# ╔═╡ ad0ef2b4-04a8-435a-b444-b0578efd4959
+md"""
+## Introduction
+I am entering my first year of graduate studies at the University of California, Irvine, and as a big fan of Julia, I am going to use it everywhere I can. I am also an enthusiastic user of Pluto.jl, a reactive notebook environment for Julia, similar to Jupyter notebooks. Today, I want to show you something I stumbled upon recently. Namely, the seamless interaction between Julia and Python using a few tools in the Julia ecosystem: [Pluto.jl](https://github.com/fonsp/Pluto.jl), and [PythonCall.jl](https://github.com/cjdoris/PythonCall.jl), along with the fantastic [SymPy](https://www.sympy.org/en/index.html) library from Python.
+
+This post aims to (1) introduce you to some mathematical concepts (which will hopefully continue into a full blog series), (2) show off the power of Julia and Pluto notebooks, and (3) highlight our new product: [Glass Notebook](https://glassnotebook.io/) (which is what you're currently viewing). Glass Notebook is a platform that makes it simple to publish interactive Pluto notebooks online by linking your GitHub repo. That means Julia, Python, Markdown, Latex, and even interactive charts are ready to go with one click. If you're intrigued, feel free to sign up for the waitlist on our [website](https://glassnotebook.io/).
+"""
+
+# ╔═╡ 5158445d-f7cb-43ce-a006-27784cf61453
+md"""
+## Toolkit
+Before we dive into the mathematics, let me explain a bit about the tools I'm using. I'm a big fan of Julia, a high-level, high-performance programming language. While it is a general-purpose language and can be used to write any application, many features are well suited for numerical analysis and computational science.
+
+In addition, I'm using Pluto.jl, a Julia package that provides a lightweight, reactive notebook environment. The key feature of Pluto is its reactivity: when you change a piece of code, all the affected parts of your notebook automatically update. This is a fantastic feature for exploratory data analysis, teaching, learning, working with data, or prototyping algorithms. By integrating Pluto.jl with Makie.jl, a Julia plotting library, you unlock a powerful combination for interactive computing and visualization.
+
+Last but not least, I'm using PythonCall.jl and SymPy. PythonCall.jl is a package that allows us to call Python functions and methods directly from Julia. SymPy, on the other hand, is a Python library for symbolic mathematics. By combining these two, we can harness the power of SymPy's symbolic computation right inside our Julia notebook.
+"""
+
+# ╔═╡ 422ba6fc-00c3-4609-a95a-fd15cd469c5b
 sp = pyimport("sympy");
 
-# ╔═╡ 4227af63-3895-425e-800b-86d2dd95ac9b
+# ╔═╡ afa8b40d-d6b0-4b00-87cd-79d5f2d861cc
 TableOfContents()
 
-# ╔═╡ a1c0b046-d1ec-4dbe-a4e2-842861d2a96a
+# ╔═╡ 5b7a3438-c5e7-4bfc-a114-568d85fdcdf8
 md"""
-# Introduction
-I am entering my first year of graduate studies at the University of California, Irvine and as a big fan of Julia, I am going to attempt to use it everywhere I can. This course is not meant to be a computational mathematics course, but I feel like it's the perfect onramp for someone like me to get a grasp of computational symbolics, which is a fundamental skill that will be important throughout the rest of my graduate physics studies. I started out with the intention of doing everything "by hand" and in pure Julia, using the [Symbolics.jl](https://symbolics.juliasymbolics.org/stable/) ecosystem. Although Symbolics.jl is already extremely impressive for it's area of focus, it isn't quite ready to replace something like Mathematica for physicists. Still, I absolutely love Julia, Pluto.jl (these reactive notebooks), Makie.jl (plotting), Julia syntax (θ, y₁, etc), and all of the other features that come with this language, so I didn't want to abandon this idea.
-
-Luckily, the amazing library [PythonCall.jl](https://github.com/cjdoris/PythonCall.jl) combined with [SymPy](https://www.sympy.org/en/index.html) saved the day. I am sure to encounter some rough edges eventually, but being able to use Python and sympy from a Pluto notebook for my homework and notes has been heavenly.
-
-I am going to attempt to write these notebooks in a way that could serve as a blog post if I want. There are a few reasons for that - (1) maybe this will encourage Python developers to give Julia a look, (2) Julia makes math much more fun and trying to implement mathematical concepts in code helps me understand these concepts at a deeper level, (3) writing this in blog format (and potentially publishing on something like substack/medium) will force me to not only implement these concepts for homework problems but also understand them deeply enough to explain them to others, and (4) our new product [Glass Notebook](https://glassnotebook.io) is now functional so publishing interactive Pluto notebooks is super simple!
+## Problems
+From the book "Basic Training In Mathematics: A fitness program for science students"
 """
 
-# ╔═╡ dc6153be-1e46-4905-8bc2-22f3625766cb
-md"""
-# Differential Calculus of One Variable
-
-**Homework Problems**
-- 1.2.1
-- 1.2.2 
-- 1.3.3 
-- 1.6.1  
-- 1.6.7
-- 1.6.12
-"""
-
-# ╔═╡ 40a9c9df-5753-45c8-ad7f-a061f5f95217
-md"""
-## Differential Calculus
-"""
-
-# ╔═╡ cc912e2a-dbeb-406a-87fd-29f7ca8c9b83
-md"""
-The *derivative* of the function, denoted by ``f'(x)``, ``f^(1)``, ``Df``, or ``\frac{df}{dx}`` is defined by
-
-```math
-\begin{align*}
-\frac{df}{dx} &= \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \\
-\end{align*}
-```
-"""
-
-# ╔═╡ cf5bc48a-f371-4775-bdf8-49e23a20fa8f
+# ╔═╡ e0594465-a40c-4f50-a583-7539505b18f5
 md"""
 !!! info "Problem 1.2.1"
 	Now let's take a look at problem 1.2.1 from the book. It says
@@ -93,7 +93,7 @@ md"""
 	```
 """
 
-# ╔═╡ d0b255e2-1e55-4cc3-add4-c2835ae3320c
+# ╔═╡ 8c40297e-44da-4370-9df0-0e1aa8d16b5e
 md"""
 !!! warning "By Hand"
 	Let's first answer this question "by hand" and write out the step-by-step calculations
@@ -107,96 +107,30 @@ md"""
 	```
 """
 
-# ╔═╡ 923a2a6a-3250-416e-98ef-a2f174b2e39d
+# ╔═╡ 12fc0871-ed31-4841-a676-1a8200ccf036
 md"""
 #### With SymPy
-Now let's use SymPy to check our answer
+But that's not interesting. Let's employ SymPy to automate much of this process for us.
 """
 
-# ╔═╡ aff78df5-0920-49c2-bcb1-84bf80d68b43
+# ╔═╡ d80b3177-191c-4bdd-b429-cef7a47286d8
 x = sp.symbols("x")
 
-# ╔═╡ 37293b01-db57-42ba-a535-78474f98a760
+# ╔═╡ f564947d-61a6-46db-a06f-91b339405631
 u = x^2 + 1
 
-# ╔═╡ 05132b78-af6c-47bc-9981-8a3f9d1ceb8d
+# ╔═╡ 3aa07746-d6ed-488b-9005-7b57a28b2c3a
 f = u^2
 
-# ╔═╡ e85faf70-7001-4e7d-af72-b248bfa18c30
+# ╔═╡ 8974e8ec-8616-42fa-a987-86fe6cad626f
 sp.diff(f, x)
 
-# ╔═╡ 55ef9d3e-de07-46fa-b5b5-79aec7b1b82f
+# ╔═╡ 4042e656-ee06-475a-9f9d-79802e91bb68
 md"""
-!!! info "Problem 1.2.2"
-
-	Problem 1.2.2 says
-	
-	Show from first principles that 
-	
-	```math
-	\begin{aligned}
-	D(1/x) = -1/x^2
-	\end{aligned}
-	```
+Notice how latex is automatically rendered for us 🥳
 """
 
-# ╔═╡ 81002f85-42b6-46a7-afeb-c4254b021318
-md"""
-!!! warning "By Hand"
-
-	Given: 
-	```math
-	\begin{aligned}
-	\frac{df}{dx} = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
-	\end{aligned}
-	```
-	```math
-	\begin{aligned}
-	f(x) &= \frac{1}{x} \\
-	\end{aligned}
-	```
-	
-	
-	Answer:
-	```math
-	\begin{align*}
-	\frac{df}{dx} &= \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \\
-	&= \lim_{h \to 0} \frac{\frac{1}{x + h} - \frac{1}{x}}{h} \\
-	&= \lim_{h \to 0} \frac{-1}{x(x + h)} \\
-	&= \frac{1}{x^2} \\
-	\therefore \frac{d}{dx}\left(\frac{1}{x}\right) &= \boxed{-\frac{1}{x^2}}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ efdad68b-48ca-4094-801e-6cb953953104
-md"""
-#### With SymPy
-Let's check our answer using SymPy. This will be a trend as you will see.
-"""
-
-# ╔═╡ cf59b175-1908-44ce-b68c-7142e5cd7631
-f2 = 1/x
-
-# ╔═╡ 880c2448-80ae-4a9b-b8b7-d485829164cb
-sp.diff(f2, x)
-
-# ╔═╡ 29a6b261-8db8-4c98-866b-d82afd4df6ff
-md"""
-The "formula" for computing any derivative can be found using the binomial theorem and some work. This is shown below
-```math
-\begin{aligned}
-Dx^n = n x^{n-1}
-\end{aligned}
-```
-"""
-
-# ╔═╡ baa7f78f-45aa-4804-9eee-82b9dd2b4696
-md"""
-## Exponential and Log Functions
-"""
-
-# ╔═╡ 16ac7078-22b0-452a-8a66-d00ce11fee89
+# ╔═╡ e51f0e5b-2e20-40b1-aeea-5945dbfe9db7
 md"""
 !!! info "Problem 1.3.3"
 	Problem 1.3.3 says:
@@ -219,7 +153,7 @@ md"""
 
 """
 
-# ╔═╡ 742a87c9-4967-42d2-9ed2-781a280ee750
+# ╔═╡ 6803d7d7-6c3c-41f5-9a51-cbb79ba49612
 md"""
 !!! warning "By Hand"
 
@@ -253,61 +187,58 @@ md"""
 	```
 """
 
-# ╔═╡ 9ca1bbac-413b-498d-9627-53745e7ec04b
+# ╔═╡ 9ba9bd01-5e94-4a73-8e43-cb4537d3b3d3
 md"""
 #### With SymPy
+Now with PythonCall.jl we can seamlessly interact with SymPy in a Pluto notebook.
 """
 
-# ╔═╡ 63a0bd0e-3c1b-4e2b-a895-b0f740d6e04a
+# ╔═╡ 89d671c6-d3ca-493f-b46d-b6683f846888
 md"""
 First, let's check that we understand the basic Taylor series expansion for ``e^x`` and ``e^-{x}``, then let's create series expansion functions for `sinh` and `cosh` that utilizes the exponential form
 """
 
-# ╔═╡ 5c359259-8d97-4a0b-91e7-14178eef4b5b
+# ╔═╡ 1fd725b2-7c7d-4b60-be32-6ff0fe0f30f7
 sp.series(sp.exp(x), n = 4)
 
-# ╔═╡ c0a9481e-b9d4-440f-8bc1-b42745c9f6dd
+# ╔═╡ 9d335909-16f0-45b1-8c19-181d08444bdc
 md"""
 Great, now we can set up the `cosh` and `sinh` Taylor series expansions, using the Taylor series expansions for ``e`` that we verified above
 """
 
-# ╔═╡ df9a44a7-e3f2-4eaf-8810-e83c3d542328
+# ╔═╡ 84520cc8-fe52-4388-9444-36c478d6b831
 function series_sinh(f, n)
     return (sp.series(sp.exp(x), n = 4) - sp.series(sp.exp(-x), n = 4)) / 2
 end
 
-# ╔═╡ 5407f327-4ec0-4b06-84c9-590cfa513934
+# ╔═╡ 6bd4261d-bfef-429a-821f-3e6b63f549e2
 function series_cosh(f, n)
     return (sp.series(sp.exp(x), n = 4) + sp.series(sp.exp(-x), n = 4)) / 2
 end
 
-# ╔═╡ fafc59e5-e0eb-4250-97b1-81e9da1318cc
+# ╔═╡ 735b095c-0376-4f36-9b85-858476dcc1d3
 md"""
 Taking these expansions to the 5th term, gives us the exact results as our "by hand" approach. The only difference is the factorials (``!``) have been computed
 """
 
-# ╔═╡ d033c49a-97ef-4e6d-89e9-62dc1b09dd82
+# ╔═╡ cf51abd3-a9dc-410f-9937-757d3a6393ef
 series_sinh(x, 5)
 
-# ╔═╡ ca4d7d12-8647-4597-bb74-a126ef6ff2f9
+# ╔═╡ bb988269-4b9d-4777-a736-028c6297f43a
 series_cosh(x, 5)
 
-# ╔═╡ 268f4572-4d71-473a-976a-9710ba038aa2
+# ╔═╡ f323d299-b32c-42d8-a0cb-0a45ab5b8ec0
 md"""
-## Plotting functions
+## Interactivity
+This post would not be complete without showcasing the amazing interactivity this workflow allows.
+
+With our foray into series expansions, I thought it would make for a nice visual if I included an interactive plot demonstrating how the Taylor series approximation improves as the approximation order increases, which is something this notebook will dive into later, but for now, let's demonstrate this:
 """
 
-# ╔═╡ 437c5c60-6e5f-4d7b-8aa9-7c4eed0d2a2a
-md"""
-This sections explains the basics of plotting functions by hand. Instead of going through that, I think it would be insightful to show how a Taylor series approximation of ``e^x`` improves with increasing `n` terms. This will showcase the power of Pluto.jl, PythonCall.jl/Sympy, Makie.jl, Symbolics.jl, and even [Glass Notebook](https://glassnotebook.io/).
-
-*Notice how easy it is to convert from a Python object to Julia* 🎉😍
-"""
-
-# ╔═╡ 6e10a792-76f7-470a-9906-1f0482cb5d4f
+# ╔═╡ 1526c75c-eb16-4d31-9376-2132f0c4b6d9
 @bind n_term PlutoUI.Slider(1:5; show_value = true)
 
-# ╔═╡ 560016e6-2649-488f-8523-679bdd113e79
+# ╔═╡ 2f123263-6928-4e12-9d70-1312b6f115c0
 begin
 	xs = collect(-1:0.1:1)
 	ys = exp.(xs)
@@ -316,7 +247,7 @@ begin
 	taylor_series_ys = [pyconvert(Float64, exp_series.subs(x, i)) for i in xs]
 end
 
-# ╔═╡ b827bbe1-8f3b-42a5-a074-f9ed5d3599a4
+# ╔═╡ c681fbe1-0dd8-4702-9910-9959288dc568
 let
 	f = Figure()
 	ax = Axis(f[1, 1])
@@ -330,343 +261,18 @@ let
 	f
 end
 
-# ╔═╡ 47c8993f-a468-4bc1-a56b-9604a0f66a2d
+# ╔═╡ 88f71931-00f9-43e6-bf9c-f681d83fd809
 md"""
+*Notice how easy it is to convert from a Python object to Julia* 🎉😍
+
 We can see from above, as we increase the amount of terms ``n`` in the expansion by moving the `Slider`, the Taylor series approximation approaches the ground truth ``e^x``
 """
 
-# ╔═╡ bfe68fab-ac5e-47cd-8b65-7f583e742a64
+# ╔═╡ bf3247a7-06d1-498f-94e3-34923fb0a035
 md"""
-## Miscellaneous Problems on Differential Calculus
-"""
+## What's Next
 
-# ╔═╡ d352fe25-3447-4423-8c35-61b0905175a0
-md"""
-!!! info "Problem 1.6.1"
-	
-	Expand the function ``f(x) = \sin(x) / (\cosh(x) + 2)`` in a Taylor series around the origin going up to ``x^3``. Calculate ``f(0.1)`` from this series and compare to the exact answer obtained from a calculator
-"""
-
-# ╔═╡ f09b2c80-6e3f-4cba-82f8-d9e96b181677
-md"""
-!!! warning "By Hand"
-
-	Given the Taylor series expansion
-	```math
-	\begin{align*}
-	f(x) &= f(0) + f'(0)(x) + \frac{f''(0)}{2!}(x^2) + \frac{f'''(0)}{3!}(x^3)
-	\end{align*}
-	```
-
-	We can find the first three derivatives and plug them in. (*This would take forever to do by hand, so I just used Symbolics.jl and Latexify.jl and copy-pasted these in, see below*)
-	```math
-	\begin{align*}
-	f'(x) &= \frac{\cos\left( x \right)}{2 + \cosh\left( x \right)} - \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right) \\
-
-	f''(x) &= \frac{ - \sin\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cosh\left( x \right) \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
-	&- \left( \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
-	&- \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \sinh\left( x \right)\\
-
-	f'''(x) &= \frac{ - \cos\left( x \right) \cosh\left( x \right) - \sin\left( x \right) \sinh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\
-	&+ \left( \frac{ - \cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} + 2 \left( 2 + \cosh\left( x \right) \right) \frac{\sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \sinh\left( x \right) \right) \cosh\left( x \right) \\ 
-	&+ \frac{ - \cos\left( x \right)}{2 + \cosh\left( x \right)} + \frac{ - \cos\left( x \right) \cosh\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} \\ 
-	&- \left( \frac{ - \sin\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{2}} - 2 \frac{\cos\left( x \right)}{\left( 2 + \cosh\left( x \right) \right)^{4}} \left( 2 + \cosh\left( x \right) \right) \sinh\left( x \right) \right) \sinh\left( x \right) \\ 
-	&+ \ ...
-	\end{align*}
-	```
-
-	Evaluating these at ``x = 0`` gives:
-	```math
-	\begin{align*}
-	f(0) &= 0 \\
-	f'(0) &= \frac{1}{3} \\
-	f''(0) &= 0 \\
-	f'''(0) &= -\frac{2}{3} \\
-	\end{align*}
-	```
-
-	The Taylor series expansion of ``f(x)`` around ``x = 0`` up to ``x^3`` is then:
-	```math
-	\begin{align*}
-	f(x) &= \frac{1}{3}x - \frac{2}{3}x^3 \\
-	f(0.1) &= 0.032667
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 74e10394-f509-42dd-8be7-2e8fd1705871
-md"""
-Too lazy to calculate these derivatives truly by hand, so this is cheating
-"""
-
-# ╔═╡ 3b72dfe5-f5e4-4a5b-8918-0dd66c212825
-let
-	f = sp.sin(x) / (sp.cosh(x) + 2)
-	
-	dfx, dfxx, dfxxx = sp.diff(f, x), sp.diff(f, x, x), sp.diff(f, x, x, x)
-	@info dfx
-	@info dfxx
-	@info dfxxx
-
-	@info f.subs(x, 0)
-	@info dfx.subs(x, 0)
-	@info dfxx.subs(x, 0)
-	@info dfxxx.subs(x, 0)
-end
-
-# ╔═╡ 0b649dd0-c6cb-494d-a13c-948cf3a464bb
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 79246c9b-4ad8-435f-a6b1-89ab4693554b
-md"""
-This is a great example of where a computer and SymPy comes in handy. Taking all those derivatives by hand was tedius. Let's see how SymPy can solve this. First let's create a function for the Taylor series about the origin
-"""
-
-# ╔═╡ a3745d6d-3354-4281-9375-cf5502f2cdf7
-f3 = sp.sin(x) / (sp.cosh(x) + 2)
-
-# ╔═╡ 40963988-c90e-4df5-b29f-9f7a1bb218f4
-f3.subs(x, 0.1)
-
-# ╔═╡ 03d69820-2aa1-4f9f-878d-a8c4af5be844
-f3_ts = sp.series(f3, x, n = 4).removeO()
-
-# ╔═╡ e8156dab-18b0-4be8-b30c-b0532d340382
-f3_ts.subs(x, 0.1)
-
-# ╔═╡ c04e573c-e870-4ab6-9a2d-566e676786f5
-md"""
-We see above that the taylor series expansion of the function `f_ts` is approximately equal to the true function at ``f(0.1)``
-"""
-
-# ╔═╡ e504618c-539d-424c-ba78-e8e180efec70
-md"""
-!!! info "Problem 1.6.7"
-	A wire of length ``L`` is used to fence a rectangular piece of land. For a rectangle of general aspect ratio compute the area of the rectangle. Use the rule for finding the maximum of a function to find the shape that gives the largest area. Find this area. 
-"""
-
-# ╔═╡ d0954565-974e-4fc5-817b-214275fff618
-md"""
-!!! warning "By Hand"
-
-	Let's denote the length and width of the rectangle as ``x`` and ``y`` respectively. Given that the perimeter of the rectangle is ``L``, we have:
-
-	```math
-	\begin{align*}
-	2x + 2y &= L \\
-	y &= \frac{L - 2x}{2}
-	\end{align*}
-	```
-
-	Area
-	```math
-	\begin{align*}
-	A(x) = x \cdot \frac{L - 2x}{2}
-	\end{align*}
-	```
-
-	Maximum area
-	```math
-	\begin{align*}
-	A'(x) & = 0 \\
-	A'(x) &= \frac{L}{2} - 2x\\
-	x &= \boxed{\frac{L}{4}} \\ \\
-
-	y &= \frac{L - 2x}{2} \\
-	y &= \frac{L - 2(\frac{L}{4})}{2} \\
-	y &= \boxed{\frac{L}{4}}
-	\end{align*}
-	```
-
-	```math
-	\begin{align*}
-
-	\end{align*}
-	```
-"""
-
-# ╔═╡ 98f0c338-ea99-426b-a5e6-efec73a6755f
-md"""
-#### With Symbolics
-*Note, the tricky `[0]`* : When working with Julia, the index starts at 1 but in Python the index starts at 0
-"""
-
-# ╔═╡ db2627d8-9f85-4b13-8de6-73d6e2da984e
-y, L = sp.symbols("y"), sp.symbols("L")
-
-# ╔═╡ 71154263-d87b-4ab3-9459-4a9b75d3f498
-perimeter = sp.Eq(2y + 2x, L)
-
-# ╔═╡ f739f755-f317-435c-b9b9-020431417230
-y0 = sp.solve(perimeter, y)[0]
-
-# ╔═╡ c023b9a3-f869-4f84-bf49-cb11c2feeffd
-area = x*(y0)
-
-# ╔═╡ c6500315-9e8e-48d4-93bd-250f024c7e3f
-dxda = sp.diff(area, x)
-
-# ╔═╡ 4113fc21-7b00-40fe-8aa1-c9ba709c876d
-x_ = sp.solve(sp.Eq(dxda, 0), x)[0]
-
-# ╔═╡ 3e9dac40-ff49-490a-9913-416b4c56d732
-y_ = y0.subs(x, x_)
-
-# ╔═╡ 11bc8845-bffc-4afc-997d-3e09acaeead6
-md"""
-!!! info "Problem 1.6.12"
-	Find the slope at the point (2, 3) on the ellipse ``3x^2 + 4y^2 = 48`` using implicit differentiation
-"""
-
-# ╔═╡ 02dcca30-576d-43ae-b20d-3e1321d69ab6
-md"""
-!!! warning "By Hand"
-	```math
-	\begin{align*}
-	3x^2 + 4y^2 &= 48 \\
-	\frac{d}{dx}(3x^2 + 4y^2) &= \frac{d}{dx}(48) \\
-	6x + 8 \frac{dy}{dx}(y) &= 0 \\
-	\frac{dy}{dx} &= \frac{-6x}{8y} \\
-	\frac{dy}{dx} &= \boxed{\frac{-1}{2}}
-	\end{align*}
-	```
-"""
-
-# ╔═╡ e2a81df9-1065-44ae-a03b-eafceec4565c
-md"""
-#### With SymPy
-"""
-
-# ╔═╡ 8a29293e-edf8-4250-a9d9-581a5fd38d9e
-f4 = 3x^2 + 4y^2 - 48
-
-# ╔═╡ a26482db-e494-4c17-bf15-ff743ba71338
-dxdy = sp.idiff(f4, y, x)
-
-# ╔═╡ 84a517a5-e3c0-4c73-a3e6-2ae714eec0e2
-dxdy.subs([(x, 2), (y, 3)])
-
-# ╔═╡ 80dd6ef1-cf9a-4651-804f-59d67a9d0b91
-md"""
-# Summary
-
-There were many ideas discussed in this chapter of the book, and although this notebook doesn't touch on all of them, the book does a nice job at summarizing the most important concepts, which I included below. I am genuinely amazed by how smooth this combination of Pluto.jl/PythonCall.jl/SymPy is. I am looking forward to learning about symbolic computing through these exercises and playing around with different ways of formatting these Pluto.jl notebooks and tutorials. 
-
----
-Definition of the deriative
-
-- derivative of a product of functions
-
-```math
-\begin{align*}
-&D(fg) = gDf + fDg \\
-\end{align*}
-```
-- a quotient of two functions
-```math
-\begin{align*}
-D(\frac{f}{g}) &= \frac{[gDf - fDg]}{g^2} \\
-\end{align*}
-```
-
-- chain rule for a function of a function
-```math
-\begin{align*}
-\frac{df(u(x))}{dx} = \frac{df}{du} \cdot \frac{du}{dx}
-\end{align*}
-```
----
-
-The notion of the Taylor series
-
-- about the origin
-```math
-\begin{align*}
-f(x) = f(0) + xf^{(1)}(0) + \frac{x^2}{2!}f^{(2)}(0) + ...
-\end{align*}
-```
-
-- about point a
-```math
-\begin{align*}
-f(a + x) = f(a) + xf^{(1)}(a) + \frac{x^2}{2!}f^{(2)}(a) + ...
-\end{align*}
-```
----
-
-The following series
-```math
-\begin{align*}
-e^x &= 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + ... \\
-e^x &= \lim_{N \to \infty} [1 + \frac{x}{N}]^N \\
-\cos(x) &= 1 - \frac{x^2}{2!} + ... \\
-\sin(x) &= x - \frac{x^3}{3!} + ... \\
-(1 + x)^p &= 1 + px + \frac{(p)(p-1)}{2}x^2 + ...
-\end{align*}
-```
----
-
-Definition of the hyperbolic function
-
-- in particular their symmetry under ``x \to -x``
-```math
-\begin{align*}
-\cosh(x) &= \frac{e^x + e^{-x}}{2} \\
-\sinh(x) &= \frac{e^x - e^{-x}}{2} \\
-\end{align*}
-```
-
-- and functional identities, especially
-```math
-\begin{align*}
-\cosh^2(x) - \sinh^2(x) = 1
-\end{align*}
-```
-
-- if you need a formula for ``\cosh(2x)`` or any other identity, you can get it from the definitieon of the hyperbolic functions in terms of exponentials - the power series can also be obtained in a similar approach
----
-
-The ``\ln(x)`` function
-
-- the identity
-```math
-\begin{align*}
-x = e^{\ln(x)}
-\end{align*}
-```
-
-- and the series
-```math
-\begin{align*}
-\ln(1 + x) = x - \frac{x^2}{2} + \frac{x^3}{3} + ...
-\end{align*}
-```
-
-- and its derivative
-```math
-\begin{align*}
-D\ln(x) &= \frac{1}{x} \\
-x^a &= e^{a \ln(x)}
-\end{align*}
-```
----
-
-Trig functions, identities, derivatives, radian measures, etc will not be listed since it's expected that we know them by heart
-
----
-
-Definition of a differential
-
-- exact relation
-```math
-\begin{align*}
-df = f'dx
-\end{align*}
-```
-
-which defines ``df`` in terms of the derivative at the point ``x`` and that as ``dx \to 0``, ``df \to \Delta f``, the actual change in ``f``
+This post is a brief introduction to one of my initial graduate courses. Although little math has been involved so far, you can find all the homework problems in the following notebooks. I plan to expand this into a full-fledged blog series, offering high-level insights into each chapter throughout the course. Feel free to visit the [GitHub repo](https://github.com/Dale-Black/IntroMathMethods.jl) if you'd like to explore further or assist in enhancing these notebooks!
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2340,73 +1946,39 @@ version = "3.5.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═3410c11b-c560-4ef1-a261-e5603edc4d65
-# ╠═5accbc9a-553a-4417-b562-e7bc09464e02
-# ╠═4df50d93-e9d5-4527-9aae-80ababbe3727
-# ╠═4227af63-3895-425e-800b-86d2dd95ac9b
-# ╟─a1c0b046-d1ec-4dbe-a4e2-842861d2a96a
-# ╟─dc6153be-1e46-4905-8bc2-22f3625766cb
-# ╟─40a9c9df-5753-45c8-ad7f-a061f5f95217
-# ╟─cc912e2a-dbeb-406a-87fd-29f7ca8c9b83
-# ╟─cf5bc48a-f371-4775-bdf8-49e23a20fa8f
-# ╟─d0b255e2-1e55-4cc3-add4-c2835ae3320c
-# ╟─923a2a6a-3250-416e-98ef-a2f174b2e39d
-# ╠═aff78df5-0920-49c2-bcb1-84bf80d68b43
-# ╠═37293b01-db57-42ba-a535-78474f98a760
-# ╠═05132b78-af6c-47bc-9981-8a3f9d1ceb8d
-# ╠═e85faf70-7001-4e7d-af72-b248bfa18c30
-# ╟─55ef9d3e-de07-46fa-b5b5-79aec7b1b82f
-# ╟─81002f85-42b6-46a7-afeb-c4254b021318
-# ╟─efdad68b-48ca-4094-801e-6cb953953104
-# ╠═cf59b175-1908-44ce-b68c-7142e5cd7631
-# ╠═880c2448-80ae-4a9b-b8b7-d485829164cb
-# ╟─29a6b261-8db8-4c98-866b-d82afd4df6ff
-# ╟─baa7f78f-45aa-4804-9eee-82b9dd2b4696
-# ╟─16ac7078-22b0-452a-8a66-d00ce11fee89
-# ╟─742a87c9-4967-42d2-9ed2-781a280ee750
-# ╟─9ca1bbac-413b-498d-9627-53745e7ec04b
-# ╟─63a0bd0e-3c1b-4e2b-a895-b0f740d6e04a
-# ╠═5c359259-8d97-4a0b-91e7-14178eef4b5b
-# ╟─c0a9481e-b9d4-440f-8bc1-b42745c9f6dd
-# ╠═df9a44a7-e3f2-4eaf-8810-e83c3d542328
-# ╠═5407f327-4ec0-4b06-84c9-590cfa513934
-# ╟─fafc59e5-e0eb-4250-97b1-81e9da1318cc
-# ╠═d033c49a-97ef-4e6d-89e9-62dc1b09dd82
-# ╠═ca4d7d12-8647-4597-bb74-a126ef6ff2f9
-# ╟─268f4572-4d71-473a-976a-9710ba038aa2
-# ╟─437c5c60-6e5f-4d7b-8aa9-7c4eed0d2a2a
-# ╠═560016e6-2649-488f-8523-679bdd113e79
-# ╟─6e10a792-76f7-470a-9906-1f0482cb5d4f
-# ╟─b827bbe1-8f3b-42a5-a074-f9ed5d3599a4
-# ╟─47c8993f-a468-4bc1-a56b-9604a0f66a2d
-# ╟─bfe68fab-ac5e-47cd-8b65-7f583e742a64
-# ╟─d352fe25-3447-4423-8c35-61b0905175a0
-# ╟─f09b2c80-6e3f-4cba-82f8-d9e96b181677
-# ╟─74e10394-f509-42dd-8be7-2e8fd1705871
-# ╠═3b72dfe5-f5e4-4a5b-8918-0dd66c212825
-# ╟─0b649dd0-c6cb-494d-a13c-948cf3a464bb
-# ╟─79246c9b-4ad8-435f-a6b1-89ab4693554b
-# ╠═a3745d6d-3354-4281-9375-cf5502f2cdf7
-# ╠═40963988-c90e-4df5-b29f-9f7a1bb218f4
-# ╠═03d69820-2aa1-4f9f-878d-a8c4af5be844
-# ╠═e8156dab-18b0-4be8-b30c-b0532d340382
-# ╟─c04e573c-e870-4ab6-9a2d-566e676786f5
-# ╟─e504618c-539d-424c-ba78-e8e180efec70
-# ╟─d0954565-974e-4fc5-817b-214275fff618
-# ╟─98f0c338-ea99-426b-a5e6-efec73a6755f
-# ╠═db2627d8-9f85-4b13-8de6-73d6e2da984e
-# ╠═71154263-d87b-4ab3-9459-4a9b75d3f498
-# ╠═f739f755-f317-435c-b9b9-020431417230
-# ╠═c023b9a3-f869-4f84-bf49-cb11c2feeffd
-# ╠═c6500315-9e8e-48d4-93bd-250f024c7e3f
-# ╠═4113fc21-7b00-40fe-8aa1-c9ba709c876d
-# ╠═3e9dac40-ff49-490a-9913-416b4c56d732
-# ╟─11bc8845-bffc-4afc-997d-3e09acaeead6
-# ╟─02dcca30-576d-43ae-b20d-3e1321d69ab6
-# ╟─e2a81df9-1065-44ae-a03b-eafceec4565c
-# ╠═8a29293e-edf8-4250-a9d9-581a5fd38d9e
-# ╠═a26482db-e494-4c17-bf15-ff743ba71338
-# ╠═84a517a5-e3c0-4c73-a3e6-2ae714eec0e2
-# ╟─80dd6ef1-cf9a-4651-804f-59d67a9d0b91
+# ╟─ba651d97-8963-450a-b3d0-0a1f8177ee2b
+# ╟─e0c651fa-c0a3-45e2-9f12-1a49af44732b
+# ╟─ad0ef2b4-04a8-435a-b444-b0578efd4959
+# ╟─5158445d-f7cb-43ce-a006-27784cf61453
+# ╠═9a313865-02b2-4d0d-88f1-2d864b6c1994
+# ╠═be2a42dc-9bc7-4f3f-8923-7cb8b8f44e31
+# ╠═422ba6fc-00c3-4609-a95a-fd15cd469c5b
+# ╠═afa8b40d-d6b0-4b00-87cd-79d5f2d861cc
+# ╟─5b7a3438-c5e7-4bfc-a114-568d85fdcdf8
+# ╟─e0594465-a40c-4f50-a583-7539505b18f5
+# ╟─8c40297e-44da-4370-9df0-0e1aa8d16b5e
+# ╟─12fc0871-ed31-4841-a676-1a8200ccf036
+# ╠═d80b3177-191c-4bdd-b429-cef7a47286d8
+# ╠═f564947d-61a6-46db-a06f-91b339405631
+# ╠═3aa07746-d6ed-488b-9005-7b57a28b2c3a
+# ╠═8974e8ec-8616-42fa-a987-86fe6cad626f
+# ╟─4042e656-ee06-475a-9f9d-79802e91bb68
+# ╟─e51f0e5b-2e20-40b1-aeea-5945dbfe9db7
+# ╟─6803d7d7-6c3c-41f5-9a51-cbb79ba49612
+# ╟─9ba9bd01-5e94-4a73-8e43-cb4537d3b3d3
+# ╟─89d671c6-d3ca-493f-b46d-b6683f846888
+# ╠═1fd725b2-7c7d-4b60-be32-6ff0fe0f30f7
+# ╟─9d335909-16f0-45b1-8c19-181d08444bdc
+# ╠═84520cc8-fe52-4388-9444-36c478d6b831
+# ╠═6bd4261d-bfef-429a-821f-3e6b63f549e2
+# ╟─735b095c-0376-4f36-9b85-858476dcc1d3
+# ╠═cf51abd3-a9dc-410f-9937-757d3a6393ef
+# ╠═bb988269-4b9d-4777-a736-028c6297f43a
+# ╟─f323d299-b32c-42d8-a0cb-0a45ab5b8ec0
+# ╠═2f123263-6928-4e12-9d70-1312b6f115c0
+# ╟─1526c75c-eb16-4d31-9376-2132f0c4b6d9
+# ╟─c681fbe1-0dd8-4702-9910-9959288dc568
+# ╟─88f71931-00f9-43e6-bf9c-f681d83fd809
+# ╟─bf3247a7-06d1-498f-94e3-34923fb0a035
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
